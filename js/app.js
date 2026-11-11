@@ -477,7 +477,7 @@ function etapeTri(z, c, i, e) {
 function etapeQuiz(z, c, i, e) {
   let n = 0, erreurs = 0; const N = e.questions.length;
   z.innerHTML = `<h1>${h(e.titre)}</h1>${e.intro ? `<p class="prose question">${h(e.intro)}</p>` : ""}${e.doc || ""}${e.code ? blocCode(e.code) : ""}${e.widget ? `<div class="widget"></div>` : ""}<div class="quiz-q"></div>`;
-  if (e.widget === "knn") widgetKnn($(".widget", z));
+  const widget = e.widget === "knn" ? widgetKnn($(".widget", z)) : null;
   const zq = $(".quiz-q", z);
   const poser = () => {
     const q = e.questions[n]; let rate = false, fait = false;
@@ -491,7 +491,7 @@ function etapeQuiz(z, c, i, e) {
           zq.insertAdjacentHTML("beforeend", `<div class="quiz-expl" role="status"><p><strong>Exact.</strong> ${h(q.expl || "")}</p><button class="btn" id="suite">Question suivante</button></div>`);
           $("#suite", zq).onclick = () => { n++; poser(); $(".quiz-txt", zq).scrollIntoView({ block: "nearest" }); };
           $("#suite", zq).focus({ preventScroll: true });
-        } else bandeauSucces(zq, c, i, erreurs === 0 ? 3 : erreurs <= Math.ceil(N / 4) ? 2 : 1, q.expl);
+        } else { bandeauSucces(zq, c, i, erreurs === 0 ? 3 : erreurs <= Math.ceil(N / 4) ? 2 : 1, q.expl); if (widget) widget.reveler(); }
       } else { if (!rate) { rate = true; erreurs++; } b.classList.add("faux"); b.disabled = true; $(".retour-qcm", zq).textContent = "Ce n'est pas ça. Réessaie."; }
     });
   };
@@ -504,7 +504,7 @@ function widgetKnn(z) {
   const W = 340, H = 330, ML = 34, MB = 30, MT = 10, MR = 8, XM = 6.5, YM = 6.8;
   const X = x => ML + x / XM * (W - ML - MR), Y = y => H - MB - y / YM * (H - MT - MB);
   const fr = (v, d = 1) => v.toFixed(d).replace(".", ",");
-  let P = [4.0, 4.0], k = 1, atyp = false, glisse = false;
+  let P = [4.0, 4.0], k = 1, atyp = false, glisse = false, verdict = false;  // le verdict n'est affiché qu'une fois les questions réussies
   z.innerHTML = `<div class="knn">
     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Repère : longueur du corps en abscisse, longueur des antennes en ordonnée"></svg>
     <div class="knn-cmd">
@@ -529,7 +529,8 @@ function widgetKnn(z) {
     s += `<circle class="prise" cx="${X(P[0])}" cy="${Y(P[1])}" r="20"/><polygon class="inconnu" points="${etoile}"/>`;
     svg.innerHTML = s;
     $("#knn-x", z).value = P[0].toFixed(1); $("#knn-y", z).value = P[1].toFixed(1);
-    $(".knn-res", z).innerHTML = `Insecte en (${fr(P[0])} ; ${fr(P[1])}), k = ${k} : ${ns} sauterelle${ns > 1 ? "s" : ""} et ${k - ns} criquet${k - ns > 1 ? "s" : ""} parmi les voisins. Il est classé <strong>${classe}</strong>.<br><span class="muet">Voisins : ${vois.map(v => `${v.p[2] ? "sauterelle" : "criquet"} à ${fr(v.d, 2)}`).join(" ; ")}.</span>`;
+    $(".knn-res", z).innerHTML = `Insecte en (${fr(P[0])} ; ${fr(P[1])}), k = ${k}.<br>Distance${k > 1 ? "s" : ""} au${k > 1 ? "x" : ""} ${k > 1 ? k + " plus proches voisins" : "plus proche voisin"} : ${vois.map(v => fr(v.d, 2)).join(" ; ")}.<br>` +
+      (verdict ? `${ns} sauterelle${ns > 1 ? "s" : ""} et ${k - ns} criquet${k - ns > 1 ? "s" : ""} : l'insecte est classé <strong>${classe}</strong>.` : `<span class="muet">Repère sur le graphique à quels insectes mènent les traits, puis fais voter ces voisins.</span>`);
   };
   const borner = (v, m) => Math.round(Math.max(0, Math.min(m, v)) * 10) / 10;
   const viser = ev => { const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) * W / r.width, sy = (ev.clientY - r.top) * H / r.height; P = [borner((sx - ML) / (W - ML - MR) * XM, XM), borner((H - MB - sy) / (H - MT - MB) * YM, 6.5)]; dessiner(); };
@@ -547,6 +548,7 @@ function widgetKnn(z) {
   $("#knn-x", z).addEventListener("change", saisie); $("#knn-y", z).addEventListener("change", saisie);
   $("#knn-atyp", z).addEventListener("change", ev => { atyp = ev.target.checked; dessiner(); });
   dessiner();
+  return { reveler: () => { verdict = true; dessiner(); } };
 }
 
 function etapeCode(z, c, i, e) {

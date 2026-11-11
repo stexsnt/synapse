@@ -273,7 +273,7 @@ const PARCOURS = [
 <p class="formule">AB = √( (x<sub>B</sub> − x<sub>A</sub>)² + (y<sub>B</sub> − y<sub>A</sub>)² )</p>
 <p>À l'étape suivante, tu vas déplacer toi-même un insecte inconnu parmi les douze insectes connus et observer le vote de ses voisins.</p>` },
       { t: "quiz", titre: "Manipuler les plus proches voisins", widget: "knn",
-        intro: "Déplace l'insecte inconnu (l'étoile) et change la valeur de k. Les traits relient l'insecte à ses k plus proches voisins.",
+        intro: "Déplace l'insecte inconnu (l'étoile) et change la valeur de k. Les traits relient l'insecte à ses k plus proches voisins : à toi de les faire voter. Le verdict de la machine ne s'affichera qu'une fois les questions réussies.",
         questions: [
           { q: "Place l'insecte en N3 (3,0 ; 2,8). Avec k = 1, comment est-il classé ?", choix: ["Sauterelle", "Criquet"], bon: 0, expl: "Son plus proche voisin est la sauterelle (3,0 ; 4,0), à 1,2 cm." },
           { q: "Toujours en N3, passe à k = 3. Comment est-il classé ?", choix: ["Sauterelle", "Criquet"], bon: 1, expl: "Parmi ses trois voisins, il y a une sauterelle (distance 1,20) et deux criquets (distances 1,39 et 1,64). Le choix de k peut changer la réponse." },
