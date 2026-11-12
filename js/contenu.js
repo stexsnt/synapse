@@ -51,6 +51,13 @@ const TABLE_ZIPS = `<table class="donnees"><thead><tr><th>Créature</th><th>Tail
 <tr><td>5</td><td>10</td><td>2</td><td>verte</td><td>oui</td><th>Zip</th></tr><tr><td>6</td><td>28</td><td>3</td><td>rouge</td><td>non</td><th>Glop</th></tr>
 <tr><td>7</td><td>18</td><td>1</td><td>bleue</td><td>oui</td><th>Zip</th></tr><tr><td>8</td><td>22</td><td>2</td><td>verte</td><td>non</td><th>Glop</th></tr></tbody></table>`;
 
+const HISTO_PY = `# Décisions passées : (note du dossier, groupe, décision : 1 = admis, 0 = refusé)
+historique = [
+    (15, "A", 1), (12, "A", 1), (9, "A", 0), (13, "A", 1),
+    (11, "A", 0), (17, "A", 1), (14, "A", 1), (10, "A", 0),
+    (15, "B", 0), (12, "B", 0), (17, "B", 1), (14, "B", 0),
+    (18, "B", 1), (9, "B", 0), (16, "B", 1), (13, "B", 0)]
+`;
 const PARCOURS = [
 {
   id: "p1", titre: "Fonctionnement technique", sous: "Comprendre comment fonctionne une IA, sans prérequis scientifique avancé",
@@ -1019,10 +1026,433 @@ const PARCOURS = [
 {
   id: "p3", titre: "Éthique et responsabilité", sous: "Développer un esprit critique face aux enjeux éthiques et juridiques",
   chapitres: [
-    { id: "c8", num: 8, titre: "Biais et discriminations algorithmiques", resume: "Bientôt disponible", etapes: [] },
-    { id: "c9", num: 9, titre: "Désinformation et contenus générés", resume: "Bientôt disponible", etapes: [] },
-    { id: "c10", num: 10, titre: "Vie privée et données personnelles", resume: "Bientôt disponible", etapes: [] },
-    { id: "c11", num: 11, titre: "Responsabilité et cadre juridique", resume: "Bientôt disponible", etapes: [] },
+    { id: "c8", num: 8, titre: "Biais et discriminations algorithmiques", resume: "Origines des biais, variables indirectes, mesurer et réduire",
+    etapes: [
+      { t: "quiz", titre: "Le recruteur automatique", intro: "Une affaire révélée en 2018.",
+        doc: `<blockquote class="recit">À partir de 2014, une grande entreprise américaine de commerce en ligne développe un logiciel pour trier automatiquement les CV des candidats à des postes techniques. Le système apprend à partir des CV reçus pendant les dix années précédentes, en observant quels candidats avaient été recrutés. Les ingénieurs s'aperçoivent que le logiciel défavorise les candidates : il pénalise les CV contenant le mot « femmes » (par exemple « capitaine de l'équipe féminine d'échecs »). Malgré des corrections, l'entreprise abandonne le projet.</blockquote>`,
+        questions: [
+          { q: "Personne n'a programmé la règle « défavoriser les femmes ». D'où vient ce comportement ?", choix: ["D'une panne du logiciel.", "Des données d'entraînement : le système a appris à imiter les recrutements passés.", "D'un choix volontaire des ingénieurs."], bon: 1, expl: "Le système apprend ce que contiennent ses exemples." },
+          { q: "Pendant ces dix années, les personnes recrutées étaient en grande majorité des hommes. Qu'a donc « appris » le système ?", choix: ["Que les indices de féminité étaient associés à des refus.", "Que les femmes étaient moins compétentes.", "Rien de particulier."], bon: 0, expl: "Il a repéré une régularité dans les données, et l'a pénalisée." },
+          { q: "Pourquoi est-ce plus grave qu'un recruteur humain qui aurait le même préjugé ?", choix: ["Parce que le logiciel est plus lent.", "Parce qu'il applique ce préjugé à des milliers de candidatures, de façon systématique, avec une apparence d'objectivité.", "Parce qu'il coûte plus cher."], bon: 1, expl: "Personne ne le voit, et il est difficile à contester." },
+        ] },
+      { t: "qcm", titre: "À vous de juger", q: "On demande à un générateur d'images « un médecin », « un ingénieur », « une personne qui fait le ménage », « une personne pauvre ». Les images montrent souvent des hommes pour les deux premiers, des femmes ou des personnes racisées pour les deux derniers. D'où viennent ces stéréotypes ?",
+        choix: ["Du hasard.", "Des millions d'images et de légendes de l'entraînement, qui reflètent les représentations dominantes.", "D'une règle écrite par les programmeurs."], bon: 1,
+        expl: "Le modèle reproduit ce qui est le plus fréquent dans ses données." },
+      { t: "lecon", titre: "Biais et discrimination",
+        texte: `<p>Un <strong>biais algorithmique</strong> est une déformation systématique des résultats d'un système automatisé, qui favorise ou défavorise certaines situations ou certains groupes de personnes, sans justification légitime.</p>
+<p>Une <strong>discrimination</strong> est un traitement défavorable d'une personne en raison d'un critère interdit par la loi. En France, le code pénal en énumère plus de vingt, parmi lesquels l'origine, le sexe, l'âge, le handicap, l'état de santé, l'orientation sexuelle, les opinions politiques, les convictions religieuses ou le lieu de résidence. Une discrimination est illégale, qu'elle soit commise par un humain ou par un algorithme.</p>
+<p>Un biais n'est pas toujours une discrimination (une IA météo peut se tromper davantage en montagne), mais un biais qui touche des personnes selon un critère protégé en devient une.</p>` },
+      { t: "tri", titre: "Biais ou discrimination ?", q: "Simple biais, ou discrimination au sens de la loi ?", categories: ["Simple biais", "Discrimination"],
+        items: [
+          { txt: "Une IA de prévision météo se trompe plus souvent pour les villes de montagne.", cat: 0, expl: "Aucun critère protégé n'est en jeu." },
+          { txt: "Un logiciel de recrutement écarte systématiquement les candidats de plus de 50 ans.", cat: 1, expl: "L'âge est un critère protégé." },
+          { txt: "Un correcteur orthographique connaît mal les mots créoles.", cat: 0, expl: "Il fonctionne moins bien pour une langue ; il deviendrait une discrimination s'il servait à évaluer des personnes." },
+          { txt: "Un algorithme de location refuse plus souvent les personnes dont le prénom suggère une origine étrangère.", cat: 1, expl: "Le prénom sert ici de variable indirecte pour l'origine." },
+        ] },
+      { t: "lecon", titre: "D'où viennent les biais ?",
+        texte: `<ol class="phases"><li><strong>Les données historiques</strong> un système qui apprend à partir des décisions passées apprend aussi leurs injustices : c'est le cas du recruteur automatique</li><li><strong>Les données déséquilibrées</strong> si un groupe est peu présent dans les données, le système se trompe davantage à son sujet (visages mal reconnus, chapitre 2)</li><li><strong>Les choix de conception</strong> prédire « qui a coûté cher au système de santé » au lieu de « qui est le plus malade » peut défavoriser les personnes qui ont moins accès aux soins</li><li><strong>L'usage</strong> un modèle entraîné dans un pays et appliqué dans un autre, ou dont on applique les résultats sans réfléchir</li></ol>
+<p>Une <strong>variable indirecte</strong> (en anglais <em>proxy</em>) est une donnée apparemment neutre mais fortement liée à un critère protégé : le code postal peut être lié à l'origine ou au niveau de revenu, un prénom au sexe ou à l'origine, une activité sportive au sexe. Supprimer le critère protégé des données ne suffit donc pas : le système peut le « retrouver » à travers ces variables.</p>` },
+      { t: "tri", titre: "D'où vient le biais ?", q: "Indique l'origine principale du biais.", categories: ["Données historiques", "Données déséquilibrées", "Choix de conception", "Usage"],
+        items: [
+          { txt: "Un assistant vocal comprend mal les personnes qui ont un accent régional, car il a surtout été entraîné sur des voix de présentateurs radio.", cat: 1, expl: "Les accents régionaux sont peu présents dans les données." },
+          { txt: "Un logiciel de prêts bancaires refuse plus souvent les habitants de certains quartiers, car il a appris des refus passés.", cat: 0, expl: "Il reproduit les décisions passées." },
+          { txt: "Une application de détection de mélanomes, conçue avec des photos de peaux claires, est utilisée dans un pays où la majorité de la population a la peau foncée.", cat: 3, expl: "Le système est utilisé sur une autre population que celle de ses données." },
+          { txt: "Pour repérer les « bons élèves », un logiciel retient comme critère le nombre d'heures de soutien scolaire payant suivies.", cat: 2, expl: "Le critère retenu favorise les familles aisées." },
+        ] },
+      { t: "lecon", titre: "Des cas réels",
+        texte: `<table class="donnees large"><thead><tr><th>Domaine</th><th>Ce qui s'est passé</th></tr></thead><tbody>
+<tr><th>Recrutement</th><td>Un logiciel de tri de CV apprend des recrutements passés, majoritairement masculins, et pénalise les candidates (révélé en 2018).</td></tr>
+<tr><th>Justice</th><td>Aux États-Unis, une enquête du média ProPublica (2016) montre qu'un logiciel d'évaluation du risque de récidive classe à tort comme « à haut risque » deux fois plus souvent les accusés noirs que les accusés blancs.</td></tr>
+<tr><th>Reconnaissance faciale</th><td>L'étude <em>Gender Shades</em> (2018) montre des taux d'erreur bien plus élevés pour les femmes à la peau foncée.</td></tr>
+<tr><th>Prestations sociales</th><td>Aux Pays-Bas, un algorithme de détection de fraude aux allocations familiales cible de manière disproportionnée des familles d'origine étrangère : des milliers de familles sont accusées à tort. Le scandale entraîne la démission du gouvernement en 2021.</td></tr>
+<tr><th>Traduction</th><td>Des outils de traduction transforment une phrase neutre (dans une langue sans genre grammatical) en « il est médecin » et « elle est infirmière ».</td></tr></tbody></table>
+<aside class="retenir">Un algorithme n'est pas neutre « par nature » : il reproduit les choix de ceux qui le conçoivent et les déséquilibres des données dont il apprend. Plus grave, il peut <strong>amplifier</strong> ces injustices, car il les applique à grande échelle, rapidement, et sous une apparence d'objectivité mathématique.</aside>` },
+      { t: "quiz", titre: "Le jury d'admission", intro: "Une formation sélective veut automatiser ses admissions. Elle dispose des décisions de son jury pour seize candidats : la note du dossier (sur 20), un groupe (A ou B, par exemple deux types d'établissements d'origine) et la décision.",
+        doc: `<table class="donnees"><thead><tr><th>Groupe A</th><th>Décision</th><th>Groupe B</th><th>Décision</th></tr></thead><tbody><tr><td>15</td><td>admis</td><td>15</td><td>refusé</td></tr><tr><td>12</td><td>admis</td><td>12</td><td>refusé</td></tr><tr><td>9</td><td>refusé</td><td>17</td><td>admis</td></tr><tr><td>13</td><td>admis</td><td>14</td><td>refusé</td></tr><tr><td>11</td><td>refusé</td><td>18</td><td>admis</td></tr><tr><td>17</td><td>admis</td><td>9</td><td>refusé</td></tr><tr><td>14</td><td>admis</td><td>16</td><td>admis</td></tr><tr><td>10</td><td>refusé</td><td>13</td><td>refusé</td></tr></tbody></table>`,
+        questions: [
+          { q: "Quels sont les taux d'admission des deux groupes ?", choix: ["A : 62,5 % ; B : 37,5 %.", "A : 50 % ; B : 50 %.", "A : 37,5 % ; B : 62,5 %."], bon: 0, expl: "5 admis sur 8 dans le groupe A, 3 sur 8 dans le groupe B." },
+          { q: "La note moyenne est de 12,625 dans le groupe A et de 14,25 dans le groupe B. La différence de taux d'admission s'explique-t-elle par les notes ?", choix: ["Oui, le groupe A a de meilleures notes.", "Non : le groupe B a de meilleures notes, mais il est moins admis.", "On ne peut pas savoir."], bon: 1, expl: "101 ÷ 8 = 12,625 et 114 ÷ 8 = 14,25." },
+          { q: "À partir de quelle note les candidats sont-ils admis ?", choix: ["12 dans les deux groupes.", "12 dans le groupe A, 16 dans le groupe B.", "16 dans le groupe A, 12 dans le groupe B."], bon: 1, expl: "Le jury a appliqué un seuil plus exigeant au groupe B." },
+        ] },
+      { t: "code", titre: "Mesurer les taux", d: 2,
+        caches: ["taux_admission('A')", "taux_admission('B')", "taux_admission('A') + taux_admission('B')"],
+        enonce: `<p>Les décisions du jury sont rangées dans la liste <code>historique</code> : chaque élément contient la note, le groupe et la décision (1 = admis, 0 = refusé).</p><p>Complète la fonction <code>taux_admission(groupe)</code> : elle compte les candidats du groupe et ceux qui sont admis, puis renvoie le quotient.</p>`,
+        depart: HISTO_PY + `\ndef taux_admission(groupe):\n    total = 0\n    admis = 0\n    for (note, g, decision) in historique:\n        # à compléter\n        pass\n    return 0\n\nprint("Taux d'admission du groupe A :", taux_admission("A"))\nprint("Taux d'admission du groupe B :", taux_admission("B"))`,
+        solution: HISTO_PY + `\ndef taux_admission(groupe):\n    total = 0\n    admis = 0\n    for (note, g, decision) in historique:\n        if g == groupe:\n            total = total + 1\n            admis = admis + decision\n    return admis / total\n\nprint("Taux d'admission du groupe A :", taux_admission("A"))\nprint("Taux d'admission du groupe B :", taux_admission("B"))`,
+        tests: [{ appels: [["taux_admission('A')", "0.625"], ["taux_admission('B')", "0.375"]] }],
+        indices: ["Dans la boucle, ne compte que les candidats dont g est égal à groupe.", "Comme la décision vaut 1 ou 0, admis = admis + decision compte les admis.", "À la fin : return admis / total"] },
+      { t: "predire", titre: "Un modèle qui apprend le biais",
+        code: HISTO_PY + `\ndef predire(note, groupe):\n    # le candidat passé le plus proche... dans le même groupe\n    meilleure_distance = 1000\n    prediction = 0\n    for (n, g, decision) in historique:\n        if g == groupe:\n            d = abs(note - n)\n            if d < meilleure_distance:\n                meilleure_distance = d\n                prediction = decision\n    return prediction\n\nprint(predire(14, "A"), predire(14, "B"))`,
+        attendu: "1 0",
+        expl: "Deux candidats ont la même note, 14 : celui du groupe A est admis, celui du groupe B refusé. Le modèle a reproduit le double seuil du jury, car il cherche des voisins dans le même groupe. Les deux groupes sont traités différemment pour les notes de 12 à 15." },
+      { t: "code", titre: "Retirer le groupe", d: 2,
+        caches: ["predire(12)", "predire(9)", "predire(16)", "predire(11)"],
+        enonce: `<p>On décide que le modèle ne doit plus utiliser le groupe. Modifie la fonction pour qu'elle ne reçoive plus que la note : <code>predire(note)</code> cherche le candidat passé le plus proche parmi <strong>tous</strong> les candidats.</p>`,
+        depart: HISTO_PY + `\ndef predire(note, groupe):\n    meilleure_distance = 1000\n    prediction = 0\n    for (n, g, decision) in historique:\n        if g == groupe:\n            d = abs(note - n)\n            if d < meilleure_distance:\n                meilleure_distance = d\n                prediction = decision\n    return prediction\n\nprint(predire(14))`,
+        solution: HISTO_PY + `\ndef predire(note):\n    meilleure_distance = 1000\n    prediction = 0\n    for (n, g, decision) in historique:\n        d = abs(note - n)\n        if d < meilleure_distance:\n            meilleure_distance = d\n            prediction = decision\n    return prediction\n\nprint(predire(14))`,
+        tests: [{ appels: [["predire(14)", "1"], ["predire(10)", "0"], ["predire(18)", "1"]] }],
+        indices: ["Retire le paramètre groupe de la première ligne.", "Supprime la ligne if g == groupe: et décale les lignes suivantes vers la gauche."] },
+      { t: "quiz", titre: "Le problème est-il réglé ?", intro: "Sans le groupe, les deux candidats à 14 sont admis : la prédiction ne dépend plus que de la note.",
+        questions: [
+          { q: "Le modèle apprend toujours à partir des décisions passées du jury. Pourquoi cela reste-t-il un problème ?", choix: ["Parce que les étiquettes elles-mêmes sont biaisées : des candidats du groupe B ont été refusés avec 12, 13, 14 ou 15.", "Parce que le programme est plus lent.", "Parce que la liste est trop courte pour Python."], bon: 0, expl: "Ici, le résultat dépend même de l'ordre de la liste : à égalité de distance, le premier voisin rencontré est un candidat du groupe A. Avec d'autres données, le modèle reproduirait les refus injustes." },
+          { q: "Que faudrait-il faire ?", choix: ["Rien : le modèle est désormais équitable.", "Corriger ou rééquilibrer les données, mesurer les résultats par groupe et faire auditer le système.", "Ajouter plus de candidats refusés."], bon: 1, expl: "Retirer une colonne ne corrige pas les décisions passées." },
+          { q: "Dans la réalité, il n'y aurait pas de colonne « groupe », mais le nom du lycée d'origine ou le code postal. Le biais pourrait-il persister ?", choix: ["Non, ces données sont neutres.", "Oui : ce sont des variables indirectes, liées au groupe, qui permettent au modèle de retrouver la distinction supprimée."], bon: 1, expl: "Une donnée neutre en apparence peut être liée à un critère protégé." },
+        ] },
+      { t: "lecon", titre: "Réduire les biais",
+        texte: `<p>Il n'existe pas de solution miracle, mais plusieurs leviers, à combiner :</p>
+<ul><li><strong>Améliorer les données</strong> : les rendre plus représentatives, rééquilibrer les groupes, corriger les étiquettes injustes.</li><li><strong>Mesurer</strong> : comparer les résultats du système selon les groupes (taux d'erreur, taux d'acceptation). On parle d'<strong>audit</strong> lorsqu'une équipe extérieure vérifie le système.</li><li><strong>Choisir avec soin</strong> les descripteurs et ce que l'on veut prédire, en repérant les variables indirectes.</li><li><strong>Diversifier</strong> les équipes qui conçoivent les systèmes.</li><li><strong>Garder un humain</strong> dans la décision et permettre de contester une décision automatisée.</li><li><strong>Être transparent</strong> : expliquer comment le système fonctionne et sur quelles données.</li></ul>
+<aside class="savoir"><strong>Qu'est-ce qu'un système « équitable » ?</strong> Il existe plusieurs définitions mathématiques de l'<strong>équité</strong> : avoir le même taux d'acceptation dans chaque groupe, avoir le même taux d'erreur dans chaque groupe… Des chercheurs ont montré que, dans la plupart des situations réelles, il est impossible de satisfaire toutes ces définitions à la fois. Choisir laquelle appliquer n'est pas une question technique : c'est un choix de société.</aside>` },
+      { t: "quiz", titre: "Calculer des taux d'erreur", intro: "Un logiciel de reconnaissance faciale a été testé sur 1 000 photos d'hommes et 1 000 photos de femmes. Il s'est trompé sur 8 photos d'hommes et sur 95 photos de femmes.",
+        questions: [
+          { q: "Quels sont les taux d'erreur ?", choix: ["Hommes : 8 % ; femmes : 95 %.", "Hommes : 0,8 % ; femmes : 9,5 %.", "Hommes : 0,08 % ; femmes : 0,95 %."], bon: 1, expl: "8 ÷ 1 000 et 95 ÷ 1 000." },
+          { q: "Le fabricant annonce « un taux d'erreur global d'environ 5 % ». Ce chiffre est-il exact ?", choix: ["Oui : (8 + 95) ÷ 2 000 = 5,15 %.", "Non, il est de 10 %.", "Non, il est de 1 %."], bon: 0, expl: "Le chiffre est exact… et pourtant trompeur." },
+          { q: "Pourquoi cette présentation est-elle trompeuse ?", choix: ["Parce que 5 %, c'est beaucoup.", "Parce que ce taux moyen cache un écart énorme : les femmes subissent près de douze fois plus d'erreurs que les hommes.", "Parce que le test est trop petit."], bon: 1, expl: "Il faut publier et contrôler les taux d'erreur par groupe." },
+          { q: "Quelle cause est la plus probable ?", choix: ["Beaucoup moins de photos de femmes dans les données d'entraînement.", "Un appareil photo défectueux.", "Un ordinateur trop lent."], bon: 0, expl: "Solution : rééquilibrer les données, puis mesurer par groupe." },
+        ] },
+      { t: "quiz", titre: "La variable cachée", intro: "Une entreprise supprime les colonnes « sexe » et « âge » de son logiciel de tri de CV pour le rendre équitable. Elle garde le prénom, l'année d'obtention du diplôme, les loisirs et l'adresse.",
+        questions: [
+          { q: "Quelle donnée conservée permet de calculer l'âge ?", choix: ["L'adresse.", "L'année d'obtention du diplôme.", "Les loisirs."], bon: 1, expl: "C'est une variable indirecte de l'âge." },
+          { q: "Quelle donnée permet souvent de deviner le sexe ?", choix: ["Le prénom.", "L'année du diplôme.", "Le code postal."], bon: 0, expl: "Certains loisirs y sont aussi statistiquement liés ; l'adresse peut être liée à l'origine ou au revenu." },
+          { q: "Quelle mesure serait plus efficace ?", choix: ["Supprimer aussi la colonne « nom ».", "Supprimer les variables indirectes inutiles au poste, mesurer les résultats selon le sexe et l'âge, faire auditer le système et garder une décision humaine.", "Ne rien changer."], bon: 1, expl: "Supprimer le critère protégé ne suffit pas." },
+        ] },
+      { t: "quiz", titre: "Réduire un biais", intro: "Un lycée envisage un logiciel qui prédit le risque de décrochage scolaire, entraîné sur les données des dix dernières années : notes, absences, quartier, profession des parents, bourse.",
+        questions: [
+          { q: "Quels descripteurs risquent d'introduire un biais ?", choix: ["Les notes et les absences.", "Le quartier et la profession des parents.", "Aucun."], bon: 1, expl: "Ce sont des indicateurs sociaux, pas des comportements scolaires : ils risquent d'enfermer les élèves dans leur milieu d'origine. La bourse aussi." },
+          { q: "Quelle conséquence injuste peut-on craindre ?", choix: ["Un élève boursier aux bons résultats est classé « à risque » et orienté d'office vers un dispositif de remédiation.", "Les notes des élèves baissent toutes.", "Le logiciel refuse de fonctionner."], bon: 0, expl: "Ce classement le stigmatise." },
+          { q: "Quelle règle d'utilisation est la plus protectrice ?", choix: ["Laisser le logiciel décider seul des orientations.", "Garder le classement secret.", "Ne jamais prendre de décision automatique : le logiciel alerte seulement une équipe éducative, et les familles sont informées et peuvent contester."], bon: 2, expl: "On peut aussi n'utiliser que des indicateurs scolaires, et vérifier régulièrement que le logiciel ne cible pas davantage certains groupes." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Un biais algorithmique est…", choix: ["une déformation systématique des résultats qui favorise ou défavorise certains groupes.", "une panne d'ordinateur.", "une erreur de frappe dans le code.", "un virus informatique."], bon: 0, expl: "Sans justification légitime." },
+          { q: "Un système qui apprend à partir de décisions passées injustes…", choix: ["corrige automatiquement ces injustices.", "ne peut pas fonctionner.", "risque de reproduire ces injustices.", "devient neutre."], bon: 2, expl: "Il apprend aussi les injustices de ses exemples." },
+          { q: "Une variable indirecte (proxy) est…", choix: ["une variable Python mal nommée.", "un serveur informatique.", "une donnée chiffrée.", "une donnée neutre en apparence mais liée à un critère protégé."], bon: 3, expl: "Par exemple un prénom ou un code postal." },
+          { q: "Le code postal peut servir de variable indirecte car il est souvent lié…", choix: ["à la météo.", "au niveau de revenu ou à l'origine.", "à la taille.", "au groupe sanguin."], bon: 1, expl: "Le système peut « retrouver » le critère protégé." },
+          { q: "Une discrimination commise par un algorithme est…", choix: ["autorisée, car un algorithme est neutre.", "impossible.", "autorisée si elle est rare.", "illégale, comme une discrimination commise par un humain."], bon: 3, expl: "La loi s'applique dans les deux cas." },
+          { q: "Pourquoi un biais algorithmique peut-il être plus grave qu'un préjugé individuel ?", choix: ["Parce qu'il est toujours volontaire.", "Parce qu'il est appliqué à grande échelle avec une apparence d'objectivité.", "Parce qu'il coûte cher.", "Parce qu'il est visible de tous."], bon: 1, expl: "Il peut amplifier les injustices." },
+          { q: "Un logiciel se trompe sur 2 % des hommes et 20 % des femmes. Pour révéler ce biais, il faut…", choix: ["regarder seulement le taux d'erreur global.", "augmenter la vitesse du logiciel.", "comparer les taux d'erreur par groupe.", "supprimer les femmes des tests."], bon: 2, expl: "Un taux moyen peut cacher un écart énorme." },
+          { q: "Supprimer la colonne « sexe » d'un jeu de données…", choix: ["ne suffit pas toujours, à cause des variables indirectes.", "supprime forcément tout biais lié au sexe.", "est interdit.", "rend le système plus rapide."], bon: 0, expl: "Le prénom ou les loisirs peuvent le révéler." },
+          { q: "Un audit d'algorithme consiste à…", choix: ["vendre un algorithme.", "effacer un algorithme.", "traduire un algorithme en Python.", "vérifier le fonctionnement et les effets d'un système, par une équipe extérieure."], bon: 3, expl: "On y compare notamment les résultats par groupe." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Biais algorithmique.</strong> Déformation systématique des résultats, qui favorise ou défavorise certains groupes sans justification légitime.</p>
+<p><strong>Discrimination.</strong> Traitement défavorable selon un critère interdit par la loi (origine, sexe, âge, handicap…). Elle est illégale, qu'elle vienne d'un humain ou d'un algorithme.</p>
+<p><strong>Quatre origines.</strong> Données historiques, données déséquilibrées, choix de conception, usage.</p>
+<p><strong>Variable indirecte.</strong> Donnée neutre en apparence mais liée à un critère protégé (code postal, prénom) : supprimer le critère ne suffit pas.</p>
+<p><strong>Amplification.</strong> Un algorithme applique ses biais à grande échelle, vite, sous une apparence d'objectivité.</p>
+<p><strong>Réduire les biais.</strong> Améliorer les données, mesurer par groupe (audit), choisir les descripteurs, diversifier les équipes, garder un humain, être transparent.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>définir un biais algorithmique et une discrimination</li><li>identifier l'origine d'un biais</li><li>repérer une variable indirecte</li><li>calculer et comparer des taux par groupe</li><li>proposer des moyens de réduire un biais</li></ul>` },
+    ] },
+    { id: "c9", num: 9, titre: "Désinformation et contenus générés", resume: "Hypertrucages, indices, vérifications de contexte, loi et réflexes",
+    etapes: [
+      { t: "tri", titre: "Vrai ou généré ?", q: "Quatre contenus ont circulé sur les réseaux sociaux. Quelle est ta première impression ?", categories: ["Authentique", "Fabriqué"],
+        items: [
+          { txt: "Mars 2023 : une photo du pape François vêtu d'une immense doudoune blanche à la mode.", cat: 1, expl: "Une image générée par IA." },
+          { txt: "Mars 2022 : une vidéo du président ukrainien Volodymyr Zelensky appelant ses soldats à déposer les armes.", cat: 1, expl: "Une vidéo truquée." },
+          { txt: "Mai 2023 : une photo d'une explosion près du Pentagone, à Washington, partagée par des comptes d'apparence officielle.", cat: 1, expl: "Une image générée. Elle a même provoqué une brève baisse des marchés financiers américains avant d'être démentie." },
+          { txt: "Janvier 2024 : des appels téléphoniques où la voix du président américain demande aux électeurs de ne pas voter à une élection primaire.", cat: 1, expl: "Une voix clonée." },
+        ],
+        expl: "Les quatre contenus étaient fabriqués grâce à l'IA. Les motifs varient : se divertir ou faire le « buzz », gagner de l'argent, déstabiliser un pays, influencer une élection." },
+      { t: "qcm", titre: "Du moins grave au plus grave", q: "Lequel de ces quatre contenus a, selon toi, les conséquences les plus graves ? (La réponse proposée est un exemple de classement : d'autres se défendent, s'ils sont justifiés.)",
+        choix: ["La photo du pape en doudoune.", "La photo de l'explosion près du Pentagone.", "Les appels avec la voix clonée du président, qui manipulent directement une élection."], bon: 2,
+        expl: "Un classement possible : la photo du pape (amusante, peu de conséquences, mais elle montre la facilité de tromper), la photo du Pentagone (panique, effet sur les marchés), la vidéo de Zelensky (démoraliser une armée en guerre), les appels (manipulation directe d'une élection)." },
+      { t: "lecon", titre: "Désinformation et hypertrucages",
+        texte: `<p>La <strong>désinformation</strong> est la diffusion <strong>volontaire</strong> d'informations fausses ou trompeuses, dans le but de nuire, de manipuler ou de tirer profit. La <strong>mésinformation</strong> est la diffusion d'une information fausse <strong>sans intention</strong> de tromper : par exemple, partager de bonne foi une rumeur.</p>
+<p>Un <strong>hypertrucage</strong> (en anglais <em>deepfake</em>) est une image, un son ou une vidéo créé ou modifié par l'IA pour faire croire qu'une personne a dit ou fait ce qu'elle n'a ni dit ni fait, ou qu'un événement a eu lieu alors qu'il n'a jamais existé.</p>
+<p>Les principales formes de contenus trompeurs générés par IA :</p>
+<ul><li><strong>les images générées</strong> : scène inventée, photo truquée d'une personnalité ;</li><li><strong>les vidéos truquées</strong> : remplacement de visage, mouvement des lèvres synchronisé sur un faux discours ;</li><li><strong>le clonage vocal</strong> : quelques secondes d'enregistrement suffisent pour imiter une voix, utilisée pour des arnaques (« Maman, j'ai eu un accident, envoie-moi de l'argent ») ;</li><li><strong>les textes générés en masse</strong> : faux avis de consommateurs, faux comptes qui publient des milliers de messages, faux sites d'information.</li></ul>` },
+      { t: "tri", titre: "Désinformation ou mésinformation ?", q: "Classe chaque situation.", categories: ["Désinformation", "Mésinformation"],
+        items: [
+          { txt: "Un groupe crée de faux sites d'information pour diffuser de fausses nouvelles avant une élection.", cat: 0, expl: "Volontaire, pour manipuler." },
+          { txt: "Ta grand-mère partage une fausse image d'un animal extraordinaire, croyant qu'elle est vraie.", cat: 1, expl: "De bonne foi." },
+          { txt: "Une entreprise publie des centaines de faux avis positifs générés par IA sur ses produits.", cat: 0, expl: "Volontaire, pour tirer profit ; c'est aussi une pratique commerciale trompeuse." },
+          { txt: "Un élève relaie une rumeur sur la fermeture du lycée, sans vérifier.", cat: 1, expl: "Sans intention de tromper, même s'il aurait dû vérifier." },
+        ] },
+      { t: "lecon", titre: "Pourquoi l'IA change la donne",
+        texte: `<p>Les trucages existent depuis l'invention de la photographie. Ce qui change avec l'IA :</p>
+<table class="donnees large"><thead><tr><th>Avant</th><th>Aujourd'hui</th></tr></thead><tbody>
+<tr><td>Coûteux et lent</td><td>quelques secondes et un téléphone suffisent</td></tr>
+<tr><td>Réservé à des experts</td><td>accessible à tous, sans compétence technique</td></tr>
+<tr><td>Trucages souvent visibles</td><td>résultats de plus en plus réalistes</td></tr>
+<tr><td>Diffusion limitée</td><td>propagation virale par les réseaux sociaux, qui favorisent les contenus choquants</td></tr></tbody></table>
+<aside class="retenir"><strong>Le « dividende du menteur ».</strong> L'existence des hypertrucages a un effet pervers : une personnalité prise en flagrant délit sur une vraie vidéo peut prétendre qu'il s'agit d'un trucage. Quand tout peut être faux, on finit par douter de tout, y compris du vrai. C'est pourquoi la vérification du <strong>contexte</strong> et des <strong>sources</strong> devient essentielle.</aside>
+<p>Les hypertrucages ont aussi des victimes directes : harcèlement, en particulier au moyen de fausses images à caractère sexuel visant très majoritairement des femmes et des adolescentes, usurpation d'identité, arnaques. Ce sont des infractions graves.</p>` },
+      { t: "quiz", titre: "Le dividende du menteur", intro: "Une vraie vidéo montre un élu en train d'insulter un journaliste. L'élu déclare : « C'est un deepfake fabriqué par mes adversaires. »",
+        questions: [
+          { q: "Pourquoi cette défense est-elle rendue possible par l'existence des hypertrucages ?", choix: ["Parce que toutes les vidéos sont désormais fausses.", "Parce que l'on sait qu'il est facile de fabriquer de fausses vidéos : n'importe quelle vidéo compromettante peut être contestée.", "Parce que la loi interdit de filmer les élus."], bon: 1, expl: "Le doute profite au menteur." },
+          { q: "Comment des journalistes pourraient-ils établir que la vidéo est authentique ?", choix: ["En demandant son avis à l'élu.", "En retrouvant le fichier original et les témoins, et en recoupant avec d'autres enregistrements de la scène.", "En comptant les partages."], bon: 1, expl: "Ils peuvent aussi analyser les métadonnées et la chaîne de diffusion." },
+        ] },
+      { t: "lecon", titre: "Repérer un contenu généré",
+        texte: `<p><strong>Les indices visuels et sonores</strong> sont utiles, mais de moins en moins fiables à mesure que les outils progressent :</p>
+<ul><li><strong>les mains et les détails</strong> : doigts en trop ou fusionnés, bijoux ou lunettes asymétriques, dents irrégulières ;</li><li><strong>les textes</strong> dans l'image : lettres déformées, mots qui n'existent pas sur les panneaux ;</li><li><strong>la lumière</strong> : ombres incohérentes, reflets absents dans les yeux ou les vitres ;</li><li><strong>l'arrière-plan</strong> : objets fondus les uns dans les autres, foule aux visages flous ou répétés ;</li><li><strong>en vidéo</strong> : clignements des yeux rares, lèvres mal synchronisées, contours du visage qui « bougent » ;</li><li><strong>en audio</strong> : voix monotone, respiration absente, sons de fond incohérents.</li></ul>
+<p><strong>Les vérifications de contexte</strong> sont plus sûres :</p>
+<ol class="phases"><li><strong>Source</strong> qui publie ? Le compte est-il authentique, ancien, connu ?</li><li><strong>Origine</strong> recherche d'image inversée : où et quand l'image est-elle apparue la première fois ?</li><li><strong>Recoupement</strong> des médias fiables en parlent-ils ? Une cellule de vérification l'a-t-elle analysée ?</li><li><strong>Plausibilité</strong> l'événement est-il cohérent avec ce que l'on sait par ailleurs ?</li></ol>
+<p>Une <strong>recherche d'image inversée</strong> consiste à soumettre une image à un moteur de recherche pour retrouver les pages où elle (ou une image semblable) apparaît. On peut ainsi découvrir qu'une photo « d'actualité » date de plusieurs années, a été prise ailleurs, ou a déjà été démentie.</p>
+<aside class="savoir"><strong>Marquage et filigranes.</strong> Des entreprises et des médias développent des systèmes pour indiquer l'origine d'un contenu : filigranes invisibles insérés dans les images générées, « certificats de contenu » qui retracent l'histoire d'une photo. Ces dispositifs sont utiles, mais ils ne couvrent pas tous les outils et peuvent parfois être retirés : ils complètent l'esprit critique sans le remplacer.</aside>` },
+      { t: "tri", titre: "Indice ou vérification ?", q: "Chaque geste relève-t-il des indices visuels et sonores, ou des vérifications de contexte ?", categories: ["Indice visuel ou sonore", "Vérification de contexte"],
+        items: [
+          { txt: "Compter les doigts d'une main sur la photo.", cat: 0, expl: "Un détail de l'image." },
+          { txt: "Chercher qui a publié l'image en premier.", cat: 1, expl: "On vérifie la source." },
+          { txt: "Lire les inscriptions d'un panneau à l'arrière-plan.", cat: 0, expl: "Les lettres déformées trahissent souvent une image générée." },
+          { txt: "Faire une recherche d'image inversée.", cat: 1, expl: "On remonte à l'origine." },
+          { txt: "Écouter si la voix respire entre les phrases.", cat: 0, expl: "Un indice sonore." },
+          { txt: "Chercher si un média fiable a analysé le contenu.", cat: 1, expl: "On recoupe." },
+        ] },
+      { t: "quiz", titre: "Les indices", intro: "Une photo virale montre un célèbre footballeur tenant une pancarte de soutien à un parti politique. De près, on remarque six doigts à la main gauche, des lettres illisibles sur la pancarte, et aucune ombre sous les pieds des personnes.",
+        questions: [
+          { q: "Que peut-on en conclure ?", choix: ["L'image est authentique.", "L'image est très probablement générée ou truquée.", "On ne peut rien dire."], bon: 1, expl: "Trois indices visuels concordants." },
+          { q: "Ces indices suffiraient-ils si l'image avait été parfaitement réalisée ?", choix: ["Oui, il y a toujours un défaut visible.", "Non : il faudrait vérifier qui a publié en premier, faire une recherche d'image inversée et chercher si des médias fiables ou le joueur en parlent."], bon: 1, expl: "Un contenu bien réalisé peut ne présenter aucun défaut visible. On se demande aussi si la scène est plausible." },
+        ] },
+      { t: "tri", titre: "Évaluer un risque", q: "Évalue le risque de désinformation, en tenant compte de l'auteur, de la diffusion et des conséquences possibles.", categories: ["Faible", "Moyen à élevé", "Élevé"],
+        items: [
+          { txt: "Une image générée d'un chat astronaute, publiée par un compte d'art numérique qui indique « image créée par IA ».", cat: 0, expl: "L'image est déclarée comme générée et ne prétend représenter aucun fait réel." },
+          { txt: "Un faux enregistrement audio d'un candidat tenant des propos racistes, diffusé la veille d'une élection.", cat: 2, expl: "Aucun temps pour démentir, et le résultat du vote peut changer ; c'est aussi une atteinte grave à une personne." },
+          { txt: "Une fausse photo d'inondation dans ta ville, partagée dans un groupe de messagerie de quartier.", cat: 1, expl: "Un groupe de quartier diffuse vite ; l'information peut provoquer une panique ou des déplacements dangereux. On vérifie auprès de la mairie ou des secours." },
+        ] },
+      { t: "quiz", titre: "L'arnaque à la voix", intro: "Le père de Mathis reçoit un appel. Il entend la voix de son fils, paniquée : « Papa, j'ai perdu mon téléphone et mon portefeuille, envoie vite 300 € sur ce compte, c'est urgent ! »",
+        questions: [
+          { q: "Quelle technique a probablement été utilisée ?", choix: ["La recherche d'image inversée.", "Le clonage vocal, à partir de vidéos publiées par Mathis ou d'un appel précédent.", "Un filigrane."], bon: 1, expl: "Quelques secondes d'enregistrement suffisent." },
+          { q: "Quels éléments de l'appel doivent alerter ?", choix: ["L'urgence, la demande d'argent, le compte inhabituel et l'impossibilité supposée de joindre Mathis autrement.", "Le fait que Mathis dise « Papa ».", "L'heure de l'appel."], bon: 0, expl: "L'urgence empêche de réfléchir : c'est le but." },
+          { q: "Quel réflexe protège le mieux ?", choix: ["Envoyer la moitié de la somme.", "Raccrocher et rappeler Mathis sur son numéro habituel ; convenir en famille d'un mot de passe secret.", "Demander à la voix de répéter."], bon: 1, expl: "On peut aussi limiter les vidéos publiques où l'on parle longuement." },
+        ] },
+      { t: "lecon", titre: "Ce que dit la loi, et que faire",
+        texte: `<p><strong>En Europe</strong>, le règlement sur l'IA impose des obligations de <strong>transparence</strong>, applicables à partir d'août 2026 : les personnes doivent être informées qu'elles échangent avec une IA, les contenus générés doivent porter un marquage détectable par machine, et les hypertrucages doivent être signalés comme tels par ceux qui les diffusent.</p>
+<p><strong>En France</strong>, publier sans son consentement un montage réalisé à partir de l'image ou des paroles d'une personne, sans qu'il soit évident qu'il s'agit d'un montage, est un délit. La loi de 2024 visant à sécuriser et réguler l'espace numérique a étendu cette infraction aux contenus générés par IA et prévu des peines aggravées pour les hypertrucages à caractère sexuel. Le harcèlement, l'escroquerie ou la diffusion de fausses nouvelles peuvent également être poursuivis.</p>
+<aside class="retenir"><strong>Face à un contenu douteux</strong><br><strong>Je ne partage pas</strong> un contenu dont je ne suis pas sûr : partager, même pour le dénoncer, aide à le diffuser.<br><strong>Je vérifie</strong> la source, l'origine et le contexte.<br><strong>Je signale</strong> le contenu à la plateforme ; s'il est illicite (harcèlement, images sexuelles truquées, arnaque, menace), je le signale aussi sur <strong>Pharos</strong> (internet-signalement.gouv.fr).<br><strong>Si j'en suis victime</strong>, je garde des preuves (captures d'écran, liens), j'en parle à un adulte de confiance et je peux appeler le <strong>3018</strong>, numéro national gratuit contre les violences numériques pour les jeunes.</aside>` },
+      { t: "quiz", titre: "Que faire ?", intro: "Dans le groupe de discussion de la classe circule une image truquée, humiliante, représentant une élève de seconde.",
+        questions: [
+          { q: "Qui peut engager sa responsabilité ?", choix: ["Personne : ce n'est qu'une image.", "Seulement la personne qui a fabriqué l'image.", "La personne qui a fabriqué et diffusé l'image, mais aussi ceux qui la relaient."], bon: 2, expl: "Un montage diffusé sans consentement est un délit, et il peut s'agir de harcèlement. Les peines sont aggravées pour une image à caractère sexuel, et plus encore quand la victime est mineure." },
+          { q: "Que doivent faire les élèves qui reçoivent l'image ?", choix: ["La transférer à un ami pour avoir son avis.", "Ne ni la transférer ni la commenter, la signaler, et prévenir un adulte de l'établissement.", "Répondre par une plaisanterie."], bon: 1, expl: "Chaque transfert étend la diffusion." },
+          { q: "Que peut faire la victime ?", choix: ["Effacer la conversation et attendre que cela passe.", "Garder des preuves, en parler à un adulte de confiance, appeler le 3018, signaler sur Pharos ; elle peut porter plainte avec ses parents.", "Quitter le lycée."], bon: 1, expl: "Les captures d'écran et les liens servent de preuves." },
+          { q: "Pourquoi « juste transférer » l'image n'est-il pas un acte anodin ?", choix: ["Parce que chaque transfert multiplie l'humiliation de la victime : relayer, c'est participer au harcèlement, et c'est puni par la loi.", "Parce que cela consomme des données mobiles.", "Parce que l'image perd en qualité."], bon: 0, expl: "Relayer, c'est diffuser." },
+        ] },
+      { t: "ordre", texte: true, titre: "Enquête sur une image", q: "Range dans l'ordre les étapes d'une enquête sur une image douteuse.",
+        lignes: ["J'observe l'image à la recherche d'indices visuels.", "Je fais une recherche d'image inversée.", "Je note la date et le site de la plus ancienne publication.", "Je cherche si un média ou une cellule de vérification l'a déjà analysée.", "Je rédige ma conclusion : verdict, degré de certitude, preuves."],
+        expl: "Une bonne conclusion distingue ce qui est établi de ce qui est supposé." },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Un hypertrucage (deepfake) est…", choix: ["un virus informatique.", "un réseau social.", "un contenu créé ou modifié par IA pour faire croire à quelque chose de faux.", "un filtre photo qui rend la peau lisse."], bon: 2, expl: "Image, son ou vidéo." },
+          { q: "La désinformation se distingue de la mésinformation par…", choix: ["la langue utilisée.", "l'intention de tromper.", "la longueur du message.", "le support (image ou texte)."], bon: 1, expl: "La désinformation est volontaire." },
+          { q: "Le clonage vocal permet…", choix: ["de traduire un texte.", "de couper le son d'une vidéo.", "d'enregistrer une conversation.", "d'imiter la voix d'une personne à partir de quelques enregistrements."], bon: 3, expl: "Quelques secondes suffisent." },
+          { q: "Une recherche d'image inversée permet de…", choix: ["retrouver où et quand une image a déjà été publiée.", "retourner une image à l'envers.", "supprimer une image d'Internet.", "améliorer la qualité d'une image."], bon: 0, expl: "On remonte à l'origine de l'image." },
+          { q: "Lequel de ces indices peut signaler une image générée ?", choix: ["Une image en noir et blanc.", "Une photo prise de nuit.", "Une image de petite taille.", "Des lettres déformées sur un panneau."], bon: 3, expl: "Comme les doigts en trop ou les ombres incohérentes." },
+          { q: "Le « dividende du menteur » désigne le fait que…", choix: ["les menteurs gagnent de l'argent grâce à l'IA.", "les deepfakes sont rémunérés.", "l'on peut faire passer un contenu vrai pour un trucage.", "les IA mentent pour gagner des points."], bon: 2, expl: "Quand tout peut être faux, on doute aussi du vrai." },
+          { q: "En Europe, le règlement sur l'IA impose que les hypertrucages…", choix: ["soient signalés comme tels par ceux qui les diffusent.", "soient interdits dans tous les cas.", "soient réservés aux journalistes.", "soient payants."], bon: 0, expl: "C'est une obligation de transparence." },
+          { q: "Face à une image choquante dont on n'est pas sûr, le bon réflexe est de…", choix: ["la partager pour prévenir tout le monde.", "ne pas la partager et vérifier sa source.", "la modifier.", "l'imprimer."], bon: 1, expl: "Partager, même pour dénoncer, aide à diffuser." },
+          { q: "Pharos est…", choix: ["un logiciel de retouche.", "un réseau social.", "un générateur d'images.", "la plateforme officielle de signalement des contenus illicites en ligne."], bon: 3, expl: "internet-signalement.gouv.fr" },
+          { q: "Le 3018 est…", choix: ["le numéro de la météo.", "un numéro gratuit d'aide contre les violences numériques pour les jeunes.", "un modèle de langage.", "un code postal."], bon: 1, expl: "Un numéro national gratuit." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Désinformation</strong> : diffusion volontaire d'informations fausses. <strong>Mésinformation</strong> : diffusion sans intention de tromper.</p>
+<p><strong>Hypertrucage.</strong> Image, son ou vidéo créé ou modifié par IA pour faire croire à quelque chose de faux : images générées, vidéos truquées, clonage vocal, textes en masse.</p>
+<p><strong>Ce qui change.</strong> Rapide, accessible à tous, réaliste, viral. <strong>Dividende du menteur</strong> : un contenu vrai peut être présenté comme un trucage.</p>
+<p><strong>Repérer.</strong> Les indices visuels et sonores aident, mais les vérifications de contexte sont plus sûres : <strong>source</strong>, <strong>origine</strong> (recherche d'image inversée), <strong>recoupement</strong>, <strong>plausibilité</strong>.</p>
+<p><strong>La loi.</strong> Transparence imposée par le règlement européen ; en France, le montage sans consentement est un délit, aggravé pour les contenus à caractère sexuel.</p>
+<p><strong>Les réflexes.</strong> Je ne partage pas, je vérifie, je signale (plateforme, Pharos) ; victime, je garde des preuves, j'en parle, j'appelle le 3018.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>distinguer désinformation et mésinformation</li><li>définir un hypertrucage et citer ses formes</li><li>repérer des indices visuels et sonores</li><li>mener les quatre vérifications de contexte</li><li>réagir face à un contenu douteux ou illicite</li></ul>` },
+    ] },
+    { id: "c10", num: 10, titre: "Vie privée et données personnelles", resume: "Données sensibles, inférences, RGPD, droits et bons réflexes",
+    etapes: [
+      { t: "quiz", titre: "Quelles données est-ce que je donne aux IA ?", intro: "Sofia, 15 ans, discute avec un assistant conversationnel grand public.",
+        doc: `<blockquote class="recit"><strong>Sofia :</strong> Salut ! Je m'appelle Sofia Martin, je suis en 2de4 au lycée des Tilleuls. Tu peux m'aider à écrire un message pour ma prof principale ? Je n'étais pas là mardi parce que j'avais rendez-vous chez le psychologue pour mes crises d'angoisse.<br><strong>Assistant :</strong> Bien sûr ! Voici une proposition de message…<br><strong>Sofia :</strong> Merci. Et pour le week-end, on fait une fête chez moi, 12 rue des Lilas, mes parents sont absents. Écris une invitation sympa. Je te mets la photo de la maison pour l'illustrer.</blockquote>`,
+        questions: [
+          { q: "Quelles informations sont les plus sensibles ?", choix: ["Son prénom et sa classe.", "Ses données de santé, et son adresse combinée à l'absence de ses parents et à la photo de la maison.", "Le jour de son absence."], bon: 1, expl: "Les données de santé sont sensibles au sens du RGPD ; l'adresse, l'absence des parents et la photo posent un problème de sécurité." },
+          { q: "Lesquelles étaient vraiment nécessaires pour obtenir l'aide demandée ?", choix: ["Toutes.", "Son nom et son lycée.", "Aucune."], bon: 2, expl: "« Je suis élève de seconde, j'étais absente pour un rendez-vous médical » suffisait ; l'invitation pouvait s'écrire sans adresse ni photo." },
+          { q: "Que peut devenir cette conversation une fois envoyée ?", choix: ["Elle disparaît aussitôt.", "Elle peut être conservée, relue, utilisée pour entraîner des modèles selon les réglages, exposée en cas de fuite.", "Elle est envoyée à son lycée."], bon: 1, expl: "Une conversation avec un assistant n'est pas un journal intime." },
+        ] },
+      { t: "lecon", titre: "Données personnelles et données sensibles",
+        texte: `<p>Une <strong>donnée personnelle</strong> est toute information se rapportant à une personne physique identifiée ou identifiable, <strong>directement</strong> (nom, photo du visage) ou <strong>indirectement</strong> (numéro de téléphone, adresse IP, plaque d'immatriculation, ou la combinaison de plusieurs informations : date de naissance, commune et lycée).</p>
+<p>Certaines données personnelles sont dites <strong>sensibles</strong> : origine, opinions politiques, convictions religieuses, appartenance syndicale, données de santé, données génétiques et biométriques, vie et orientation sexuelles. Leur traitement est en principe interdit, sauf exceptions strictement encadrées.</p>` },
+      { t: "tri", titre: "Personnelle, sensible, ou non ?", q: "Classe chaque information.", categories: ["Personnelle ordinaire", "Personnelle sensible", "Non personnelle"],
+        items: [
+          { txt: "Ton adresse électronique.", cat: 0, expl: "Elle se rapporte à une personne identifiable." },
+          { txt: "La température moyenne à Limoges en juillet.", cat: 2, expl: "Elle ne concerne aucune personne." },
+          { txt: "Ton groupe sanguin.", cat: 1, expl: "Une donnée de santé." },
+          { txt: "Ta religion.", cat: 1, expl: "Les convictions religieuses sont des données sensibles." },
+          { txt: "Le nombre d'élèves de seconde en France.", cat: 2, expl: "Une statistique, qui n'identifie personne." },
+          { txt: "L'adresse IP de ton ordinateur.", cat: 0, expl: "Elle identifie indirectement." },
+          { txt: "Ton empreinte digitale.", cat: 1, expl: "Une donnée biométrique." },
+        ] },
+      { t: "lecon", titre: "Données et IA : où est le risque ?",
+        texte: `<ul><li><strong>À l'entraînement</strong> : de grands modèles ont été entraînés sur des textes et des images collectés en masse sur Internet, y compris des données personnelles publiées par les internautes.</li><li><strong>À l'utilisation</strong> : les conversations avec un assistant peuvent être conservées et, selon les services et les réglages, relues ou utilisées pour améliorer les modèles.</li><li><strong>Par inférence</strong> : une IA peut <strong>déduire</strong> des informations que l'on n'a jamais données.</li></ul>
+<p>Une <strong>inférence</strong> est une information déduite par un système à partir d'autres données. Les habitudes d'achat peuvent révéler une grossesse, les « j'aime » sur un réseau social peuvent permettre de deviner des opinions politiques, les trajets enregistrés par un téléphone révèlent le domicile, le lieu d'études, les lieux de culte ou les consultations médicales.</p>
+<aside class="savoir"><strong>Une amende record pour la reconnaissance faciale.</strong> En 2022, la CNIL a infligé une amende de 20 millions d'euros à l'entreprise Clearview AI, qui avait constitué une base de plusieurs milliards de photos de visages collectées sur Internet, sans le consentement des personnes. En 2019, la CNIL avait aussi estimé que des dispositifs de reconnaissance faciale à l'entrée de deux lycées n'étaient pas conformes au RGPD.</aside>` },
+      { t: "quiz", titre: "Ce que l'IA devine", intro: "Une application de musique enregistre les morceaux écoutés, les heures d'écoute, la localisation du téléphone et la vitesse de déplacement pendant l'écoute.",
+        questions: [
+          { q: "Que pourrait-elle déduire sans que l'utilisateur l'ait jamais dit ?", choix: ["Son domicile et son lieu d'études, ses horaires de sommeil, son moyen de transport.", "Son numéro de carte bancaire.", "Rien de plus que ses goûts musicaux."], bon: 0, expl: "Les positions récurrentes la nuit et en journée, les heures d'écoute, la vitesse ; le type de musique peut même trahir l'humeur." },
+          { q: "Ces déductions sont-elles des données personnelles ?", choix: ["Non, puisque l'utilisateur ne les a pas données.", "Oui : elles se rapportent à une personne identifiable."], bon: 1, expl: "Les inférences sont elles aussi des données personnelles." },
+          { q: "Où est le problème, si chaque donnée collectée paraît anodine ?", choix: ["Leur croisement révèle des informations intimes que l'utilisateur n'a jamais accepté de donner.", "Elles prennent de la place sur le téléphone.", "Il n'y en a pas."], bon: 0, expl: "Ces informations peuvent servir à le cibler, ou être exposées en cas de fuite." },
+        ] },
+      { t: "quiz", titre: "Identifiable sans son nom", intro: "Une salle de sport publie un jeu de données « anonyme » : pour chaque adhérent, la date de naissance, le code postal, le sexe et les horaires de passage.",
+        questions: [
+          { q: "Pourquoi ces données ne sont-elles pas vraiment anonymes ?", choix: ["Parce que le croisement de la date de naissance, du code postal et du sexe ne désigne souvent qu'une seule personne.", "Parce que les horaires sont faux.", "Parce que le fichier est public."], bon: 0, expl: "Peu de personnes partagent à la fois le même jour de naissance, le même code postal et le même sexe. Une chercheuse américaine l'a montré à la fin des années 1990 pour une grande majorité des habitants des États-Unis." },
+          { q: "Quelle modification réduit ce risque ?", choix: ["Ajouter le prénom.", "Ne garder que la tranche d'âge, regrouper les codes postaux par département, regrouper les horaires par tranches.", "Publier le fichier en couleur."], bon: 1, expl: "Moins la combinaison est précise, moins elle est unique." },
+        ] },
+      { t: "lecon", titre: "Le RGPD, une protection européenne",
+        texte: `<p>Le <strong>Règlement général sur la protection des données</strong> (RGPD), applicable depuis mai 2018, encadre l'utilisation des données personnelles dans toute l'Union européenne, y compris par les entreprises étrangères qui s'adressent aux Européens. En France, son application est contrôlée par la <strong>CNIL</strong> (Commission nationale de l'informatique et des libertés).</p>
+<table class="donnees large"><thead><tr><th>Principe</th><th>Ce que cela veut dire</th></tr></thead><tbody>
+<tr><th>Base légale</th><td>Un traitement doit avoir une justification : le consentement de la personne, un contrat, une obligation légale…</td></tr>
+<tr><th>Finalité</th><td>Les données sont collectées pour un but précis, annoncé à l'avance, et ne peuvent pas être réutilisées pour un tout autre but.</td></tr>
+<tr><th>Minimisation</th><td>On ne collecte que les données <strong>strictement nécessaires</strong> à ce but.</td></tr>
+<tr><th>Durée limitée</th><td>Les données ne sont pas conservées indéfiniment.</td></tr>
+<tr><th>Sécurité</th><td>Les données doivent être protégées contre les fuites et les piratages.</td></tr>
+<tr><th>Transparence</th><td>Les personnes doivent être informées, de façon claire, de l'utilisation de leurs données.</td></tr></tbody></table>
+<aside class="retenir"><strong>Mes droits.</strong> <strong>Accès</strong> : savoir quelles données une organisation détient sur moi, et en obtenir une copie. <strong>Rectification</strong> : faire corriger des données inexactes. <strong>Effacement</strong> : obtenir leur suppression dans certains cas. <strong>Opposition</strong> : refuser certaines utilisations, comme la publicité ciblée. Et le droit de ne pas faire l'objet d'une décision <strong>entièrement automatisée</strong> produisant des effets importants. En cas de refus, on peut déposer une plainte auprès de la CNIL. L'amende peut aller jusqu'à 20 millions d'euros ou 4 % du chiffre d'affaires mondial.</aside>
+<aside class="savoir"><strong>Et les mineurs ?</strong> En France, un mineur peut consentir seul au traitement de ses données par un service en ligne à partir de <strong>15 ans</strong>. En dessous, l'accord conjoint d'un parent est nécessaire. Beaucoup d'assistants fixent par ailleurs un âge minimal dans leurs conditions d'utilisation : il faut le vérifier.</aside>` },
+      { t: "tri", titre: "Quel principe ?", q: "Chaque situation ne respecte pas un principe du RGPD. Lequel ?", categories: ["Finalité", "Minimisation", "Durée limitée", "Transparence"],
+        items: [
+          { txt: "Une application de révision collecte la position géographique et la liste de contacts.", cat: 1, expl: "Ces données ne sont pas nécessaires pour réviser." },
+          { txt: "« Vos données sont conservées aussi longtemps que nécessaire. »", cat: 2, expl: "La durée n'est pas précisée." },
+          { txt: "Des notes saisies pour réviser sont revendues à des partenaires pour de la publicité.", cat: 0, expl: "Les données sont réutilisées pour un tout autre but." },
+          { txt: "Une politique de confidentialité de quarante pages, incompréhensible.", cat: 3, expl: "L'information doit être claire." },
+        ] },
+      { t: "quiz", titre: "Lire une politique de confidentialité", intro: "Voici un extrait de la politique de confidentialité d'une application de révision fictive, RéviIA.",
+        doc: `<blockquote class="recit"><strong>1. Données collectées.</strong> Nous collectons vos nom, prénom, date de naissance, adresse électronique, établissement scolaire, notes que vous saisissez, conversations avec notre assistant, ainsi que votre position géographique et votre liste de contacts afin d'améliorer votre expérience.<br><strong>2. Utilisation.</strong> Vos conversations peuvent être utilisées pour entraîner nos modèles et sont accessibles à nos équipes. Vos données peuvent être partagées avec nos partenaires commerciaux à des fins publicitaires.<br><strong>3. Conservation.</strong> Vos données sont conservées aussi longtemps que nécessaire.<br><strong>4. Âge.</strong> Le service est ouvert à partir de 13 ans. En utilisant l'application, vous acceptez l'ensemble de ces conditions.</blockquote>`,
+        questions: [
+          { q: "Quelles données ne sont pas nécessaires à une application de révision ?", choix: ["L'adresse électronique.", "La position géographique, la liste de contacts et la date de naissance complète.", "Les notes saisies."], bon: 1, expl: "Le principe en jeu est la minimisation." },
+          { q: "Quelle formulation est floue ?", choix: ["« Le service est ouvert à partir de 13 ans. »", "« Afin d'améliorer votre expérience » : la finalité est vague.", "« Nous collectons vos nom, prénom ». "], bon: 1, expl: "De même « partenaires commerciaux » (destinataires non identifiés) et « accessibles à nos équipes » (qui, et pourquoi ?)." },
+          { q: "« En utilisant l'application, vous acceptez l'ensemble de ces conditions. » Est-ce un consentement valable pour la publicité ?", choix: ["Oui, l'utilisateur est prévenu.", "Non : le consentement doit être libre, spécifique, éclairé et donné par un acte positif clair."], bon: 1, expl: "Une acceptation globale, imposée pour utiliser le service, ne vaut pas consentement à la publicité." },
+          { q: "Un élève de 14 ans peut-il s'inscrire seul en France ?", choix: ["Oui, l'application l'autorise dès 13 ans.", "Non : en dessous de 15 ans, l'accord d'un parent est nécessaire."], bon: 1, expl: "L'âge annoncé par l'application ne change pas la règle française." },
+        ] },
+      { t: "quiz", titre: "La reconnaissance faciale au lycée", intro: "Un lycée envisage d'installer à l'entrée un portique de reconnaissance faciale pour contrôler l'accès des élèves.",
+        questions: [
+          { q: "Quel type de donnée ce dispositif traite-t-il ?", choix: ["Des données non personnelles.", "Des données biométriques : des données sensibles, dont le traitement est en principe interdit.", "Des données personnelles ordinaires."], bon: 1, expl: "Elles permettent d'identifier une personne par son visage." },
+          { q: "Pourquoi la CNIL a-t-elle jugé ce type de dispositif non conforme en 2019 ?", choix: ["Parce que les portiques coûtent trop cher.", "Parce que le but peut être atteint par des moyens beaucoup moins intrusifs : le dispositif n'est pas strictement nécessaire.", "Parce que les lycéens sont trop nombreux."], bon: 1, expl: "Traiter les visages de tous les élèves, en majorité mineurs, est disproportionné." },
+          { q: "Quel dispositif moins intrusif atteint le même objectif ?", choix: ["Un badge ou une carte de lycéen, contrôlé par un surveillant.", "Un relevé d'empreintes digitales.", "Une caméra dans chaque salle."], bon: 0, expl: "C'est le principe de minimisation." },
+        ] },
+      { t: "lecon", titre: "Les bons réflexes",
+        texte: `<ul><li><strong>Minimiser</strong> : ne pas confier à une IA son nom complet, son adresse, des informations de santé, des photos de soi ou d'autres personnes, ni des informations sur ses proches.</li><li><strong>Anonymiser</strong> : remplacer les noms par des initiales ou des rôles (« mon professeur », « une amie »).</li><li><strong>Régler</strong> : désactiver, quand c'est possible, l'utilisation des conversations pour l'entraînement ; supprimer régulièrement l'historique.</li><li><strong>Se renseigner</strong> : lire au moins le résumé de la politique de confidentialité ; privilégier les outils proposés par l'établissement.</li><li><strong>Respecter les autres</strong> : ne jamais soumettre à une IA la photo, la voix ou les informations d'une autre personne sans son accord.</li></ul>
+<p><strong>À faire en classe.</strong> Avec l'outil d'IA autorisé par ton établissement, cherche les réglages de confidentialité : l'âge minimal, la conservation de l'historique, l'usage des conversations pour l'entraînement, l'endroit où se trouve la politique de confidentialité, la façon d'exercer son droit d'accès ou d'effacement.</p>` },
+      { t: "quiz", titre: "Exercer ses droits", intro: "Lucie a utilisé pendant un an une application de devoirs avec IA. Elle veut savoir quelles données l'éditeur a conservées sur elle, puis les faire supprimer.",
+        questions: [
+          { q: "Quels droits doit-elle exercer ?", choix: ["Le droit d'opposition, puis de rectification.", "Le droit d'accès, puis le droit à l'effacement.", "Le droit d'auteur."], bon: 1, expl: "Savoir, puis faire supprimer." },
+          { q: "Quel message convient ?", choix: ["« Supprimez tout, merci. »", "« En application du RGPD, je vous demande de m'indiquer l'ensemble des données personnelles que vous détenez à mon sujet, de m'en transmettre une copie, puis de les supprimer. Mon compte est associé à l'adresse [adresse]. »", "« Je vais porter plainte. »"], bon: 1, expl: "Le règlement prévoit un délai de réponse d'un mois." },
+          { q: "Que peut-elle faire si l'éditeur ne répond pas ?", choix: ["Rien.", "Relancer, puis déposer une plainte auprès de la CNIL.", "Créer un nouveau compte."], bon: 1, expl: "Avec l'aide de ses parents si elle a moins de 15 ans." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Une donnée personnelle est une information…", choix: ["qui concerne uniquement le nom d'une personne.", "stockée sur un téléphone.", "publiée sur un réseau social.", "se rapportant à une personne identifiée ou identifiable."], bon: 3, expl: "Directement ou indirectement." },
+          { q: "Laquelle de ces données est sensible au sens du RGPD ?", choix: ["Une adresse électronique.", "Une information sur la santé.", "Un numéro de téléphone.", "Un prénom."], bon: 1, expl: "Comme l'origine, les opinions ou les données biométriques." },
+          { q: "Le principe de minimisation signifie…", choix: ["réduire la taille des fichiers.", "supprimer toutes les données chaque jour.", "ne collecter que les données strictement nécessaires.", "afficher les données en petit."], bon: 2, expl: "Nécessaires au but annoncé." },
+          { q: "En France, un mineur peut consentir seul au traitement de ses données par un service en ligne à partir de…", choix: ["15 ans.", "11 ans.", "13 ans.", "18 ans."], bon: 0, expl: "En dessous, l'accord d'un parent est nécessaire." },
+          { q: "Une inférence, c'est…", choix: ["une donnée volée.", "un mot de passe.", "une information déduite à partir d'autres données.", "une erreur de calcul."], bon: 2, expl: "Par exemple le domicile, déduit des trajets." },
+          { q: "Le droit d'accès permet…", choix: ["de savoir quelles données une organisation détient sur soi.", "d'accéder aux comptes des autres.", "d'entrer dans les locaux d'une entreprise.", "d'utiliser gratuitement un service."], bon: 0, expl: "Et d'en obtenir une copie." },
+          { q: "En France, la CNIL est…", choix: ["un réseau social.", "un logiciel d'IA.", "un tribunal pénal.", "l'autorité qui veille à la protection des données personnelles."], bon: 3, expl: "On peut y déposer une plainte." },
+          { q: "Pour demander de l'aide à une IA sur un message à un professeur, le meilleur réflexe est…", choix: ["de donner son nom complet et son adresse.", "de remplacer les noms par des rôles et de n'indiquer que le nécessaire.", "d'ajouter une photo de sa classe.", "de copier tous ses échanges avec le professeur."], bon: 1, expl: "Minimiser et anonymiser." },
+          { q: "Combiner date de naissance, code postal et sexe…", choix: ["ne permet jamais d'identifier quelqu'un.", "est interdit.", "peut suffire à identifier une personne.", "crée une donnée sensible."], bon: 2, expl: "La combinaison est presque toujours unique." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Donnée personnelle.</strong> Information se rapportant à une personne identifiée ou identifiable, directement ou indirectement. <strong>Données sensibles</strong> : santé, origine, opinions, religion, biométrie…</p>
+<p><strong>Trois risques avec l'IA.</strong> À l'entraînement, à l'utilisation (conversations conservées), par <strong>inférence</strong> (informations déduites).</p>
+<p><strong>RGPD.</strong> Base légale, finalité, <strong>minimisation</strong>, durée limitée, sécurité, transparence. Contrôlé en France par la <strong>CNIL</strong>.</p>
+<p><strong>Mes droits.</strong> Accès, rectification, effacement, opposition ; pas de décision entièrement automatisée aux effets importants. Consentement seul à partir de 15 ans.</p>
+<p><strong>Mes réflexes.</strong> Minimiser, anonymiser, régler, se renseigner, respecter les autres.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>reconnaître une donnée personnelle et une donnée sensible</li><li>expliquer ce qu'est une inférence</li><li>citer les principes du RGPD</li><li>exercer mes droits</li><li>appliquer les bons réflexes avec une IA</li></ul>` },
+    ] },
+    { id: "c11", num: 11, titre: "Responsabilité et cadre juridique", resume: "Qui répond d'une IA, règlement européen, droits et droit d'auteur",
+    etapes: [
+      { t: "quiz", titre: "Qui est responsable si une IA se trompe ?", intro: "Une décision de justice canadienne, 2024.",
+        doc: `<blockquote class="recit">Après le décès de sa grand-mère, un passager consulte l'assistant conversationnel du site d'Air Canada. Celui-ci lui affirme qu'il peut acheter un billet au plein tarif, puis demander après son voyage un remboursement partiel grâce à un « tarif deuil ». Le passager suit ce conseil. Mais la compagnie refuse de le rembourser : sa véritable règle ne permet pas de demander ce tarif après le voyage. Devant le tribunal, la compagnie soutient que l'assistant est une entité distincte, responsable de ses propres actes. En février 2024, le tribunal rejette cet argument et condamne la compagnie à indemniser le passager, environ 800 dollars canadiens.</blockquote>`,
+        questions: [
+          { q: "Pourquoi le tribunal refuse-t-il de considérer l'assistant comme responsable ?", choix: ["Parce que l'assistant n'est qu'un outil : la compagnie est responsable de toutes les informations publiées sur son site.", "Parce que l'assistant était en panne.", "Parce que le passager avait mal lu."], bon: 0, expl: "Que l'information vienne d'une page statique ou d'un assistant conversationnel." },
+          { q: "Le tribunal donne-t-il tort au passager de ne pas avoir vérifié ?", choix: ["Oui.", "Non : il n'avait aucune raison de se méfier d'une information donnée par le site officiel de la compagnie."], bon: 1, expl: "Le site officiel fait foi aux yeux du client." },
+          { q: "Quelle leçon pour les entreprises ?", choix: ["Un assistant conversationnel les dégage de toute responsabilité.", "Elles répondent de ce que dit leur assistant : elles doivent le tester, limiter son champ et vérifier qu'il s'appuie sur les vraies règles.", "Elles doivent supprimer leur site."], bon: 1, expl: "Et indiquer clairement les informations qui font foi." },
+        ] },
+      { t: "quiz", titre: "Un cas plus grave", intro: "En mars 2018, à Tempe, aux États-Unis, une voiture autonome en test de l'entreprise Uber percute et tue une piétonne qui traversait de nuit en poussant son vélo. Le logiciel avait détecté la piétonne quelques secondes avant le choc, mais sans la classer correctement, et le freinage d'urgence automatique avait été désactivé. La conductrice de sécurité, chargée de surveiller la route, regardait une vidéo sur son téléphone.",
+        questions: [
+          { q: "Que peut-on reprocher à l'entreprise ?", choix: ["Rien : la voiture conduisait seule.", "Un logiciel qui classait mal la piétonne, la désactivation du freinage d'urgence automatique et une organisation de la sécurité insuffisante.", "D'avoir roulé de nuit."], bon: 1, expl: "Ce sont des choix de conception et de sécurité." },
+          { q: "Et à la conductrice de sécurité ?", choix: ["Son inattention.", "D'avoir freiné trop tard.", "Rien."], bon: 0, expl: "Elle était chargée de surveiller la route." },
+          { q: "Quelles ont été les suites ?", choix: ["La voiture a été condamnée.", "La conductrice a été condamnée en 2023 à une mise à l'épreuve ; l'entreprise n'a pas été poursuivie pénalement, mais l'enquête a aussi pointé ses choix.", "Personne n'a été inquiété."], bon: 1, expl: "Le cas illustre une responsabilité partagée, et le débat sur la place de l'humain chargé de surveiller une machine." },
+        ] },
+      { t: "lecon", titre: "Une IA n'est pas une personne",
+        texte: `<aside class="retenir">En droit, seules les <strong>personnes</strong> peuvent être responsables : les personnes physiques (les êtres humains) et les personnes morales (entreprises, associations, administrations). Une IA est un <strong>outil</strong> : elle n'a pas de personnalité juridique, ne peut pas être condamnée et ne peut pas indemniser une victime. Lorsqu'une IA cause un dommage, on cherche donc quelle personne en répond.</aside>
+<p><strong>La chaîne des acteurs</strong></p>
+<ol class="phases"><li><strong>Fournisseurs de données</strong> ceux qui collectent et étiquettent les données</li><li><strong>Fournisseur</strong> l'entreprise qui conçoit et met sur le marché le système d'IA</li><li><strong>Déployeur</strong> l'organisation qui utilise le système (banque, hôpital, lycée…)</li><li><strong>Utilisateur final</strong> la personne qui s'en sert et applique ses résultats</li><li><strong>Personne concernée</strong> celle qui subit la décision ou le dommage</li></ol>
+<p>Selon les cas, la responsabilité peut peser sur l'un ou plusieurs de ces acteurs : le fournisseur si le système est défectueux, le déployeur s'il l'utilise mal ou hors de son domaine prévu, l'utilisateur s'il commet une imprudence.</p>
+<table class="donnees large"><thead><tr><th></th><th>Responsabilité civile</th><th>Responsabilité pénale</th></tr></thead><tbody>
+<tr><th>But</th><td><strong>réparer</strong> le dommage subi par la victime</td><td><strong>punir</strong> une infraction prévue par la loi</td></tr>
+<tr><th>Conséquence</th><td>versement de dommages et intérêts</td><td>amende, prison</td></tr>
+<tr><th>Exemple</th><td>la compagnie aérienne indemnise le passager</td><td>poursuite pour homicide involontaire après un accident mortel</td></tr></tbody></table>
+<p>En Europe, une directive de 2024 sur les produits défectueux précise que les logiciels, y compris les systèmes d'IA, sont des « produits » : une victime peut obtenir réparation du fabricant d'un logiciel défectueux.</p>` },
+      { t: "tri", titre: "Civile ou pénale ?", q: "De quelle responsabilité s'agit-il plutôt ?", categories: ["Civile", "Pénale"],
+        items: [
+          { txt: "Une entreprise doit rembourser un client à qui son assistant a donné une information fausse.", cat: 0, expl: "Il s'agit de réparer." },
+          { txt: "Une personne qui a diffusé un hypertrucage sexuel d'une camarade est poursuivie devant un tribunal.", cat: 1, expl: "Une infraction punie par la loi ; la victime peut aussi demander réparation." },
+          { txt: "Un fabricant de logiciel indemnise une usine dont la machine a été endommagée par un défaut du programme.", cat: 0, expl: "Il s'agit de réparer." },
+        ] },
+      { t: "quiz", titre: "Qui répond ?", intro: "Un hôpital utilise un logiciel d'IA qui aide à repérer des fractures sur les radiographies. Le logiciel ne signale pas une fracture ; le médecin, pressé, ne regarde pas lui-même la radio ; le patient souffre de complications.",
+        questions: [
+          { q: "Qui est le déployeur ?", choix: ["L'éditeur du logiciel.", "L'hôpital.", "Le médecin."], bon: 1, expl: "L'éditeur est le fournisseur, le médecin l'utilisateur." },
+          { q: "Que peut-on reprocher au médecin ?", choix: ["D'avoir utilisé un logiciel.", "De ne pas avoir examiné lui-même la radio.", "Rien."], bon: 1, expl: "À l'éditeur, on peut reprocher un logiciel insuffisamment fiable ; à l'hôpital, une organisation qui ne laisse pas de temps de vérification." },
+          { q: "Le « contrôle humain » imposé pour ce type de système a-t-il fonctionné ?", choix: ["Oui, puisqu'un médecin était présent.", "Non : le médecin s'est contenté du résultat du logiciel. C'est le risque de confiance excessive dans l'automatisation."], bon: 1, expl: "Un humain compétent doit pouvoir détecter les erreurs de la machine et décider." },
+        ] },
+      { t: "lecon", titre: "Le règlement européen sur l'IA",
+        texte: `<p>Adopté en 2024, le <strong>règlement européen sur l'intelligence artificielle</strong> (souvent appelé <em>AI Act</em>) est le premier grand texte au monde à encadrer l'IA de façon générale. Il suit une <strong>approche par les risques</strong> : plus un système peut porter atteinte à la santé, à la sécurité ou aux droits des personnes, plus les règles sont strictes.</p>
+<table class="donnees large"><thead><tr><th>Niveau</th><th>Règles et exemples</th></tr></thead><tbody>
+<tr><th>Inacceptable</th><td><strong>interdit</strong> : notation sociale des citoyens, manipulation exploitant les vulnérabilités, reconnaissance des émotions au travail et dans les établissements scolaires, surveillance biométrique en temps réel par la police dans l'espace public (sauf exceptions)…</td></tr>
+<tr><th>Haut risque</th><td><strong>obligations strictes</strong> (données de qualité, documentation, contrôle humain, robustesse) dans des domaines sensibles : <strong>éducation</strong> (admission, notation, surveillance des examens), emploi, crédit, justice, santé…</td></tr>
+<tr><th>Risque limité</th><td><strong>transparence</strong> : informer que l'on parle à une IA, signaler les contenus générés et les hypertrucages.</td></tr>
+<tr><th>Risque minimal</th><td><strong>pas d'obligation particulière</strong> : filtres anti-spam, IA de jeux vidéo, correcteurs orthographiques…</td></tr></tbody></table>
+<table class="donnees large"><thead><tr><th>Date</th><th>Ce qui s'applique</th></tr></thead><tbody>
+<tr><th>1er août 2024</th><td>entrée en vigueur du règlement</td></tr>
+<tr><th>2 février 2025</th><td>interdiction des pratiques inacceptables</td></tr>
+<tr><th>2 août 2025</th><td>règles pour les grands modèles d'IA à usage général</td></tr>
+<tr><th>2 août 2026</th><td>obligations de transparence</td></tr>
+<tr><th>2 décembre 2027</th><td>obligations pour les systèmes à haut risque (dont l'éducation)</td></tr></tbody></table>
+<p>Les sanctions peuvent atteindre 35 millions d'euros ou 7 % du chiffre d'affaires mondial pour les pratiques interdites.</p>` },
+      { t: "tri", titre: "Quel niveau de risque ?", q: "Classe chaque système d'après le règlement européen sur l'IA.", categories: ["Inacceptable", "Haut risque", "Risque limité", "Risque minimal"],
+        items: [
+          { txt: "Un logiciel qui attribue une note de « bon citoyen » aux habitants selon leur comportement.", cat: 0, expl: "C'est la notation sociale." },
+          { txt: "Un assistant conversationnel sur le site d'une mairie.", cat: 2, expl: "Il doit indiquer qu'il est une IA." },
+          { txt: "Un logiciel qui classe les candidatures à un emploi.", cat: 1, expl: "L'emploi est un domaine sensible." },
+          { txt: "Le filtre anti-spam d'une messagerie.", cat: 3, expl: "Pas d'obligation particulière." },
+          { txt: "Un logiciel qui analyse les expressions des élèves en classe pour mesurer leur attention.", cat: 0, expl: "Reconnaissance des émotions dans un établissement scolaire." },
+          { txt: "Un logiciel qui corrige et note automatiquement des copies d'examen.", cat: 1, expl: "La notation dans l'éducation est à haut risque." },
+        ] },
+      { t: "lecon", titre: "Mes droits, et les œuvres créées avec l'IA",
+        texte: `<p><strong>Face à une décision automatisée</strong></p>
+<ul><li>Le <strong>RGPD</strong> donne à toute personne le droit de ne pas faire l'objet d'une décision fondée <strong>exclusivement</strong> sur un traitement automatisé et produisant des effets importants (refus de crédit, de recrutement…), sauf exceptions encadrées. On peut alors demander une <strong>intervention humaine</strong>, exprimer son point de vue et contester la décision.</li><li>En France, lorsqu'une <strong>administration</strong> prend une décision individuelle sur le fondement d'un algorithme, elle doit le mentionner et, sur demande, en expliquer les règles de fonctionnement. C'est le cas pour la procédure d'affectation dans l'enseignement supérieur.</li></ul>
+<p><strong>Et les œuvres créées avec l'IA ?</strong> En France, le droit d'auteur protège les œuvres qui portent l'<strong>empreinte de la personnalité d'un auteur humain</strong>. Une image produite par une IA à partir d'une courte demande n'est généralement pas considérée comme une œuvre protégée ; la question devient plus discutée lorsque l'humain a fait des choix créatifs importants. Par ailleurs, l'entraînement des modèles sur des œuvres protégées suscite de nombreux litiges. Ces questions sont encore en cours d'évolution.</p>
+<aside class="retenir">Derrière chaque système d'IA, il y a des personnes et des organisations qui le conçoivent, le vendent et l'utilisent : ce sont elles qui <strong>répondent</strong> de ses effets. Le droit européen impose d'autant plus d'obligations que les risques sont élevés, et donne à chacun des droits pour comprendre et contester les décisions automatisées.</aside>` },
+      { t: "quiz", titre: "Contester une décision", intro: "La demande de prêt étudiant d'Inès est refusée par une banque. Le courriel indique : « Votre dossier a été analysé par notre système automatique. Décision : refus. »",
+        questions: [
+          { q: "Quel droit Inès peut-elle invoquer ?", choix: ["Le droit d'auteur.", "Le droit de ne pas faire l'objet d'une décision exclusivement automatisée aux effets importants, prévu par le RGPD.", "Le droit à l'image."], bon: 1, expl: "Article 22 du RGPD : intervention humaine, expression de son point de vue, contestation." },
+          { q: "Quel message convient ?", choix: ["« Votre système est nul. »", "« Je demande qu'un conseiller réexamine mon dossier, que les principaux éléments ayant conduit à ce refus me soient expliqués, et je souhaite pouvoir présenter ma situation. »", "« Merci de supprimer mon compte. »"], bon: 1, expl: "Les trois demandes : un humain, une explication, la possibilité de s'exprimer." },
+        ] },
+      { t: "quiz", titre: "L'image du concours", intro: "Pour un concours d'affiches organisé par sa ville, Nathan soumet une image entièrement générée par une IA à partir de la demande « une affiche joyeuse pour la fête de la musique ». Il remporte le premier prix.",
+        questions: [
+          { q: "Nathan est-il l'auteur de cette affiche au sens du droit d'auteur français ?", choix: ["Oui, puisqu'il a écrit la demande.", "En principe non : une demande aussi courte ne porte pas l'empreinte de sa personnalité.", "Oui, puisqu'il a gagné."], bon: 1, expl: "L'image n'est généralement pas considérée comme une œuvre protégée." },
+          { q: "Le règlement du concours ne parlait pas de l'IA. Nathan a-t-il été honnête ?", choix: ["Oui, rien ne l'interdisait.", "Il aurait dû au minimum préciser que l'image avait été générée par IA.", "Oui, tout le monde le fait."], bon: 1, expl: "Présenter comme son œuvre une création qu'il n'a pas réalisée trompe le jury et les autres candidats. Le règlement devrait dire si l'IA est autorisée et exiger une déclaration." },
+          { q: "Un illustrateur estime que l'IA a été entraînée sur ses dessins sans son accord. Quelle question cela soulève-t-il ?", choix: ["Celle de l'utilisation d'œuvres protégées pour entraîner des IA sans l'accord ni la rémunération de leurs auteurs.", "Celle du prix des ordinateurs.", "Aucune."], bon: 0, expl: "En Europe, une exception permet l'analyse automatisée de textes et de données, mais les auteurs peuvent s'y opposer ; de nombreux litiges sont en cours." },
+        ] },
+      { t: "quiz", titre: "Le procès du robot livreur", intro: "Une affaire fictive, à débattre en classe : chaque groupe plaide pour une partie, puis le tribunal rend un jugement motivé.",
+        doc: `<blockquote class="recit">Un soir de pluie de novembre, un robot de livraison autonome de l'entreprise Livria renverse un cycliste sur une piste cyclable. Le cycliste a une jambe cassée. L'enquête établit que :<br>• le logiciel de navigation a été conçu par la société NaviSoft, qui a publié un mois plus tôt une mise à jour améliorant la détection des cyclistes par temps de pluie ;<br>• Livria n'avait pas encore installé cette mise à jour, « pour ne pas interrompre le service » ;<br>• la caméra avant du robot était partiellement couverte de boue ; le manuel prévoit un nettoyage quotidien, qui n'avait pas été fait ;<br>• un opérateur de Livria surveillait à distance 15 robots en même temps ; il n'a pas vu l'alerte du robot ;<br>• le cycliste roulait sans éclairage ;<br>• la ville avait autorisé la circulation des robots sur les pistes cyclables, à titre expérimental.</blockquote>`,
+        questions: [
+          { q: "Dans la chaîne des acteurs, qui est Livria ?", choix: ["Le fournisseur.", "Le déployeur.", "La personne concernée."], bon: 1, expl: "NaviSoft est le fournisseur ; le cycliste, la personne concernée." },
+          { q: "Le robot peut-il être partie au procès ?", choix: ["Oui, c'est lui qui a renversé le cycliste.", "Non : une IA n'a pas de personnalité juridique."], bon: 1, expl: "On cherche quelle personne répond du dommage." },
+          { q: "Qu'est-ce qui pèse le plus contre Livria ?", choix: ["Avoir acheté un robot.", "La mise à jour non installée, la caméra non nettoyée et un seul opérateur pour quinze robots.", "La pluie."], bon: 1, expl: "Un jugement bien motivé retient en général la responsabilité principale du déployeur." },
+          { q: "L'absence d'éclairage du cycliste…", choix: ["supprime son droit à réparation.", "peut réduire son indemnisation, sans la supprimer.", "n'a aucune importance."], bon: 1, expl: "Il n'y a pas de jugement unique attendu : restent la part éventuelle de NaviSoft, le rôle de la ville et les règles à fixer pour l'avenir." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Lorsqu'une IA cause un dommage, la responsabilité est recherchée…", choix: ["auprès de l'IA elle-même.", "auprès des personnes ou des organisations qui la conçoivent, la fournissent ou l'utilisent.", "nulle part, car c'est un accident.", "uniquement auprès de la victime."], bon: 1, expl: "Une IA est un outil." },
+          { q: "La responsabilité civile a pour but de…", choix: ["punir l'auteur d'une infraction.", "interdire un logiciel.", "former les utilisateurs.", "réparer le dommage subi par la victime."], bon: 3, expl: "Punir relève de la responsabilité pénale." },
+          { q: "Le règlement européen sur l'IA repose sur…", choix: ["une approche par les risques.", "une interdiction totale de l'IA.", "un label facultatif.", "une taxe sur les ordinateurs."], bon: 0, expl: "Plus le risque est élevé, plus les règles sont strictes." },
+          { q: "La notation sociale des citoyens par une IA est, en Europe…", choix: ["autorisée sans condition.", "un système à risque minimal.", "interdite.", "obligatoire."], bon: 2, expl: "C'est un risque inacceptable." },
+          { q: "Un assistant conversationnel doit, au titre de la transparence…", choix: ["cacher qu'il est une IA.", "être payant.", "informer qu'il est une IA.", "ne parler que français."], bon: 2, expl: "Risque limité : obligation de transparence." },
+          { q: "Le RGPD permet de demander…", choix: ["la suppression de tous les algorithmes.", "la gratuité de tous les services.", "un remboursement automatique.", "qu'une décision importante entièrement automatisée fasse l'objet d'une intervention humaine."], bon: 3, expl: "Et de la contester." },
+          { q: "Dans la chaîne des acteurs, le « déployeur » est…", choix: ["l'organisation qui utilise le système d'IA dans son activité.", "la personne qui subit la décision.", "le ministre du numérique.", "le premier client."], bon: 0, expl: "Une banque, un hôpital, un lycée…" },
+          { q: "En France, une image générée par une IA à partir d'une simple demande…", choix: ["est toujours protégée par le droit d'auteur au profit de l'IA.", "appartient automatiquement à l'État.", "n'est généralement pas considérée comme une œuvre protégée.", "est interdite."], bon: 2, expl: "Il manque l'empreinte de la personnalité d'un auteur humain." },
+          { q: "Les sanctions du règlement européen pour les pratiques interdites peuvent atteindre…", choix: ["1 000 euros.", "35 millions d'euros ou 7 % du chiffre d'affaires mondial.", "une semaine de fermeture.", "un simple avertissement."], bon: 1, expl: "Des montants très dissuasifs." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Une IA n'est pas une personne.</strong> Elle ne peut être ni condamnée ni tenue d'indemniser : on cherche quelle personne répond du dommage.</p>
+<p><strong>La chaîne des acteurs.</strong> Fournisseurs de données, <strong>fournisseur</strong>, <strong>déployeur</strong>, utilisateur final, personne concernée.</p>
+<p><strong>Deux responsabilités.</strong> <strong>Civile</strong> : réparer. <strong>Pénale</strong> : punir.</p>
+<p><strong>Règlement européen sur l'IA.</strong> Approche par les risques : <strong>inacceptable</strong> (interdit), <strong>haut risque</strong> (obligations strictes, dont l'éducation), <strong>risque limité</strong> (transparence), <strong>risque minimal</strong>.</p>
+<p><strong>Mes droits.</strong> Pas de décision exclusivement automatisée aux effets importants : intervention humaine, explication, contestation.</p>
+<p><strong>Droit d'auteur.</strong> Il protège l'empreinte de la personnalité d'un auteur humain.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>expliquer pourquoi une IA n'est pas responsable</li><li>identifier fournisseur, déployeur et utilisateur</li><li>distinguer responsabilité civile et pénale</li><li>classer un système selon son niveau de risque</li><li>contester une décision automatisée</li></ul>` },
+    ] },
   ]
 },
 {

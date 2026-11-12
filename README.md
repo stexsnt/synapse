@@ -9,7 +9,7 @@ Les évaluations du livret et leurs corrigés ne sont volontairement pas publié
 
 ## État
 
-Parties 1 et 2 complètes (chapitres 1 à 7). Les chapitres 8 à 14 apparaissent comme
+Parties 1 à 3 complètes (chapitres 1 à 11). Les chapitres 12 à 14 apparaissent comme
 « Bientôt disponible ».
 
 ## Mise en ligne sur GitHub Pages
