@@ -27,4 +27,4 @@ fichier. Ajouter les nouvelles étapes à la fin d'un chapitre. Avant de publier
 ## Suivi de classe
 
 Dans sa page Profil, l'élève génère un « code pour mon professeur ». La page `prof.html`
-(lien « Espace professeur ») transforme les codes collés en tableau de classe, avec export CSV.
+(lien « Espace professeur ») range les codes collés par classe (un onglet par classe, comparaison, progrès, export CSV).
