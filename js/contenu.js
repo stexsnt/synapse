@@ -8,7 +8,10 @@
      tri     : { t, titre, q, doc?, categories:[...], items:[{ txt, cat, expl }], expl? }
      ordre   : { t, titre?, q, lignes:[...dans le bon ordre], attendu?, texte?: true, expl? }
                (texte: true = phrases à ranger, validées par leur ordre ; sinon programme exécuté)
-     quiz    : { t, titre, intro?, doc?, code?, widget?: "knn", questions:[{ q, choix, bon, expl }] }
+     quiz    : { t, titre, intro?, doc?, code?, widget?: "knn" | "pixels" | "perceptron", questions:[{ q, choix, bon, expl }] }
+     atelier : { t, titre, intro?, objectifs:[{ consigne, entrees:[noms], poids:[valeurs de départ], min, max, pas,
+                 biais?:{ val, min, max, pas }, seuil?, cible: "amis" | "et" | "ou", expl }] }
+               (curseurs pour régler les poids d'un neurone ; la sortie vaut 1 si la somme dépasse le seuil)
      predire : { t, titre?, code, attendu, expl }
      code    : { t, titre, enonce, depart, solution, d, tests, caches?, indices, requis?, interdit? }
 
@@ -205,7 +208,155 @@ const PARCOURS = [
 <p><strong>Je sais…</strong></p><ul class="je-sais"><li>définir l'IA, un algorithme, un modèle</li><li>expliquer le principe de l'apprentissage</li><li>situer cinq dates clés</li><li>citer trois usages de l'IA au quotidien</li><li>distinguer IA générative et IA qui prédit</li><li>lire un programme Python à base de règles</li></ul>` },
     ]
   },
-  { id: "c2", num: 2, titre: "Les données, matière première de l'IA", resume: "Bientôt disponible", etapes: [] },
+  {
+    id: "c2", num: 2, titre: "Les données, matière première de l'IA", resume: "Jeux de données, pixels, étiquettes, qualité des données",
+    etapes: [
+      { t: "qcm", titre: "Comment reconnaître un chat ?",
+        q: "Tu reconnais un chat au premier coup d'œil. Pour l'expliquer à un ordinateur, on propose la règle : « si l'animal a des oreilles pointues, alors c'est un chat ». Quel est le problème ?",
+        choix: ["Aucun : cette règle suffit.", "Elle accepte un renard ou un lynx, et refuse un chat vu de dos ou les oreilles couchées.", "L'ordinateur ne peut pas appliquer une règle."], bon: 1,
+        expl: "Toute règle simple a des contre-exemples. Les règles écrites à la main échouent face à la variété du réel : il faut une autre méthode." },
+      { t: "quiz", titre: "Ce que voit vraiment l'ordinateur", widget: "pixels",
+        intro: "Pour un ordinateur, une image n'est qu'un tableau de nombres. Dans cette grille, chaque case est un pixel : 1 signifie « noir », 0 signifie « blanc ». Touche les cases qui contiennent un 1 pour les colorier.",
+        questions: [
+          { q: "Que représente l'image obtenue ?", choix: ["Une maison", "Une tête de chat", "La lettre M"], bon: 1, expl: "On reconnaît les oreilles, les yeux et le nez." },
+          { q: "Combien de nombres faut-il pour décrire cette image ?", choix: ["10", "50", "100"], bon: 2, expl: "10 × 10 = 100 nombres, un par pixel." },
+          { q: "Une photo de téléphone compte environ 12 millions de pixels, chacun décrit par trois nombres (rouge, vert, bleu). Combien de nombres décrivent une telle photo ?", choix: ["12 millions", "36 millions", "3 milliards"], bon: 1, expl: "12 millions × 3 = 36 millions de nombres." },
+        ] },
+      { t: "qcm", titre: "Changer de méthode",
+        q: "Plutôt que d'écrire des règles, on montre à l'ordinateur des milliers de photos accompagnées de la bonne réponse : « chat » ou « pas chat ». Que risque-t-il de se passer si toutes les photos de chats ont été prises sur un canapé ?",
+        choix: ["Rien de particulier.", "Le système risque d'associer « chat » au canapé.", "Le système reconnaîtra encore mieux les chats."], bon: 1,
+        expl: "Il reconnaîtrait mal un chat dans un jardin et pourrait répondre « chat » devant un canapé vide. Il faut des chats de toutes races et couleurs, de face, de profil et de dos, dans des lieux variés, et beaucoup de photos « pas chat », y compris d'animaux qui leur ressemblent." },
+      { t: "lecon", titre: "Données et jeux de données",
+        texte: `<p>Une <strong>donnée</strong> est une information enregistrée sous une forme qu'un ordinateur peut traiter : un nombre, un mot, une date, une image, un son…</p>
+<p>Un <strong>jeu de données</strong> est un ensemble organisé de données décrivant des <strong>objets</strong> (des élèves, des films, des images…). Dans une table :</p>
+<ul><li>chaque <strong>ligne</strong> décrit un objet ;</li><li>chaque <strong>colonne</strong> correspond à un <strong>descripteur</strong> (on dit aussi attribut ou caractéristique) ;</li><li>chaque case contient une <strong>valeur</strong>.</li></ul>
+<table class="donnees"><thead><tr><th>Fruit n°</th><th>Masse (g)</th><th>Diamètre (cm)</th><th>Couleur</th><th>Étiquette</th></tr></thead><tbody><tr><td>1</td><td>140</td><td>7,2</td><td>orange</td><th>orange</th></tr><tr><td>2</td><td>75</td><td>5,4</td><td>orange</td><th>clémentine</th></tr><tr><td>3</td><td>165</td><td>7,8</td><td>orange</td><th>orange</th></tr><tr><td>4</td><td>70</td><td>5,1</td><td>orange</td><th>clémentine</th></tr></tbody></table>
+<p>Ici, les objets sont les fruits ; les descripteurs sont la masse, le diamètre et la couleur. La dernière colonne, l'<em>étiquette</em>, est la réponse que l'on voudra faire apprendre à une IA.</p>` },
+      { t: "quiz", titre: "Lire un jeu de données", intro: "Une application de cinéma utilise la table suivante.",
+        doc: `<table class="donnees"><thead><tr><th>Titre</th><th>Durée (min)</th><th>Genre</th><th>Année</th><th>Aimé par l'utilisateur ?</th></tr></thead><tbody><tr><td>Film A</td><td>112</td><td>comédie</td><td>2021</td><td>oui</td></tr><tr><td>Film B</td><td>148</td><td>science-fiction</td><td>2010</td><td>oui</td></tr><tr><td>Film C</td><td>95</td><td>horreur</td><td>2019</td><td>non</td></tr><tr><td>Film D</td><td>130</td><td>comédie</td><td>2023</td><td>oui</td></tr></tbody></table>`,
+        questions: [
+          { q: "Quels sont les objets de ce jeu de données ?", choix: ["Les films", "Les genres", "Les utilisateurs"], bon: 0, expl: "Chaque ligne décrit un film. Les descripteurs sont le titre, la durée, le genre et l'année." },
+          { q: "Quelle colonne joue le rôle d'étiquette si l'on veut prédire les goûts de l'utilisateur ?", choix: ["Genre", "Année", "Aimé par l'utilisateur ?"], bon: 2, expl: "C'est la réponse que l'IA devra apprendre à donner." },
+          { q: "Pourquoi quatre films ne suffisent-ils pas pour faire des recommandations fiables ?", choix: ["Parce que les films sont trop longs.", "Avec si peu d'exemples, on ne peut dégager aucune tendance fiable.", "Parce qu'il manque le nom du réalisateur."], bon: 1, expl: "On ne sait rien de ses goûts pour les autres genres, et une seule exception change tout." },
+        ] },
+      { t: "lecon", titre: "Données structurées et non structurées",
+        texte: `<ul><li>Les <strong>données structurées</strong> sont rangées selon un format fixe, comme une table : chaque valeur est à une place précise. Exemples : un fichier CSV, une base de données de notes, un relevé météo.</li>
+<li>Les <strong>données non structurées</strong> n'ont pas de format fixe : textes libres, photos, sons, vidéos, messages sur les réseaux sociaux.</li></ul>
+<p>La grande majorité des données produites dans le monde est non structurée. Les IA modernes, en particulier les réseaux de neurones, ont justement fait de grands progrès dans le traitement des images, des sons et des textes.</p>` },
+      { t: "tri", titre: "Structurées ou non ?", q: "Classe ces données.", categories: ["Structurées", "Non structurées"],
+        items: [
+          { txt: "L'emploi du temps de la classe dans l'ENT.", cat: 0, expl: "Un tableau au format fixe." },
+          { txt: "Un message vocal.", cat: 1, expl: "Un son n'a pas de format en table." },
+          { txt: "Le fichier des horaires de bus de la ville.", cat: 0, expl: "Une table : lignes, arrêts, heures." },
+          { txt: "Une vidéo publiée sur un réseau social.", cat: 1, expl: "Une suite d'images et de sons." },
+          { txt: "Les commentaires laissés sous cette vidéo.", cat: 1, expl: "Du texte libre." },
+          { txt: "Le relevé des températures d'une station météo.", cat: 0, expl: "Une table de dates et de mesures." },
+        ] },
+      { t: "lecon", titre: "Une image, ce sont des nombres",
+        texte: `<p>Une image numérique est un quadrillage de petits points appelés <strong>pixels</strong>. En niveaux de gris, chaque pixel est un nombre entre 0 (noir) et 255 (blanc). En couleur, chaque pixel est décrit par trois nombres : l'intensité du rouge, du vert et du bleu (codage <strong>RVB</strong>).</p>
+<p>Une IA qui « regarde » une photo ne voit donc ni chat ni chien : elle reçoit des millions de nombres et doit apprendre quelles combinaisons de nombres correspondent à un chat. De la même façon, un son est une suite de nombres mesurant la vibration de l'air, et un texte est découpé en morceaux numérotés.</p>` },
+      { t: "quiz", titre: "Compter les nombres d'une image",
+        questions: [
+          { q: "Une image en niveaux de gris mesure 28 pixels sur 28. Combien de nombres la décrivent ?", choix: ["56", "784", "2 352"], bon: 1, expl: "28 × 28 = 784 nombres." },
+          { q: "Une image en couleur mesure 1 920 pixels sur 1 080 (format Full HD). Combien de nombres la décrivent ?", choix: ["Environ 2 millions", "Environ 6 millions", "Environ 600 millions"], bon: 1, expl: "1 920 × 1 080 × 3 = 6 220 800 nombres." },
+          { q: "Une vidéo Full HD compte 25 images par seconde. Combien de nombres décrivent une minute de vidéo ?", choix: ["Environ 150 millions", "Environ 9 milliards", "Environ 9 millions"], bon: 1, expl: "Une minute contient 25 × 60 = 1 500 images, soit plus de 9 milliards de nombres. C'est pourquoi les vidéos sont compressées." },
+        ] },
+      { t: "lecon", titre: "Étiquettes, entraînement et test",
+        texte: `<p>Une <strong>étiquette</strong> est la réponse attendue associée à une donnée : « chat », « spam », « 7 », « orange »… Des données accompagnées de leur étiquette sont dites <strong>étiquetées</strong>, ou <strong>annotées</strong>. Ce sont souvent des humains qui étiquettent les données, image par image, phrase par phrase. Ce travail est long et indispensable : une IA ne peut apprendre que ce qu'on lui a montré.</p>
+<p>On partage le jeu de données en deux parties :</p>
+<ul><li>les <strong>données d'entraînement</strong>, la plus grande partie (souvent 70 à 80 %), servent à faire apprendre le système ;</li><li>les <strong>données de test</strong>, mises de côté, servent ensuite à vérifier ses performances sur des exemples <em>qu'il n'a jamais vus</em>.</li></ul>
+<aside class="retenir"><strong>Pourquoi deux parties ?</strong> Un élève qui a appris par cœur les corrigés des exercices réussira ces exercices… mais pas forcément un exercice nouveau. De même, on n'évalue jamais une IA sur les données qui ont servi à l'entraîner : il faut vérifier qu'elle sait <strong>généraliser</strong>.</aside>` },
+      { t: "quiz", titre: "L'IA « parfaite » de Lina", intro: "Lina entraîne une IA sur 1 000 photos de chiffres manuscrits. Elle mesure ensuite ses performances sur ces mêmes 1 000 photos et obtient 100 % de bonnes réponses. Elle conclut que son IA est parfaite.",
+        questions: [
+          { q: "Pourquoi son raisonnement est-il incorrect ?", choix: ["1 000 photos, c'est trop.", "Elle teste son IA sur les données qui ont servi à l'entraîner.", "Les chiffres manuscrits sont impossibles à reconnaître."], bon: 1, expl: "L'IA peut les avoir « apprises par cœur » sans savoir généraliser." },
+          { q: "Comment aurait-elle dû procéder ?", choix: ["Entraîner sur 800 photos et tester sur les 200 autres, jamais vues.", "Entraîner deux fois sur les 1 000 photos.", "Tester sur 10 photos choisies parmi les 1 000."], bon: 0, expl: "On met de côté une partie des photos avant l'entraînement." },
+          { q: "Sur de nouvelles photos, son IA n'obtient que 70 %. Quelle explication est plausible ?", choix: ["Les nouvelles photos sont fausses.", "L'IA a appris par cœur les particularités des 1 000 photos, ou les nouvelles photos sont différentes.", "L'ordinateur est tombé en panne."], bon: 1, expl: "On parle de surapprentissage (chapitre 3). Les nouvelles photos peuvent aussi venir d'autres personnes, d'un autre stylo, d'un autre éclairage." },
+        ] },
+      { t: "lecon", titre: "La qualité des données",
+        texte: `<p>Un système d'IA apprend tout ce que contiennent ses données, y compris leurs défauts. Les informaticiens résument cela par l'expression anglaise <em>garbage in, garbage out</em> : des données de mauvaise qualité donnent des résultats de mauvaise qualité.</p>
+<table class="donnees large"><thead><tr><th>Défaut</th><th>Exemple</th></tr></thead><tbody>
+<tr><th>Erreurs de saisie</th><td>une note de 120 au lieu de 12,0 ; une taille en mètres au milieu de tailles en centimètres</td></tr>
+<tr><th>Valeurs manquantes</th><td>une case vide, ou un code comme « Abs » ou −1 qu'il faut savoir interpréter</td></tr>
+<tr><th>Doublons</th><td>le même élève enregistré deux fois, qui « compte double »</td></tr>
+<tr><th>Incohérences de format</th><td>« 2de3 » et « 2nde 3 » ; « 12,5 » et « 12.5 » ; majuscules et minuscules</td></tr>
+<tr><th>Quantité insuffisante</th><td>dix photos ne suffisent pas pour apprendre à reconnaître les chats</td></tr>
+<tr><th>Manque de représentativité</th><td>des photos de chats prises uniquement de face, ou uniquement sur un canapé</td></tr>
+<tr><th>Données périmées</th><td>des prix immobiliers d'il y a vingt ans pour estimer un prix actuel</td></tr></tbody></table>
+<p>Un jeu de données est <strong>biaisé</strong> lorsqu'il ne représente pas fidèlement la réalité que l'on veut traiter : certaines situations ou certains groupes de personnes y sont sur-représentés, sous-représentés ou absents. Le système entraîné reproduit alors ce déséquilibre.</p>
+<aside class="savoir"><strong>Des visages mal reconnus.</strong> En 2018, l'étude <em>Gender Shades</em> de Joy Buolamwini et Timnit Gebru a montré que plusieurs logiciels commerciaux de reconnaissance faciale se trompaient beaucoup plus souvent sur le genre des femmes à la peau foncée que sur celui des hommes à la peau claire. Une des causes : des jeux de données d'entraînement où ces visages étaient peu nombreux. Nous reviendrons sur les biais au chapitre 8.</aside>
+<aside class="retenir"><strong>À retenir.</strong> Avant d'entraîner une IA, il faut <strong>nettoyer</strong> les données (corriger, compléter, supprimer les doublons, harmoniser les formats) et vérifier qu'elles sont <strong>assez nombreuses</strong> et <strong>représentatives</strong>. C'est souvent l'étape la plus longue d'un projet d'IA.</aside>` },
+      { t: "tri", titre: "Nettoyer à la main", q: "Un professeur a regroupé dans un tableur les notes sur 20 du dernier contrôle de la 2de3. Des erreurs se sont glissées. Pour chaque ligne, choisis la bonne action.",
+        doc: `<table class="donnees"><thead><tr><th>Ligne</th><th>Nom</th><th>Prénom</th><th>Classe</th><th>Note /20</th></tr></thead><tbody><tr><td>1</td><td>Martin</td><td>Léa</td><td>2de3</td><td>14</td></tr><tr><td>2</td><td>Bernard</td><td>Hugo</td><td>2de3</td><td>9,5</td></tr><tr><td>3</td><td>Petit</td><td>Inès</td><td>2nde 3</td><td>16</td></tr><tr><td>4</td><td>Martin</td><td>Léa</td><td>2de3</td><td>14</td></tr><tr><td>5</td><td>Durand</td><td>Noah</td><td>2de3</td><td></td></tr><tr><td>6</td><td>Moreau</td><td>Jade</td><td>2de3</td><td>25</td></tr><tr><td>7</td><td>Laurent</td><td>Tom</td><td>2de4</td><td>11</td></tr><tr><td>8</td><td>Simon</td><td>Chloé</td><td>2de3</td><td>120</td></tr><tr><td>9</td><td>michel</td><td>lucas</td><td>2de3</td><td>12</td></tr><tr><td>10</td><td>Garcia</td><td>Emma</td><td>2de3</td><td>Abs</td></tr><tr><td>11</td><td>Roux</td><td>Adam</td><td>2de3</td><td>13.5</td></tr><tr><td>12</td><td>Fournier</td><td>Zoé</td><td>2de3</td><td>8</td></tr></tbody></table>`,
+        categories: ["Corriger", "Supprimer la ligne", "Demander une vérification"],
+        items: [
+          { txt: "Ligne 3 : la classe est écrite « 2nde 3 ».", cat: 0, expl: "Format de classe différent : on l'harmonise sans risque." },
+          { txt: "Ligne 4 : Martin Léa, 2de3, 14.", cat: 1, expl: "C'est un doublon de la ligne 1 : l'élève compterait double." },
+          { txt: "Ligne 5 : la note est vide.", cat: 2, expl: "Absence ou oubli de saisie ? Seul le professeur peut le dire." },
+          { txt: "Ligne 6 : la note vaut 25.", cat: 2, expl: "Note impossible sur 20 : seule la copie donne la bonne valeur." },
+          { txt: "Ligne 7 : l'élève est en 2de4.", cat: 1, expl: "Il est hors du champ de l'étude, qui porte sur la 2de3." },
+          { txt: "Ligne 8 : la note vaut 120.", cat: 2, expl: "Sans doute 12 mal saisi, mais ce n'est qu'une supposition : il faut vérifier." },
+          { txt: "Ligne 9 : « michel lucas » sans majuscules.", cat: 0, expl: "Harmonisation sans risque." },
+          { txt: "Ligne 11 : la note est écrite « 13.5 ».", cat: 0, expl: "Point décimal au lieu de la virgule : on harmonise." },
+        ],
+        expl: "La ligne 10 (« Abs ») demande aussi une vérification : un absent n'a pas de note, il faut l'exclure du calcul de la moyenne. Neuf lignes sur douze posaient problème." },
+      { t: "qcm", titre: "Une note manquante", q: "Pourquoi ne faut-il pas remplacer automatiquement une note manquante par 0 ?",
+        choix: ["Parce que 0 n'est pas un nombre.", "Parce qu'elle peut correspondre à un absent ou à un oubli : mettre 0 ferait baisser la moyenne et serait injuste.", "Parce que le tableur refuse les zéros."], bon: 1,
+        expl: "Une valeur manquante n'est pas une valeur nulle." },
+      { t: "lecon", titre: "Les conséquences d'un oubli, en Python",
+        texte: `<p>Le programme ci-dessous calcule la moyenne d'une liste de notes, d'abord sans aucune vérification, puis après avoir écarté les valeurs impossibles. La valeur −1 signifie « absent ».</p><p>Exécute-le et compare les deux moyennes.</p>`,
+        code: `# Notes d'un contrôle sur 20. La valeur -1 signifie « absent ».\nnotes = [12, 15.5, -1, 8, 25, 14, 11, 9.5, -1, 17, 13, 120]\n\ndef est_valide(note):\n    return 0 <= note <= 20\n\n# 1. Moyenne calculée sur toutes les valeurs, sans vérification\nsomme = 0\nfor note in notes:\n    somme = somme + note\nprint("Moyenne brute :", round(somme / len(notes), 2))\n\n# 2. Moyenne calculée après nettoyage\nvalides = []\nfor note in notes:\n    if est_valide(note):\n        valides.append(note)\nprint("Notes valides :", len(valides))\nprint("Moyenne après nettoyage :", round(sum(valides) / len(valides), 2))` },
+      { t: "quiz", titre: "Comprendre le programme", code: `def est_valide(note):\n    return 0 <= note <= 20`,
+        questions: [
+          { q: "Que renvoient est_valide(20), est_valide(-1) et est_valide(25) ?", choix: ["True, False, False", "True, True, False", "False, False, True"], bon: 0, expl: "20 est une note possible ; −1 et 25 ne sont pas entre 0 et 20." },
+          { q: "Le programme affiche une moyenne brute de 20,25 et une moyenne après nettoyage de 12,5. Quelle valeur fausse le plus la moyenne brute ?", choix: ["−1", "25", "120"], bon: 2, expl: "Une seule valeur aberrante suffit à rendre la moyenne absurde : 20,25 sur 20." },
+          { q: "La valeur 120 est sans doute une note de 12 mal saisie. Le programme l'a-t-il corrigée ?", choix: ["Oui, il l'a remplacée par 12.", "Non, il l'a seulement écartée.", "Oui, il l'a remplacée par 20."], bon: 1, expl: "Laisser un programme deviner la correction peut introduire une erreur silencieuse (et si c'était 10 ou 20 ?). Il faut revenir à la source." },
+          { q: "Une IA est entraînée à prédire la réussite des élèves avec des données non nettoyées, contenant des notes de 120. Que peut-il se passer ?", choix: ["Rien : l'IA ignore les erreurs.", "Elle apprend des liens absurdes et fait des prédictions faussées pour de vrais élèves.", "Elle corrige d'elle-même les notes."], bon: 1, expl: "Garbage in, garbage out." },
+        ] },
+      { t: "code", titre: "Compter les absents", d: 1, caches: ["compte_absents([-1, -1, -1])", "compte_absents([5, 20, 0])", "compte_absents([-1, 12, 1, -1, 11])"],
+        enonce: `<p>Écris une fonction <code>compte_absents(notes)</code> qui renvoie le nombre d'élèves absents d'une liste de notes, c'est-à-dire le nombre de valeurs égales à <code>-1</code>.</p>`,
+        depart: `notes = [12, 15.5, -1, 8, 25, 14, 11, 9.5, -1, 17, 13, 120]\n\ndef compte_absents(notes):\n    absents = 0\n    `,
+        solution: `notes = [12, 15.5, -1, 8, 25, 14, 11, 9.5, -1, 17, 13, 120]\n\ndef compte_absents(notes):\n    absents = 0\n    for note in notes:\n        if note == -1:\n            absents = absents + 1\n    return absents`,
+        tests: [{ appels: [["compte_absents(notes)", "2"], ["compte_absents([])", "0"], ["compte_absents([10, -1])", "1"]] }],
+        indices: ["Parcours la liste avec for note in notes.", "Quand note == -1, le compteur augmente de 1. N'oublie pas le return."] },
+      { t: "code", titre: "La moyenne après nettoyage", d: 2, caches: ["moyenne_valide([20, 0, 120])", "moyenne_valide([15.5, -1])", "moyenne_valide([7, 21, 9, -3, 11])"],
+        enonce: `<p>Écris une fonction <code>moyenne_valide(notes)</code> qui renvoie la moyenne des seules notes valides, c'est-à-dire comprises entre 0 et 20. On suppose qu'il y a au moins une note valide.</p>`,
+        depart: `notes = [12, 15.5, -1, 8, 25, 14, 11, 9.5, -1, 17, 13, 120]\n\ndef est_valide(note):\n    return 0 <= note <= 20\n\ndef moyenne_valide(notes):\n    `,
+        solution: `notes = [12, 15.5, -1, 8, 25, 14, 11, 9.5, -1, 17, 13, 120]\n\ndef est_valide(note):\n    return 0 <= note <= 20\n\ndef moyenne_valide(notes):\n    somme = 0\n    nombre = 0\n    for note in notes:\n        if est_valide(note):\n            somme = somme + note\n            nombre = nombre + 1\n    return somme / nombre`,
+        tests: [{ appels: [["moyenne_valide(notes)", "12.5"], ["moyenne_valide([10, 30, -1])", "10.0"], ["moyenne_valide([8, 12])", "10.0"]] }],
+        indices: ["Il faut deux accumulateurs : la somme des notes valides et leur nombre.", "N'ajoute une note que si est_valide(note) est vrai, puis renvoie somme / nombre."] },
+      { t: "code", titre: "Le négatif d'une image", d: 3, caches: ["negatif([[1]])", "negatif([[0, 0, 0]])", "negatif([[1, 0], [0, 1], [1, 1]])"],
+        enonce: `<p>L'image de l'activité est stockée sous forme de liste de listes : chaque liste est une ligne de pixels. Exécute d'abord le programme pour l'afficher.</p><p>Écris ensuite une fonction <code>negatif(img)</code> qui renvoie une <strong>nouvelle</strong> image où chaque 0 devient 1 et chaque 1 devient 0.</p>`,
+        depart: `image = [\n    [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],\n    [0, 1, 1, 0, 0, 0, 0, 1, 1, 0],\n    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],\n    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],\n    [0, 1, 0, 0, 1, 1, 0, 0, 1, 0],\n    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],\n    [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],\n    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],\n    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],\n    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]\n\ndef afficher(img):\n    for ligne in img:\n        texte = ""\n        for pixel in ligne:\n            if pixel == 1:\n                texte = texte + "#"\n            else:\n                texte = texte + "."\n        print(texte)\n\ndef negatif(img):\n    resultat = []\n    # À compléter\n    return resultat\n\nafficher(image)`,
+        solution: `image = [\n    [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],\n    [0, 1, 1, 0, 0, 0, 0, 1, 1, 0],\n    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],\n    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],\n    [0, 1, 0, 0, 1, 1, 0, 0, 1, 0],\n    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],\n    [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],\n    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],\n    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],\n    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]\n\ndef afficher(img):\n    for ligne in img:\n        texte = ""\n        for pixel in ligne:\n            if pixel == 1:\n                texte = texte + "#"\n            else:\n                texte = texte + "."\n        print(texte)\n\ndef negatif(img):\n    resultat = []\n    for ligne in img:\n        nouvelle = []\n        for pixel in ligne:\n            nouvelle.append(1 - pixel)\n        resultat.append(nouvelle)\n    return resultat\n\nafficher(negatif(image))`,
+        tests: [{ appels: [["negatif([[0, 1], [1, 1]])", "[[1, 0], [0, 0]]"], ["negatif(image)[0]", "[1, 0, 1, 1, 1, 1, 1, 1, 0, 1]"], ["sum(sum(ligne) for ligne in negatif(image))", "50", "Le négatif de l'image compte 50 pixels noirs"], ["image[0]", "[0, 1, 0, 0, 0, 0, 0, 0, 1, 0]", "L'image d'origine n'est pas modifiée"]] }],
+        indices: ["Pour chaque ligne de l'image, construis une nouvelle ligne, puis ajoute-la à resultat.", "Le contraire d'un pixel se calcule par 1 - pixel : 1 - 0 = 1 et 1 - 1 = 0.", "Deux boucles imbriquées : for ligne in img, puis for pixel in ligne."] },
+      { t: "qcm", titre: "Le même chat ?", q: "Pour un ordinateur, l'image et son négatif sont-ils « le même chat » ?",
+        choix: ["Oui : il reconnaît la forme, comme nous.", "Non : presque tous les nombres ont changé.", "Oui : le négatif contient les mêmes nombres dans un autre ordre."], bon: 1,
+        expl: "Pour nous, c'est le même chat ; pour l'ordinateur, tout a changé. Il faut donc fournir des images variées (couleurs, éclairages, contrastes) pour que l'IA apprenne ce qui ne change pas d'une photo à l'autre." },
+      { t: "quiz", titre: "Une IA de reconnaissance d'oiseaux", intro: "Une application doit reconnaître les oiseaux à partir de photos. Elle a été entraînée sur 50 000 photos prises en France, en plein jour et au printemps.",
+        questions: [
+          { q: "Que peut-on dire de ce jeu de données ?", choix: ["Il est trop petit.", "Sa taille est correcte, mais il n'est pas représentatif.", "Il est parfait."], bon: 1, expl: "Un seul pays, une seule saison, uniquement de jour." },
+          { q: "Dans quelle situation l'application risque-t-elle le plus de se tromper ?", choix: ["Une mésange photographiée en France, un midi d'avril.", "Un oiseau migrateur photographié en hiver, au crépuscule.", "Un moineau photographié dans un jardin au printemps."], bon: 1, expl: "Plumage différent en hiver, lumière différente : l'IA n'a jamais vu de telles photos." },
+          { q: "Comment améliorer ce jeu de données ?", choix: ["En supprimant la moitié des photos.", "En ajoutant des photos prises à toutes les saisons, à différentes heures, dans différents pays et sous différents angles.", "En ne gardant que les plus belles photos."], bon: 1, expl: "Avec des étiquettes vérifiées par des spécialistes." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Dans une table de données, chaque colonne correspond…", choix: ["à un objet.", "à un descripteur.", "à une erreur.", "à un pixel."], bon: 1, expl: "Chaque ligne décrit un objet, chaque colonne un descripteur." },
+          { q: "En niveaux de gris, un pixel blanc a pour valeur…", choix: ["0.", "1.", "100.", "255."], bon: 3, expl: "0 pour le noir, 255 pour le blanc." },
+          { q: "Une étiquette est…", choix: ["la réponse attendue associée à une donnée.", "le nom du fichier.", "la taille d'une image.", "un défaut des données."], bon: 0, expl: "C'est ce que l'IA doit apprendre à prédire." },
+          { q: "Le même client apparaît deux fois dans une table. C'est…", choix: ["un doublon.", "une étiquette.", "un descripteur.", "une donnée de test."], bon: 0, expl: "Il compterait double." },
+          { q: "Une IA de diagnostic entraînée uniquement sur des patients adultes risque de mal fonctionner sur des enfants. Il s'agit d'un problème…", choix: ["de format.", "de représentativité des données.", "de doublons.", "de pixels."], bon: 1, expl: "Les enfants sont absents des données d'entraînement." },
+          { q: "L'expression « garbage in, garbage out » signifie que…", choix: ["les données doivent être supprimées après usage.", "une IA trie automatiquement les déchets.", "des données de mauvaise qualité donnent de mauvais résultats.", "il faut toujours plus de données."], bon: 2, expl: "Une IA reproduit les défauts de ses données." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Vocabulaire.</strong> Une <strong>donnée</strong> est une information enregistrée sous forme numérique. Un <strong>jeu de données</strong> décrit des <strong>objets</strong> (lignes) par des <strong>descripteurs</strong> (colonnes). L'<strong>étiquette</strong> est la réponse attendue que l'IA doit apprendre.</p>
+<p><strong>Deux familles de données.</strong> <strong>Structurées</strong> : format fixe, en table (notes, horaires, relevés). <strong>Non structurées</strong> : sans format fixe (textes, images, sons, vidéos), la grande majorité.</p>
+<p><strong>Une image, ce sont des nombres.</strong> Un pixel vaut de 0 (noir) à 255 (blanc) en niveaux de gris ; en couleur, il est décrit par trois nombres (RVB). Une photo représente des millions de nombres.</p>
+<p><strong>Entraînement et test.</strong> On n'évalue jamais une IA sur ses données d'entraînement : il faut vérifier qu'elle <strong>généralise</strong>.</p>
+<p><strong>Qualité des données.</strong> Défauts à repérer : erreurs de saisie, valeurs manquantes, doublons, formats incohérents, quantité insuffisante, manque de représentativité, données périmées. Une IA reproduit les défauts et les <strong>biais</strong> de ses données : <em>garbage in, garbage out</em>.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>définir donnée, descripteur, étiquette</li><li>distinguer structuré et non structuré</li><li>expliquer comment une image est codée</li><li>justifier la séparation entraînement/test</li><li>repérer les défauts d'un jeu de données</li><li>filtrer une liste de valeurs en Python</li></ul>` },
+    ]
+  },
   {
     id: "c3", num: 3, titre: "Comment l'IA apprend-elle ?", resume: "Entraînement, types d'apprentissage, k plus proches voisins",
     etapes: [
@@ -330,7 +481,164 @@ const PARCOURS = [
 <p><strong>Je sais…</strong></p><ul class="je-sais"><li>définir apprentissage et généralisation</li><li>distinguer classification et régression</li><li>reconnaître les trois types d'apprentissage</li><li>appliquer les k plus proches voisins</li><li>expliquer le surapprentissage</li></ul>` },
     ]
   },
-  { id: "c4", num: 4, titre: "Les réseaux de neurones, cerveaux artificiels ?", resume: "Bientôt disponible", etapes: [] },
+  {
+    id: "c4", num: 4, titre: "Les réseaux de neurones, cerveaux artificiels ?", resume: "Neurone artificiel, couches, entraînement, limites de la comparaison",
+    etapes: [
+      { t: "tri", titre: "Du neurone biologique au neurone artificiel",
+        q: "Un neurone du cerveau reçoit des signaux par ses dendrites, les « additionne » dans son corps cellulaire et, si l'excitation dépasse un seuil, émet à son tour un signal le long de son axone. En 1943, Warren McCulloch et Walter Pitts en ont proposé un modèle mathématique très simplifié : le neurone formel. Relie chaque élément du neurone biologique à son équivalent artificiel.",
+        categories: ["Entrées", "Poids", "Somme et seuil", "Sortie"],
+        items: [
+          { txt: "Les dendrites", cat: 0, expl: "Elles reçoivent les signaux." },
+          { txt: "Les synapses", cat: 1, expl: "Elles renforcent ou affaiblissent le signal." },
+          { txt: "Le corps cellulaire", cat: 2, expl: "Il additionne les signaux et ne réagit qu'au-delà d'un seuil." },
+          { txt: "L'axone", cat: 3, expl: "Il transmet le signal émis." },
+        ] },
+      { t: "quiz", titre: "Vais-je au cinéma ?",
+        intro: "Samir décide d'aller au cinéma ce soir comme le ferait un neurone. Il examine trois entrées, qui valent 1 (oui) ou 0 (non).",
+        doc: `<table class="donnees large"><thead><tr><th>Entrée</th><th>Signification</th><th>Poids</th></tr></thead><tbody><tr><th>x<sub>1</sub></th><td>le film a de bonnes critiques</td><td>w<sub>1</sub> = 3</td></tr><tr><th>x<sub>2</sub></th><td>ses amis sont disponibles</td><td>w<sub>2</sub> = 2</td></tr><tr><th>x<sub>3</sub></th><td>il a un devoir à rendre demain</td><td>w<sub>3</sub> = −4</td></tr></tbody></table><p class="formule">s = 3 x<sub>1</sub> + 2 x<sub>2</sub> − 4 x<sub>3</sub>, et il va au cinéma si s &gt; 2</p>`,
+        questions: [
+          { q: "Bonnes critiques, amis disponibles, pas de devoir (1 ; 1 ; 0). Que fait Samir ?", choix: ["s = 5 : il va au cinéma.", "s = 1 : il reste chez lui.", "s = 9 : il va au cinéma."], bon: 0, expl: "s = 3 + 2 − 0 = 5, et 5 > 2." },
+          { q: "Critiques mauvaises, amis disponibles, pas de devoir (0 ; 1 ; 0). Que fait Samir ?", choix: ["s = 2 : il va au cinéma.", "s = 2 : il reste chez lui.", "s = 5 : il va au cinéma."], bon: 1, expl: "s = 2, et 2 n'est pas strictement supérieur à 2." },
+          { q: "Bonnes critiques, amis disponibles, mais un devoir (1 ; 1 ; 1). Que fait Samir ?", choix: ["s = 5 : il va au cinéma.", "s = 9 : il va au cinéma.", "s = 1 : il reste chez lui."], bon: 2, expl: "s = 3 + 2 − 4 = 1." },
+          { q: "Que signifie le signe négatif du poids w₃ ?", choix: ["Avoir un devoir dissuade Samir.", "Le devoir ne compte pas.", "Avoir un devoir l'encourage à sortir."], bon: 0, expl: "Un poids négatif fait baisser la somme. C'est même l'entrée qui compte le plus : sa valeur absolue, 4, est la plus grande." },
+        ] },
+      { t: "atelier", titre: "La sœur de Samir",
+        intro: "Change les poids avec les curseurs : le tableau recalcule la décision dans les huit situations possibles.",
+        objectifs: [{ consigne: "La sœur de Samir va au cinéma dès que ses amis sont disponibles, devoir ou pas, et n'y va jamais sans eux. Trouve des poids qui décrivent son comportement.",
+          entrees: ["critiques", "amis", "devoir"], poids: [3, 2, -4], min: -5, max: 5, pas: 1, seuil: 2, cible: "amis",
+          expl: "Par exemple w₁ = 0, w₂ = 3 et w₃ = 0 : seule la présence des amis compte. Dans cette activité, c'est toi qui fixes les poids ; dans une IA, ils sont appris à partir d'exemples." }] },
+      { t: "lecon", titre: "Le neurone artificiel",
+        texte: `<p>Un <strong>neurone artificiel</strong> est une petite fonction mathématique :</p>
+<ol><li>il reçoit des nombres en <strong>entrée</strong> : x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>… ;</li><li>il multiplie chaque entrée par un <strong>poids</strong> (w<sub>1</sub>, w<sub>2</sub>, w<sub>3</sub>…), qui mesure son importance, et ajoute un <strong>biais</strong> b ;</li><li>il applique à la somme obtenue une <strong>fonction d'activation</strong>, par exemple un seuil : la sortie vaut y = 1 si s &gt; 0, et y = 0 sinon.</li></ol>
+<p class="formule">s = w<sub>1</sub> x<sub>1</sub> + w<sub>2</sub> x<sub>2</sub> + w<sub>3</sub> x<sub>3</sub> + b</p>
+<p><strong>Exemple.</strong> Avec w<sub>1</sub> = 2, w<sub>2</sub> = −1, w<sub>3</sub> = 0,5, b = −1 et les entrées x<sub>1</sub> = 1, x<sub>2</sub> = 3, x<sub>3</sub> = 4 : s = 2 × 1 + (−1) × 3 + 0,5 × 4 − 1 = 0. Comme s n'est pas strictement positif, la sortie vaut y = 0.</p>
+<p>Les poids et le biais sont les <strong>paramètres</strong> du neurone : ce sont eux que l'apprentissage va régler.</p>
+<aside class="savoir"><strong>Le perceptron.</strong> En 1958, Frank Rosenblatt construit le <strong>perceptron</strong>, le premier neurone artificiel capable d'apprendre ses poids à partir d'exemples. En 1969, Marvin Minsky et Seymour Papert montrent qu'un neurone seul ne peut résoudre que des problèmes où une ligne droite sépare les deux catégories : il est incapable, par exemple, de calculer le « ou exclusif ». Cette limite contribue au premier « hiver de l'IA ». La solution viendra plus tard : assembler de nombreux neurones en réseau.</aside>` },
+      { t: "quiz", titre: "Calculer une sortie",
+        intro: "Un neurone a pour poids w₁ = 1,5, w₂ = −2, w₃ = 1 et pour biais b = −0,5. Sa sortie vaut 1 si s > 0, et 0 sinon.",
+        questions: [
+          { q: "Pour les entrées (1 ; 0 ; 0) ?", choix: ["s = 1, donc y = 1", "s = 1,5, donc y = 1", "s = −0,5, donc y = 0"], bon: 0, expl: "s = 1,5 − 0,5 = 1." },
+          { q: "Pour les entrées (1 ; 1 ; 1) ?", choix: ["s = 0,5, donc y = 1", "s = 0, donc y = 0", "s = 0, donc y = 1"], bon: 1, expl: "s = 1,5 − 2 + 1 − 0,5 = 0, qui n'est pas strictement positif." },
+          { q: "Pour les entrées (2 ; 1 ; 0) ?", choix: ["s = 1, donc y = 1", "s = −0,5, donc y = 0", "s = 0,5, donc y = 1"], bon: 2, expl: "s = 3 − 2 − 0,5 = 0,5." },
+        ] },
+      { t: "atelier", titre: "Un neurone logique",
+        intro: "Les entrées x₁ et x₂ valent 0 ou 1. Règle les deux poids et le biais ; la sortie vaut 1 si s > 0.",
+        objectifs: [
+          { consigne: "Obtiens un neurone dont la sortie vaut 1 uniquement lorsque x₁ = 1 ET x₂ = 1.", entrees: ["première entrée", "seconde entrée"], poids: [0, 0], min: -2, max: 2, pas: 0.5, biais: { val: 0, min: -2, max: 2, pas: 0.5 }, cible: "et",
+            expl: "Par exemple w₁ = w₂ = 1 et b = −1,5 : la somme ne devient positive que si les deux entrées valent 1." },
+          { consigne: "Obtiens maintenant un neurone dont la sortie vaut 1 lorsque x₁ = 1 OU x₂ = 1 (ou les deux).", entrees: ["première entrée", "seconde entrée"], poids: [0, 0], min: -2, max: 2, pas: 0.5, biais: { val: 0, min: -2, max: 2, pas: 0.5 }, cible: "ou",
+            expl: "Par exemple w₁ = w₂ = 1 et b = −0,5. Un seul neurone sait donc calculer « et » et « ou ». En revanche, aucun réglage ne donne le « ou exclusif » (l'un ou l'autre, mais pas les deux) : il faut plusieurs neurones." },
+        ] },
+      { t: "lecon", titre: "Les réseaux de neurones",
+        texte: `<p>Un <strong>réseau de neurones</strong> est un ensemble de neurones artificiels organisés en <strong>couches</strong> :</p>
+<ul><li>la <strong>couche d'entrée</strong> reçoit les données (par exemple, les pixels d'une image) ;</li><li>les <strong>couches cachées</strong> transforment l'information étape par étape ;</li><li>la <strong>couche de sortie</strong> donne la réponse (par exemple, un score pour chaque chiffre de 0 à 9).</li></ul>
+<p>Les sorties d'une couche sont les entrées de la couche suivante : l'information se <strong>propage</strong> de l'entrée vers la sortie.</p>
+<p>Lorsqu'un réseau compte de nombreuses couches cachées, on parle d'<strong>apprentissage profond</strong> (<em>deep learning</em>). Chaque couche apprend à repérer des éléments de plus en plus complexes : dans une image, les premières couches détectent des contours, les suivantes des formes (un œil, une oreille), les dernières des objets entiers.</p>
+<p><strong>Combien de paramètres ?</strong> Un réseau classique de reconnaissance de chiffres manuscrits reçoit des images de 28 × 28 = 784 pixels. Il possède une couche cachée de 128 neurones et une couche de sortie de 10 neurones. Chaque neurone a un poids par entrée et un biais :</p>
+<p class="formule">(784 × 128 + 128) + (128 × 10 + 10) = 101 770 paramètres</p>
+<p>Les grands modèles de langage actuels en comptent des <strong>milliards</strong>.</p>` },
+      { t: "quiz", titre: "Compter les paramètres", intro: "Chaque neurone a un poids par entrée et un biais.",
+        questions: [
+          { q: "Un réseau possède 4 entrées, une couche cachée de 5 neurones et une couche de sortie de 3 neurones. Combien de paramètres ?", choix: ["12", "35", "43", "60"], bon: 2, expl: "Couche cachée : 4 × 5 + 5 = 25. Couche de sortie : 5 × 3 + 3 = 18. Total : 43." },
+          { q: "Et avec deux couches cachées de 5 neurones ?", choix: ["48", "73", "86"], bon: 1, expl: "On ajoute une couche de 5 × 5 + 5 = 30 paramètres : 25 + 30 + 18 = 73." },
+          { q: "Une coopérative veut prédire si un melon est mûr à partir de trois mesures : couleur de l'écorce, fermeté et masse. Combien de neurones faut-il dans la couche d'entrée ?", choix: ["1", "3", "10"], bon: 1, expl: "Un par caractéristique mesurée. En sortie, un seul neurone suffit : mûr (1) ou pas mûr (0)." },
+          { q: "De quelles données la coopérative a-t-elle besoin pour entraîner ce réseau ?", choix: ["Des photos de la coopérative.", "De nombreux melons variés, mesurés, dont on sait s'ils étaient mûrs.", "Du prix de vente des melons."], bon: 1, expl: "Des exemples étiquetés (par un expert ou à la dégustation), de plusieurs variétés, saisons et producteurs, avec une partie mise de côté pour le test." },
+        ] },
+      { t: "lecon", titre: "Comment un réseau apprend-il ?",
+        texte: `<p>Au départ, les poids sont choisis au hasard : le réseau répond n'importe quoi. L'<strong>entraînement</strong> répète alors trois étapes, des milliers de fois :</p>
+<ol class="phases"><li><strong>Prédire</strong> on présente un exemple au réseau, qui calcule sa réponse</li><li><strong>Mesurer l'erreur</strong> on compare la réponse à l'étiquette attendue ; la fonction de perte transforme cet écart en un nombre</li><li><strong>Corriger</strong> on modifie légèrement chaque poids dans la direction qui diminue l'erreur</li></ol>
+<p>Un passage complet sur toutes les données d'entraînement s'appelle une <strong>époque</strong>. On répète les époques jusqu'à ce que l'erreur ne diminue plus.</p>
+<aside class="savoir"><strong>Le randonneur dans le brouillard.</strong> Corriger les poids, c'est comme descendre une montagne dans un épais brouillard. On ne voit pas la vallée (l'erreur minimale), mais on sent sous ses pieds dans quelle direction le sol descend, et l'on fait un petit pas dans cette direction, puis un autre… Les mathématiciens appellent cette méthode la <strong>descente de gradient</strong>. Pour un réseau, il faut savoir comment corriger des millions de poids à la fois : c'est le rôle de la <strong>rétropropagation</strong>, popularisée dans les années 1980.</aside>
+<aside class="retenir"><strong>À retenir.</strong> Un réseau de neurones n'est pas programmé règle par règle : ses milliers ou ses milliards de poids sont <strong>ajustés automatiquement</strong> pour réduire ses erreurs sur des exemples. C'est pourquoi il lui faut beaucoup de données et beaucoup de calculs, et c'est aussi pourquoi il est difficile d'expliquer une décision particulière : on parle de <strong>boîte noire</strong>.</aside>` },
+      { t: "ordre", texte: true, titre: "Les étapes de l'entraînement", q: "Range dans l'ordre ce qui se passe pendant l'entraînement d'un réseau.",
+        lignes: ["Les poids sont choisis au hasard.", "On présente un exemple au réseau, qui calcule sa réponse.", "On compare cette réponse à l'étiquette attendue : c'est l'erreur.", "On modifie légèrement chaque poids pour diminuer l'erreur.", "On recommence avec les exemples suivants, époque après époque."],
+        expl: "Prédire, mesurer l'erreur, corriger : ce cycle est répété des milliers de fois." },
+      { t: "quiz", titre: "Le bon vocabulaire",
+        questions: [
+          { q: "Le nombre qui mesure l'importance d'une entrée est…", choix: ["son poids.", "son biais.", "son époque."], bon: 0, expl: "Chaque entrée est multipliée par son poids." },
+          { q: "Le nombre ajouté à la somme pondérée est…", choix: ["la sortie.", "le biais.", "la couche cachée."], bon: 1, expl: "Les poids et les biais sont les paramètres du réseau." },
+          { q: "Ce qui transforme la somme s en sortie y est…", choix: ["la fonction d'activation.", "la fonction de perte.", "l'époque."], bon: 0, expl: "Par exemple un seuil : 1 si s > 0, 0 sinon. La fonction de perte, elle, mesure l'erreur." },
+          { q: "Une couche située entre l'entrée et la sortie est…", choix: ["une couche de test.", "une couche cachée.", "une couche d'étiquettes."], bon: 1, expl: "Avec de nombreuses couches cachées, on parle d'apprentissage profond." },
+        ] },
+      { t: "quiz", titre: "Voir un neurone apprendre", widget: "perceptron",
+        intro: "On reprend les criquets et les sauterelles du chapitre 3. Un seul neurone, d'entrées la longueur du corps et celle des antennes, apprend à les distinguer : sortie 1 pour « sauterelle », 0 pour « criquet ». Quand il se trompe sur un insecte, ses poids sont corrigés. Clique sur « Époque suivante » pour lui faire revoir les douze insectes.",
+        questions: [
+          { q: "Avant toute époque, les poids et le biais sont nuls. Que répond le neurone pour le premier insecte, une sauterelle ?", choix: ["1 (sauterelle) : c'est juste.", "0 (criquet) : c'est faux.", "Rien du tout."], bon: 1, expl: "La somme vaut 0, qui n'est pas strictement positive : le neurone répond 0. C'est une erreur, donc les poids vont être corrigés." },
+          { q: "Lance la première époque. Combien d'erreurs le neurone commet-il ?", choix: ["0", "3", "12"], bon: 1, expl: "Trois erreurs, et trois corrections des poids : w₁ = −0,25, w₂ = 0,25 et b = −0,1." },
+          { q: "Continue. À partir de quelle époque le neurone ne fait-il plus aucune erreur ?", choix: ["L'époque 2", "L'époque 3", "L'époque 10"], bon: 1, expl: "À l'époque 3, les douze insectes sont bien classés : les poids ne changent plus (w₁ = −0,4, w₂ = 0,5, b = −0,2)." },
+          { q: "Que représente la droite tracée sur le graphique ?", choix: ["La moyenne des insectes.", "La frontière de décision : au-dessus, « sauterelle » ; en dessous, « criquet ».", "L'erreur du neurone."], bon: 1, expl: "Le neurone répond « sauterelle » lorsque −0,4x + 0,5y − 0,2 > 0, c'est-à-dire y > 0,8x + 0,4. Il a appris à tracer une droite qui sépare les deux nuages." },
+          { q: "Où se trouve l'insecte N3 (3,0 ; 2,8) du chapitre 3 par rapport à la droite d'équation y = 0,8x + 0,4 ?", choix: ["Nettement au-dessus.", "Exactement dessus.", "Nettement en dessous."], bon: 1, expl: "0,8 × 3 + 0,4 = 2,8. Il est normal que N3 ait posé problème au chapitre 3 : il est à égale « hésitation » entre les deux groupes." },
+        ] },
+      { t: "quiz", titre: "Corriger les poids à la main",
+        intro: "La règle d'apprentissage : erreur = cible − sortie. Si l'erreur n'est pas nulle, chaque poids augmente de 0,1 × erreur × entrée, et le biais de 0,1 × erreur. Au départ, w₁ = w₂ = b = 0.",
+        questions: [
+          { q: "Premier insecte : (4,5 ; 5,0), cible 1. La somme vaut 0, donc la sortie vaut 0 et l'erreur 1. Quels sont les nouveaux paramètres ?", choix: ["w₁ = 0,45 ; w₂ = 0,5 ; b = 0,1", "w₁ = 4,5 ; w₂ = 5 ; b = 1", "w₁ = −0,45 ; w₂ = −0,5 ; b = −0,1"], bon: 0, expl: "w₁ = 0 + 0,1 × 1 × 4,5 = 0,45 ; w₂ = 0 + 0,1 × 1 × 5 = 0,5 ; b = 0 + 0,1 × 1 = 0,1." },
+          { q: "Les cinq insectes suivants sont bien classés. Le septième est (3,0 ; 1,0), cible 0. Avec ces poids, que calcule le neurone ?", choix: ["s = 1,95, sortie 1 : il se trompe.", "s = −1,95, sortie 0 : il a raison.", "s = 0, sortie 0 : il a raison."], bon: 0, expl: "s = 0,45 × 3 + 0,5 × 1 + 0,1 = 1,95 > 0. Il répond « sauterelle » pour un criquet : l'erreur vaut 0 − 1 = −1." },
+          { q: "Quels sont les paramètres après cette correction ?", choix: ["w₁ = 0,75 ; w₂ = 0,6 ; b = 0,2", "w₁ = 0,15 ; w₂ = 0,4 ; b = 0", "w₁ = 0,45 ; w₂ = 0,5 ; b = 0,1"], bon: 1, expl: "w₁ = 0,45 − 0,1 × 3 = 0,15 ; w₂ = 0,5 − 0,1 × 1 = 0,4 ; b = 0,1 − 0,1 = 0. Les poids des entrées présentes diminuent, pour que la somme soit plus petite la prochaine fois." },
+        ] },
+      { t: "code", titre: "Programmer un neurone", d: 1, caches: ["neurone(1, 1, 1, 1, -1.5)", "neurone(1, 0, 1, 1, -1.5)", "neurone(2, 3, 1, -1, 2)", "neurone(0, 0, 5, 5, 0)"],
+        enonce: `<p>Écris une fonction <code>neurone(x1, x2, w1, w2, b)</code> qui calcule la somme pondérée des deux entrées, ajoute le biais, puis renvoie 1 si cette somme est strictement positive et 0 sinon.</p>`,
+        depart: `def neurone(x1, x2, w1, w2, b):\n    `,
+        solution: `def neurone(x1, x2, w1, w2, b):\n    somme = w1 * x1 + w2 * x2 + b\n    if somme > 0:\n        return 1\n    else:\n        return 0`,
+        tests: [{ appels: [["neurone(4.0, 4.0, -0.4, 0.5, -0.2)", "1"], ["neurone(4.8, 1.8, -0.4, 0.5, -0.2)", "0"], ["neurone(1, 1, 2, 1, -3)", "0"], ["neurone(0, 0, 0, 0, 0)", "0"]] }],
+        indices: ["La somme vaut w1 * x1 + w2 * x2 + b.", "Un if compare cette somme à 0, avec une inégalité stricte."] },
+      { t: "code", titre: "Une époque d'apprentissage", d: 3, caches: ["epoque(-0.25, 0.25, -0.1)", "epoque(1, 1, 1)", "epoque(0.5, -0.5, 0)"],
+        enonce: `<p>La fonction <code>epoque(w1, w2, b)</code> fait revoir au neurone les douze insectes. À chaque erreur, elle doit corriger les trois paramètres selon la règle d'apprentissage :</p><ul><li>w1 augmente de <code>taux * erreur * x1</code> ;</li><li>w2 augmente de <code>taux * erreur * x2</code> ;</li><li>b augmente de <code>taux * erreur</code>.</li></ul><p>Complète-la. Elle renvoie les nouveaux paramètres et le nombre d'erreurs commises.</p>`,
+        depart: `# Sauterelles : cible 1. Criquets : cible 0.\ninsectes = [\n    (4.5, 5.0, 1), (5.0, 6.0, 1), (3.5, 4.5, 1),\n    (4.0, 5.5, 1), (5.5, 5.0, 1), (3.0, 4.0, 1),\n    (3.0, 1.0, 0), (4.0, 1.5, 0), (5.0, 1.2, 0),\n    (3.5, 0.8, 0), (4.5, 2.0, 0), (2.5, 1.5, 0)]\ntaux = 0.1\n\ndef neurone(x1, x2, w1, w2, b):\n    if w1 * x1 + w2 * x2 + b > 0:\n        return 1\n    else:\n        return 0\n\ndef epoque(w1, w2, b):\n    erreurs = 0\n    for (x1, x2, cible) in insectes:\n        erreur = cible - neurone(x1, x2, w1, w2, b)\n        if erreur != 0:\n            erreurs = erreurs + 1\n            # À compléter : corriger w1, w2 et b\n    return (w1, w2, b, erreurs)\n\nprint(epoque(0, 0, 0))`,
+        solution: `# Sauterelles : cible 1. Criquets : cible 0.\ninsectes = [\n    (4.5, 5.0, 1), (5.0, 6.0, 1), (3.5, 4.5, 1),\n    (4.0, 5.5, 1), (5.5, 5.0, 1), (3.0, 4.0, 1),\n    (3.0, 1.0, 0), (4.0, 1.5, 0), (5.0, 1.2, 0),\n    (3.5, 0.8, 0), (4.5, 2.0, 0), (2.5, 1.5, 0)]\ntaux = 0.1\n\ndef neurone(x1, x2, w1, w2, b):\n    if w1 * x1 + w2 * x2 + b > 0:\n        return 1\n    else:\n        return 0\n\ndef epoque(w1, w2, b):\n    erreurs = 0\n    for (x1, x2, cible) in insectes:\n        erreur = cible - neurone(x1, x2, w1, w2, b)\n        if erreur != 0:\n            erreurs = erreurs + 1\n            w1 = w1 + taux * erreur * x1\n            w2 = w2 + taux * erreur * x2\n            b = b + taux * erreur\n    return (w1, w2, b, erreurs)\n\nprint(epoque(0, 0, 0))`,
+        tests: [{ appels: [["epoque(0, 0, 0)", "(-0.25, 0.25, -0.1, 3)"], ["epoque(-0.4, 0.5, -0.2)", "(-0.4, 0.5, -0.2, 0)"]] }],
+        indices: ["Trois lignes à écrire, une par paramètre, à l'intérieur du if.", "w1 = w1 + taux * erreur * x1, et de même pour w2 avec x2.", "Pour le biais : b = b + taux * erreur."] },
+      { t: "lecon", titre: "Un réseau dans le navigateur",
+        texte: `<p>Le site <strong>TensorFlow Playground</strong> (playground.tensorflow.org) permet d'entraîner un petit réseau de neurones et de le voir apprendre. Des points orange et bleus doivent être séparés ; le fond coloré montre la réponse du réseau en chaque point du plan.</p>
+<p>Si tu y as accès, mène l'enquête :</p>
+<ol><li>Choisis le jeu de données à deux nuages bien séparés (<em>Gaussian</em>), supprime toutes les couches cachées (<em>Hidden layers</em> : 0) et lance l'entraînement. Observe la forme de la frontière.</li><li>Observe les nombres <em>Training loss</em> et <em>Test loss</em> pendant l'entraînement.</li><li>Choisis le jeu de données en cercle (<em>Circle</em>), toujours sans couche cachée.</li><li>Ajoute une couche cachée de 4 neurones et relance.</li><li>Essaie la spirale (<em>Spiral</em>) et cherche une architecture qui fonctionne.</li></ol>
+<p>L'étape suivante revient sur ce que l'on observe.</p>` },
+      { t: "quiz", titre: "Ce que montre le réseau",
+        questions: [
+          { q: "Sans couche cachée, quelle est la forme de la frontière tracée par le réseau entre deux nuages de points ?", choix: ["Une ligne droite", "Un cercle", "Une spirale"], bon: 0, expl: "Comme le neurone seul de l'étape précédente." },
+          { q: "Les points bleus forment un disque entouré de points orange. Sans couche cachée, le réseau réussit-il à les séparer ?", choix: ["Oui, en quelques époques.", "Non : il ne peut tracer qu'une frontière droite.", "Oui, à condition d'attendre très longtemps."], bon: 1, expl: "Avec une couche cachée de 4 neurones, la frontière devient courbe et entoure le disque." },
+          { q: "Que représentent les nombres « Training loss » et « Test loss » ?", choix: ["Le nombre de neurones.", "Les erreurs moyennes du réseau sur les données d'entraînement et sur les données de test.", "La durée de l'entraînement."], bon: 1, expl: "Elles diminuent au fil des époques, puis se stabilisent." },
+          { q: "La spirale est plus difficile à séparer. Que faut-il au réseau ?", choix: ["Moins de neurones.", "Davantage de couches et de neurones, et plus d'époques.", "Aucune donnée."], bon: 1, expl: "Plus le problème est complexe, plus le réseau doit être grand." },
+        ] },
+      { t: "lecon", titre: "Des cerveaux artificiels ?",
+        texte: `<p>Les mots « neurone » et « apprentissage » invitent à comparer ces réseaux à un cerveau. La comparaison a ses limites.</p>
+<table class="donnees large"><thead><tr><th></th><th>Cerveau humain</th><th>Réseau de neurones artificiels</th></tr></thead><tbody>
+<tr><th>Unités</th><td>environ 86 milliards de neurones vivants, aux comportements très variés</td><td>des nombres dans un programme, tous calculés de la même façon</td></tr>
+<tr><th>Apprentissage</th><td>quelques exemples suffisent souvent (un enfant reconnaît un chat après en avoir vu quelques-uns)</td><td>il faut souvent des milliers ou des millions d'exemples</td></tr>
+<tr><th>Énergie</th><td>une vingtaine de watts</td><td>l'entraînement d'un grand modèle mobilise des centres de données entiers (chapitre 13)</td></tr>
+<tr><th>Polyvalence</th><td>le même cerveau marche, parle, aime, imagine</td><td>un réseau est entraîné pour un type de tâche</td></tr>
+<tr><th>Compréhension</th><td>expérience du monde, du corps, des émotions</td><td>calculs statistiques sur des données</td></tr></tbody></table>
+<aside class="retenir"><strong>À retenir.</strong> Les réseaux de neurones artificiels se sont <strong>inspirés</strong> du cerveau, mais ils n'en sont pas des copies. Ce sont des outils mathématiques puissants qui apprennent des régularités dans des données ; parler de « cerveaux artificiels » est une image, pas une description.</aside>` },
+      { t: "tri", titre: "Cerveau ou réseau ?", q: "À qui chaque description s'applique-t-elle ?", categories: ["Cerveau humain", "Réseau artificiel"],
+        items: [
+          { txt: "Quelques exemples lui suffisent souvent pour apprendre.", cat: 0, expl: "Un enfant reconnaît un chat après en avoir vu quelques-uns." },
+          { txt: "Il fonctionne avec une vingtaine de watts.", cat: 0, expl: "L'entraînement d'un grand modèle mobilise des centres de données entiers." },
+          { txt: "Ses unités sont des nombres, tous calculés de la même façon.", cat: 1, expl: "Les neurones biologiques, eux, sont vivants et très variés." },
+          { txt: "Il est entraîné pour un type de tâche.", cat: 1, expl: "Le même cerveau marche, parle, aime, imagine." },
+          { txt: "Il a une expérience du monde, du corps et des émotions.", cat: 0, expl: "Un réseau effectue des calculs statistiques sur des données." },
+          { txt: "Il lui faut souvent des milliers ou des millions d'exemples.", cat: 1, expl: "C'est l'une des grandes différences avec l'apprentissage humain." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Un neurone artificiel calcule d'abord…", choix: ["une moyenne de ses sorties.", "une somme pondérée de ses entrées, plus un biais.", "le maximum de ses entrées.", "une image."], bon: 1, expl: "Puis il applique une fonction d'activation." },
+          { q: "Les paramètres réglés pendant l'entraînement sont…", choix: ["les entrées.", "les étiquettes.", "les poids et les biais.", "les pixels."], bon: 2, expl: "Ce sont eux que l'apprentissage ajuste." },
+          { q: "Avec w₁ = 2, w₂ = 1, b = −3 et les entrées x₁ = 1, x₂ = 1, la somme vaut…", choix: ["0.", "3.", "6.", "−3."], bon: 0, expl: "2 + 1 − 3 = 0." },
+          { q: "On parle d'apprentissage profond lorsque le réseau…", choix: ["comporte de nombreuses couches cachées.", "est installé sous terre.", "apprend sans données.", "ne contient qu'un neurone."], bon: 0, expl: "« Profond » renvoie au nombre de couches." },
+          { q: "Une époque correspond à…", choix: ["une correction d'un seul poids.", "un passage sur toutes les données d'entraînement.", "une année de recherche.", "la durée d'utilisation du modèle."], bon: 1, expl: "On répète les époques jusqu'à ce que l'erreur ne diminue plus." },
+          { q: "Un neurone artificiel seul (perceptron) peut séparer deux catégories…", choix: ["quelle que soit leur disposition.", "seulement si une ligne droite peut les séparer.", "seulement s'il y a plus de 1 000 exemples.", "jamais."], bon: 1, expl: "C'est la limite montrée par Minsky et Papert en 1969." },
+          { q: "On dit qu'un réseau de neurones est une « boîte noire » parce que…", choix: ["il est rangé dans un boîtier noir.", "il ne fonctionne que la nuit.", "il est difficile d'expliquer une décision à partir de ses milliers de poids.", "ses calculs sont secrets par la loi."], bon: 2, expl: "Ses poids sont ajustés automatiquement, pas écrits comme des règles lisibles." },
+          { q: "Par rapport au cerveau humain, un réseau de neurones artificiels…", choix: ["est une copie fidèle du cerveau.", "a besoin en général de beaucoup plus d'exemples pour apprendre.", "consomme beaucoup moins d'énergie.", "comprend le monde comme un humain."], bon: 1, expl: "Il s'en inspire, sans en être une copie." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Le neurone artificiel.</strong> Il reçoit des <strong>entrées</strong>, les multiplie par des <strong>poids</strong>, ajoute un <strong>biais</strong>, puis applique une <strong>fonction d'activation</strong> (par exemple un seuil : sortie 1 si s &gt; 0, 0 sinon).</p>
+<p class="formule">s = w<sub>1</sub> x<sub>1</sub> + w<sub>2</sub> x<sub>2</sub> + w<sub>3</sub> x<sub>3</sub> + b</p>
+<p>Les poids et les biais sont les <strong>paramètres</strong>. Un neurone seul ne sépare deux catégories que par une <strong>ligne droite</strong>.</p>
+<p><strong>Le réseau.</strong> Des neurones organisés en couches : <strong>entrée</strong>, <strong>couches cachées</strong>, <strong>sortie</strong>. Avec de nombreuses couches cachées, on parle d'<strong>apprentissage profond</strong>. Un réseau compte des milliers à des milliards de paramètres.</p>
+<p><strong>L'entraînement.</strong> Trois étapes répétées : <strong>prédire</strong>, <strong>mesurer l'erreur</strong>, <strong>corriger</strong> les poids pour la diminuer. Un passage sur toutes les données est une <strong>époque</strong>.</p>
+<p><strong>Les limites.</strong> Un réseau a besoin de beaucoup de données et de calculs. Ses décisions sont difficiles à expliquer : c'est une <strong>boîte noire</strong>. Il s'est <strong>inspiré</strong> du cerveau, mais n'en est pas une copie.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>calculer la sortie d'un neurone</li><li>nommer les couches d'un réseau</li><li>compter les paramètres d'un petit réseau</li><li>décrire les trois étapes de l'entraînement</li><li>expliquer l'expression « boîte noire »</li><li>comparer cerveau et réseau artificiel</li></ul>` },
+    ]
+  },
   ]
 },
 {

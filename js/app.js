@@ -2,8 +2,8 @@
 /* Synapse — interface, progression et ludification (moteur repris du site Mue). Le contenu est dans contenu.js. */
 
 const CLE = "synapse.v1";
-const XP_BASE = { lecon: 5, qcm: 10, predire: 10, ordre: 15, tri: 15, quiz: 20 };
-const NOMS_ETAPES = { lecon: "Leçon", qcm: "Question", predire: "Prédiction", ordre: "Remise en ordre", code: "Exercice de code", tri: "Classement", quiz: "Questions" };
+const XP_BASE = { lecon: 5, qcm: 10, predire: 10, ordre: 15, tri: 15, quiz: 20, atelier: 25 };
+const NOMS_ETAPES = { lecon: "Leçon", qcm: "Question", predire: "Prédiction", ordre: "Remise en ordre", code: "Exercice de code", tri: "Classement", quiz: "Questions", atelier: "Atelier" };
 const dispo = c => c.etapes.length > 0;
 const TOUS = [...PARCOURS.flatMap(p => p.chapitres), DEFIS];
 const BAC_DEPART = `# Bac à sable : écris ce que tu veux, rien n'est noté.\nprenom = input("Ton prénom ? ")\nfor i in range(3):\n    print("Bonjour", prenom, "!" * (i + 1))\n`;
@@ -358,7 +358,7 @@ function vueChapitre(c, brut) {
     ${i > 0 ? `<a href="#/c/${c.id}/${i - 1}">Étape précédente</a>` : "<span></span>"}
     <a href="#/c/${c.id}/${i + 1 < c.etapes.length ? i + 1 : "fin"}">${i + 1 < c.etapes.length ? "Passer à la suite" : "Bilan du chapitre"}</a>
   </nav>`;
-  ({ lecon: etapeLecon, qcm: etapeQcm, predire: etapePredire, ordre: etapeOrdre, code: etapeCode, tri: etapeTri, quiz: etapeQuiz })[e.t]($(".etape"), c, i, e);
+  ({ lecon: etapeLecon, qcm: etapeQcm, predire: etapePredire, ordre: etapeOrdre, code: etapeCode, tri: etapeTri, quiz: etapeQuiz, atelier: etapeAtelier })[e.t]($(".etape"), c, i, e);
 }
 
 const suivant = (c, i) => `#/c/${c.id}/${i + 1 < c.etapes.length ? i + 1 : "fin"}`;
@@ -477,7 +477,7 @@ function etapeTri(z, c, i, e) {
 function etapeQuiz(z, c, i, e) {
   let n = 0, erreurs = 0; const N = e.questions.length;
   z.innerHTML = `<h1>${h(e.titre)}</h1>${e.intro ? `<p class="prose question">${h(e.intro)}</p>` : ""}${e.doc || ""}${e.code ? blocCode(e.code) : ""}${e.widget ? `<div class="widget"></div>` : ""}<div class="quiz-q"></div>`;
-  const widget = e.widget === "knn" ? widgetKnn($(".widget", z)) : null;
+  const widget = e.widget ? ({ knn: widgetKnn, pixels: widgetPixels, perceptron: widgetPerceptron })[e.widget]($(".widget", z)) : null;
   const zq = $(".quiz-q", z);
   const poser = () => {
     const q = e.questions[n]; let rate = false, fait = false;
@@ -593,6 +593,89 @@ function etapeCode(z, c, i, e) {
       if (essais >= 3 && !sol) $("#sol", z).hidden = false;
     }
   };
+}
+
+/* Manipulation : une image n'est qu'un tableau de nombres (chapitre 2). */
+const IMAGE_CHAT = [[0,1,0,0,0,0,0,0,1,0],[0,1,1,0,0,0,0,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,0,0,1,1,0,0,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,0,0,1,1,1,0],[0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,0,0,0],[0,0,0,0,0,0,0,0,0,0]];
+function widgetPixels(z) {
+  const etat = IMAGE_CHAT.map(l => l.map(() => 0));
+  z.innerHTML = `<div class="pixels"><div class="pixels-grille" role="group" aria-label="Grille de 10 lignes et 10 colonnes">${IMAGE_CHAT.map((l, r) => l.map((v, c) => `<button data-r="${r}" data-c="${c}" aria-pressed="false" aria-label="Ligne ${r + 1}, colonne ${c + 1}, valeur ${v}">${v}</button>`).join("")).join("")}</div>
+    <div class="pixels-cmd"><p class="pixels-res" aria-live="polite"></p><button class="btn secondaire petit" id="px-tout">Colorier toutes les cases à 1</button> <button class="btn lien" id="px-raz">Tout effacer</button></div></div>`;
+  const maj = () => {
+    let bons = 0, torts = 0;
+    $$(".pixels-grille button", z).forEach(b => { const r = +b.dataset.r, c = +b.dataset.c; b.setAttribute("aria-pressed", !!etat[r][c]); if (etat[r][c]) { if (IMAGE_CHAT[r][c]) bons++; else torts++; } });
+    $(".pixels-res", z).textContent = `${bons + torts} case${bons + torts > 1 ? "s" : ""} coloriée${bons + torts > 1 ? "s" : ""}` + (torts ? `, dont ${torts} qui contien${torts > 1 ? "nent" : "t"} un 0.` : ".");
+  };
+  $(".pixels-grille", z).onclick = ev => { const b = ev.target.closest("button"); if (!b) return; etat[+b.dataset.r][+b.dataset.c] ^= 1; maj(); };
+  $("#px-tout", z).onclick = () => { IMAGE_CHAT.forEach((l, r) => l.forEach((v, c) => { etat[r][c] = v; })); maj(); };
+  $("#px-raz", z).onclick = () => { etat.forEach(l => l.fill(0)); maj(); };
+  maj();
+  return { reveler() {} };
+}
+
+/* Manipulation : un neurone apprend à séparer sauterelles et criquets (chapitre 4). */
+function widgetPerceptron(z) {
+  const D = [[4.5, 5.0, 1], [5.0, 6.0, 1], [3.5, 4.5, 1], [4.0, 5.5, 1], [5.5, 5.0, 1], [3.0, 4.0, 1], [3.0, 1.0, 0], [4.0, 1.5, 0], [5.0, 1.2, 0], [3.5, 0.8, 0], [4.5, 2.0, 0], [2.5, 1.5, 0]];
+  const W = 340, H = 330, ML = 34, MB = 30, MT = 10, MR = 8, XM = 6.5, YM = 6.8;
+  const X = x => ML + x / XM * (W - ML - MR), Y = y => H - MB - y / YM * (H - MT - MB);
+  const fr = v => String(Math.round(v * 100) / 100).replace(".", ",");
+  let w1, w2, b, ep, journal;
+  z.innerHTML = `<div class="knn"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Les douze insectes et la frontière tracée par le neurone"></svg>
+    <div class="knn-cmd"><p class="knn-legende"><span class="l-saut">sauterelle (sortie 1)</span><span class="l-criq">criquet (sortie 0)</span></p>
+    <div class="knn-ligne"><button class="btn petit" id="pc-ep">Époque suivante</button><button class="btn lien" id="pc-raz">Recommencer</button></div>
+    <ol class="pc-journal" aria-live="polite"></ol></div></div>`;
+  const svg = $("svg", z);
+  const dessiner = () => {
+    let s = "";
+    for (let g = 0; g <= 6; g++) s += `<line class="grille" x1="${X(g)}" y1="${Y(0)}" x2="${X(g)}" y2="${Y(YM)}"/><line class="grille" x1="${X(0)}" y1="${Y(g)}" x2="${X(XM)}" y2="${Y(g)}"/>` + (g ? `<text class="gradu" x="${X(g)}" y="${Y(0) + 14}" text-anchor="middle">${g}</text><text class="gradu" x="${X(0) - 7}" y="${Y(g) + 4}" text-anchor="end">${g}</text>` : "");
+    s += `<line class="axe" x1="${X(0)}" y1="${Y(0)}" x2="${X(XM)}" y2="${Y(0)}"/><line class="axe" x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(YM)}"/><text class="gradu" x="${X(XM)}" y="${H - 3}" text-anchor="end">corps (cm)</text><text class="gradu" x="${X(0) + 5}" y="${MT + 8}">antennes (cm)</text>`;
+    if (w2 !== 0) { const f = x => (-w1 * x - b) / w2; s += `<clipPath id="pc-clip"><rect x="${X(0)}" y="${Y(YM)}" width="${X(XM) - X(0)}" height="${Y(0) - Y(YM)}"/></clipPath><line class="frontiere" clip-path="url(#pc-clip)" x1="${X(0)}" y1="${Y(f(0))}" x2="${X(XM)}" y2="${Y(f(XM))}"/>`; }
+    s += D.map(p => p[2] ? `<circle class="saut" cx="${X(p[0])}" cy="${Y(p[1])}" r="6"/>` : `<rect class="criq" x="${X(p[0]) - 5.5}" y="${Y(p[1]) - 5.5}" width="11" height="11"/>`).join("");
+    svg.innerHTML = s;
+    $(".pc-journal", z).innerHTML = journal.length ? journal.map(l => `<li>${l}</li>`).join("") : `<li class="muet">Au départ : w1 = 0, w2 = 0, b = 0. Aucune frontière n'est encore tracée.</li>`;
+  };
+  const raz = () => { w1 = 0; w2 = 0; b = 0; ep = 0; journal = []; dessiner(); };
+  $("#pc-ep", z).onclick = () => {
+    let erreurs = 0; ep++;
+    for (const [x1, x2, cible] of D) { const e = cible - (w1 * x1 + w2 * x2 + b > 0 ? 1 : 0); if (e !== 0) { erreurs++; w1 += 0.1 * e * x1; w2 += 0.1 * e * x2; b += 0.1 * e; } }
+    journal.push(`Époque ${ep} : ${erreurs} erreur${erreurs > 1 ? "s" : ""}. w1 = ${fr(w1)}, w2 = ${fr(w2)}, b = ${fr(b)}`); if (journal.length > 6) journal.shift();
+    dessiner();
+  };
+  $("#pc-raz", z).onclick = raz;
+  raz();
+  return { reveler() {} };
+}
+
+/* Atelier : régler soi-même les poids d'un neurone pour obtenir un comportement donné. */
+const CIBLES = { amis: x => x[1], et: x => x[0] && x[1], ou: x => x[0] || x[1] };
+function etapeAtelier(z, c, i, e) {
+  let n = 0, rates = 0;
+  z.innerHTML = `<h1>${h(e.titre)}</h1>${e.intro ? `<p class="prose question">${h(e.intro)}</p>` : ""}<div class="atelier-z"></div>`;
+  const za = $(".atelier-z", z), fr = v => String(Math.round(v * 100) / 100).replace(".", ",");
+  const poser = () => {
+    const o = e.objectifs[n], N = o.entrees.length, w = o.poids.slice(); let b = o.biais ? o.biais.val : 0; const seuil = o.seuil || 0;
+    const cas = Array.from({ length: 1 << N }, (_, k) => o.entrees.map((_, j) => (k >> (N - 1 - j)) & 1)).reverse();
+    const curseur = (id, lib, val, mn, mx, pas) => `<div class="neu-ligne"><label for="${id}">${lib}</label><input type="range" id="${id}" min="${mn}" max="${mx}" step="${pas}" value="${val}"><output for="${id}">${fr(val)}</output></div>`;
+    za.innerHTML = `${e.objectifs.length > 1 ? `<p class="quiz-n">Objectif ${n + 1} sur ${e.objectifs.length}</p>` : ""}<p class="quiz-txt">${h(o.consigne)}</p>
+      <div class="neurone"><div class="neu-cmd">${o.entrees.map((nom, j) => curseur("neu-w" + j, `Poids w<sub>${j + 1}</sub> (${h(nom)})`, w[j], o.min, o.max, o.pas)).join("")}${o.biais ? curseur("neu-b", "Biais b", b, o.biais.min, o.biais.max, o.biais.pas) : ""}
+        <p class="neu-regle">s = ${o.entrees.map((_, j) => `w<sub>${j + 1}</sub> x<sub>${j + 1}</sub>`).join(" + ")}${o.biais ? " + b" : ""}, et la sortie vaut 1 si s &gt; ${fr(seuil)}.</p></div>
+        <table class="donnees neu-table"><thead><tr>${o.entrees.map((nom, j) => `<th>x<sub>${j + 1}</sub><span>${h(nom)}</span></th>`).join("")}<th>Somme s</th><th>Sortie</th></tr></thead><tbody></tbody></table></div>
+      <div class="actions"><button class="btn" id="ok">Vérifier</button></div><div class="retour-qcm" aria-live="polite"></div>`;
+    const calc = x => { const s = x.reduce((a, v, j) => a + v * w[j], b); return { s, y: s > seuil ? 1 : 0 }; };
+    const table = (fautes) => { $("tbody", za).innerHTML = cas.map((x, k) => { const r = calc(x); return `<tr class="${fautes && fautes.includes(k) ? "faux" : ""}">${x.map(v => `<td>${v}</td>`).join("")}<td>${fr(r.s)}</td><td><strong>${r.y}</strong>${fautes && fautes.includes(k) ? ` <span class="sr">(ne convient pas)</span>` : ""}</td></tr>`; }).join(""); };
+    za.oninput = ev => { const t = ev.target; if (t.type !== "range") return; if (t.id === "neu-b") b = +t.value; else w[+t.id.slice(5)] = +t.value; t.nextElementSibling.textContent = fr(+t.value); $(".retour-qcm", za).textContent = ""; table(); };
+    $("#ok", za).onclick = () => {
+      const fautes = cas.map((x, k) => calc(x).y === (CIBLES[o.cible](x) ? 1 : 0) ? -1 : k).filter(k => k >= 0);
+      if (fautes.length) { rates++; table(fautes); $(".retour-qcm", za).textContent = `${fautes.length} ligne${fautes.length > 1 ? "s ne correspondent" : " ne correspond"} pas au comportement voulu : ${fautes.length > 1 ? "elles sont signalées" : "elle est signalée"} dans le tableau.`; return; }
+      $$("input", za).forEach(x => x.disabled = true); $("#ok", za).disabled = true; $(".retour-qcm", za).textContent = "";
+      if (n + 1 < e.objectifs.length) {
+        za.insertAdjacentHTML("beforeend", `<div class="quiz-expl" role="status"><p><strong>Objectif atteint.</strong> ${h(o.expl || "")}</p><button class="btn" id="suite">Objectif suivant</button></div>`);
+        $("#suite", za).onclick = () => { n++; poser(); }; $("#suite", za).focus({ preventScroll: true });
+      } else bandeauSucces(za, c, i, rates === 0 ? 3 : rates <= 2 ? 2 : 1, o.expl);
+    };
+    table();
+  };
+  poser();
 }
 
 function vueFin(c, parc) {

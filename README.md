@@ -9,7 +9,7 @@ Les évaluations du livret et leurs corrigés ne sont volontairement pas publié
 
 ## État
 
-Version pilote : chapitres 1 et 3 complets. Les douze autres chapitres apparaissent comme
+Partie 1 complète (chapitres 1 à 4). Les chapitres 5 à 14 apparaissent comme
 « Bientôt disponible ».
 
 ## Mise en ligne sur GitHub Pages

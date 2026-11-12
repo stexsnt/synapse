@@ -1,5 +1,5 @@
 /* Niveaux et « code pour le professeur » : partagé par le site élève et le tableau de classe. */
-const NIVEAUX = [[0, "Données brutes"], [60, "Premier neurone"], [160, "Réseau en formation"], [300, "Modèle entraîné"], [450, "Modèle testé"], [600, "Esprit critique"]];
+const NIVEAUX = [[0, "Données brutes"], [200, "Premier neurone"], [700, "Réseau en formation"], [1500, "Modèle entraîné"], [2600, "Modèle testé"], [3800, "Esprit critique"]];
 function niveau(xp) {
   let i = 0; while (i + 1 < NIVEAUX.length && NIVEAUX[i + 1][0] <= xp) i++;
   return { i, nom: NIVEAUX[i][1], min: NIVEAUX[i][0], max: i + 1 < NIVEAUX.length ? NIVEAUX[i + 1][0] : null };

@@ -35,6 +35,17 @@ const { PARCOURS, DEFIS, PY_HARNESS, memesSorties } = new Function(src("contenu.
         }
       } else if (e.t === "ordre" && e.texte) {
         if (new Set(e.lignes).size !== e.lignes.length) { ko++; console.log("ECHEC ordre (doublons) :", nom); }
+      } else if (e.t === "atelier") {
+        // Chaque objectif doit avoir au moins une solution accessible avec les curseurs.
+        const CIBLES = { amis: x => x[1], et: x => x[0] && x[1], ou: x => x[0] || x[1] };
+        for (const o of e.objectifs) {
+          const N = o.entrees.length, vals = []; for (let v = o.min; v <= o.max + 1e-9; v += o.pas) vals.push(v);
+          const bs = []; if (o.biais) for (let v = o.biais.min; v <= o.biais.max + 1e-9; v += o.biais.pas) bs.push(v); else bs.push(0);
+          const cas = Array.from({ length: 1 << N }, (_, k) => o.entrees.map((_, j) => (k >> j) & 1));
+          const ok = (w, b) => cas.every(x => (x.reduce((a, v, j) => a + v * w[j], b) > (o.seuil || 0) ? 1 : 0) === (CIBLES[o.cible](x) ? 1 : 0));
+          let trouve = false; const rec = w => { if (trouve) return; if (w.length === N) { if (bs.some(b => ok(w, b))) trouve = true; return; } for (const v of vals) rec([...w, v]); }; rec([]);
+          if (!trouve || ok(o.poids, o.biais ? o.biais.val : 0)) { ko++; console.log("ECHEC atelier (sans solution ou déjà résolu) :", nom); }
+        }
       } else if (e.t === "tri") {
         if (e.items.some(x => !(x.cat >= 0 && x.cat < e.categories.length))) { ko++; console.log("ECHEC tri :", nom); }
       } else if (e.t === "quiz") {

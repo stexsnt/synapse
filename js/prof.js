@@ -4,7 +4,7 @@ const CLE_PROF = "synapse.prof.v1";
 const $ = (s, r = document) => r.querySelector(s);
 const h = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const CHAPS = PARCOURS.flatMap(p => p.chapitres.filter(c => c.etapes.length).map(c => ({ c, parc: p.id, nom: `Chapitre ${c.num}`, titre: c.titre })));
-const NOMS = { lecon: "Leçon", qcm: "Question", predire: "Prédiction", ordre: "Remise en ordre", code: "Exercice de code", tri: "Classement", quiz: "Questions" };
+const NOMS = { lecon: "Leçon", qcm: "Question", predire: "Prédiction", ordre: "Remise en ordre", code: "Exercice de code", tri: "Classement", quiz: "Questions", atelier: "Atelier" };
 let eleves = [], tri = { col: "nom", sens: 1 }, filtre = "tous";
 
 function analyser(texte) {
