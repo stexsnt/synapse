@@ -8,7 +8,7 @@
      tri     : { t, titre, q, doc?, categories:[...], items:[{ txt, cat, expl }], expl? }
      ordre   : { t, titre?, q, lignes:[...dans le bon ordre], attendu?, texte?: true, expl? }
                (texte: true = phrases à ranger, validées par leur ordre ; sinon programme exécuté)
-     quiz    : { t, titre, intro?, doc?, code?, widget?: "knn" | "pixels" | "perceptron", questions:[{ q, choix, bon, expl }] }
+     quiz    : { t, titre, intro?, doc?, code?, widget?: "knn" | "pixels" | "perceptron" | "generateur", questions:[{ q, choix, bon, expl }] }
      atelier : { t, titre, intro?, objectifs:[{ consigne, entrees:[noms], poids:[valeurs de départ], min, max, pas,
                  biais?:{ val, min, max, pas }, seuil?, cible: "amis" | "et" | "ou", expl }] }
                (curseurs pour régler les poids d'un neurone ; la sortie vaut 1 si la somme dépasse le seuil)
@@ -644,9 +644,376 @@ const PARCOURS = [
 {
   id: "p2", titre: "Usage éclairé", sous: "Utiliser l'IA comme un outil, et non comme une solution automatique",
   chapitres: [
-    { id: "c5", num: 5, titre: "L'IA dans notre quotidien", resume: "Bientôt disponible", etapes: [] },
-    { id: "c6", num: 6, titre: "Bien utiliser l'IA pour apprendre", resume: "Bientôt disponible", etapes: [] },
-    { id: "c7", num: 7, titre: "Vérifier et valider les productions de l'IA", resume: "Bientôt disponible", etapes: [] },
+    { id: "c5", num: 5, titre: "L'IA dans notre quotidien", resume: "IA génératives, modèles de langage, usages adaptés ou non",
+    etapes: [
+      { t: "tri", titre: "La journée de Léna", q: "Voici la journée de Léna, élève de seconde. Pour chaque moment, quelle tâche le système d'IA réalise-t-il ?",
+        doc: `<blockquote class="recit">7 h 05. Léna déverrouille son téléphone d'un regard. Une notification lui annonce de la pluie à 8 h ; elle prend son parapluie. Dans le bus, elle fait défiler les vidéos courtes qu'une application lui propose, puis écoute une playlist « Découvertes de la semaine ». En anglais, le professeur projette un article ; Léna en traduit un mot avec son téléphone en le photographiant. À midi, la cantine utilise une caméra pour compter les plateaux. L'après-midi, elle demande à un assistant conversationnel d'expliquer une notion de SVT qu'elle n'a pas comprise. Le soir, elle retouche une photo pour ses amis : l'application efface automatiquement un passant à l'arrière-plan. Avant de dormir, elle dicte un message vocal, transcrit en texte sans une faute.</blockquote>`,
+        categories: ["Reconnaître", "Recommander", "Prédire", "Générer"],
+        items: [
+          { txt: "Le téléphone se déverrouille d'un regard.", cat: 0, expl: "Il reconnaît un visage." },
+          { txt: "Une notification annonce de la pluie à 8 h.", cat: 2, expl: "Une prévision, en partie produite par des modèles d'IA." },
+          { txt: "L'application propose des vidéos courtes.", cat: 1, expl: "Comme la playlist « Découvertes de la semaine »." },
+          { txt: "La caméra de la cantine compte les plateaux.", cat: 0, expl: "Elle reconnaît les plateaux, puis les compte." },
+          { txt: "L'assistant conversationnel explique une notion de SVT.", cat: 3, expl: "Il produit un texte nouveau." },
+          { txt: "Le message vocal est transcrit en texte.", cat: 0, expl: "Le système reconnaît la parole." },
+        ],
+        expl: "Deux moments combinent plusieurs tâches : la traduction d'un mot photographié (reconnaître le texte, puis traduire) et l'effacement du passant (le reconnaître, puis générer l'arrière-plan). La plupart de ces usages relèvent d'IA qui recommandent ou reconnaissent, souvent sans que l'utilisateur les ait choisies." },
+      { t: "lecon", titre: "Deux familles, et un panorama",
+        texte: `<p>Comme on l'a vu au chapitre 1, les IA qui nous entourent se répartissent en deux grandes familles :</p>
+<ul><li>les IA qui <strong>classent, recommandent ou prédisent</strong>, souvent invisibles : fil d'actualité, suggestions de vidéos, filtre anti-spam, navigation, déverrouillage facial ;</li><li>les IA <strong>génératives</strong>, qui produisent des contenus à la demande et se sont diffusées dans le grand public depuis la fin de l'année 2022.</li></ul>
+<table class="donnees large"><thead><tr><th>Contenu produit</th><th>Exemples d'usages</th><th>Exemples d'outils</th></tr></thead><tbody>
+<tr><th>Texte</th><td>répondre à une question, résumer, reformuler, traduire, rédiger un courriel</td><td>assistants conversationnels : ChatGPT (OpenAI), Le Chat (Mistral AI, entreprise française), Gemini (Google), Claude (Anthropic)…</td></tr>
+<tr><th>Image</th><td>illustrer, créer une affiche, modifier une photo</td><td>générateurs d'images intégrés aux assistants ou aux logiciels de retouche</td></tr>
+<tr><th>Son</th><td>voix de synthèse, musique, doublage</td><td>synthèse vocale, générateurs de musique</td></tr>
+<tr><th>Vidéo</th><td>courtes séquences animées à partir d'une description</td><td>générateurs de vidéos</td></tr>
+<tr><th>Code</th><td>écrire, expliquer ou corriger un programme</td><td>assistants de programmation</td></tr></tbody></table>
+<p>Les outils récents sont souvent <strong>multimodaux</strong> : ils comprennent et produisent plusieurs types de contenus (on peut leur montrer une photo et leur poser une question écrite à son sujet). Ces outils évoluent très vite : les noms changent, mais les principes de fonctionnement restent.</p>` },
+      { t: "tri", titre: "Quel type de contenu ?", q: "Quel type de contenu chaque demande fait-elle générer ?", categories: ["Texte", "Image", "Son", "Code"],
+        items: [
+          { txt: "« Écris un poème sur l'automne. »", cat: 0, expl: "Un texte." },
+          { txt: "« Lis à voix haute ce paragraphe avec une voix calme. »", cat: 2, expl: "De la synthèse vocale. L'outil lit un texte et produit du son : il doit être multimodal." },
+          { txt: "« Voici la photo de mon exercice : explique-moi mon erreur. »", cat: 0, expl: "Un texte, produit à partir d'une image : l'outil doit être multimodal." },
+          { txt: "« Écris une fonction Python qui calcule la moyenne d'une liste. »", cat: 3, expl: "Un programme." },
+          { txt: "« Dessine le logo d'un club d'échecs. »", cat: 1, expl: "Une image." },
+        ] },
+      { t: "lecon", titre: "Comment un modèle de langage écrit-il ?",
+        texte: `<p>Les assistants conversationnels reposent sur un <strong>grand modèle de langage</strong> (en anglais <em>large language model</em>, LLM) : un très grand réseau de neurones entraîné sur d'immenses quantités de textes.</p>
+<p>Un modèle de langage ne lit pas des lettres ni des mots entiers, mais des <strong>tokens</strong> : des morceaux de texte (un mot court, un bout de mot, un signe de ponctuation) numérotés. Par exemple, « incroyablement » peut être découpé en « in », « croy », « able », « ment ».</p>
+<aside class="retenir"><strong>Le principe : prédire la suite.</strong> À partir du texte déjà écrit, le modèle calcule pour chaque token possible une <strong>probabilité d'être le suivant</strong>. Il en choisit un, l'ajoute au texte, puis recommence, token après token, jusqu'à la fin de la réponse. Toute la réponse est construite ainsi.</aside>
+<ol class="phases"><li><strong>Pré-entraînement</strong> le réseau apprend à prédire le token suivant sur des milliards de textes ; il en acquiert les régularités, les connaissances… et les erreurs et les biais</li><li><strong>Ajustement</strong> on l'entraîne à suivre des consignes et à répondre de façon utile, souvent grâce à des humains qui notent ses réponses</li><li><strong>Utilisation</strong> l'utilisateur écrit une requête, le <em>prompt</em>, et le modèle génère la suite</li></ol>
+<aside class="savoir"><strong>Pourquoi deux réponses différentes ?</strong> Le modèle ne choisit pas toujours le token le plus probable : il tire au sort parmi les plus probables, en respectant leurs probabilités. C'est pourquoi la même question peut recevoir deux réponses différentes. Cette part de hasard rend les textes plus variés… et explique aussi qu'une réponse juste une fois puisse être fausse la fois suivante.</aside>` },
+      { t: "quiz", titre: "Prédire le mot suivant",
+        intro: "Un modèle de langage doit compléter : « Après les cours, je rentre à la… ». Il calcule les probabilités suivantes.",
+        doc: `<table class="donnees"><thead><tr><th>maison</th><th>gare</th><th>cantine</th><th>plage</th><th>autres mots</th></tr></thead><tbody><tr><td>0,62</td><td>0,11</td><td>0,04</td><td>0,03</td><td>0,20</td></tr></tbody></table>`,
+        questions: [
+          { q: "Si le modèle tire au sort selon ces probabilités, sur 100 réponses, combien environ commenceront par « maison » ?", choix: ["Toutes", "Environ 62", "Environ 11"], bon: 1, expl: "0,62 × 100 = 62. Et environ 3 commenceront par « plage »." },
+          { q: "Pourquoi est-il utile de ne pas toujours choisir le mot le plus probable ?", choix: ["Pour aller plus vite.", "Pour rendre les textes plus variés et moins répétitifs.", "Pour consommer moins d'énergie."], bon: 1, expl: "Sans hasard, la même question donnerait toujours exactement la même réponse." },
+          { q: "Quel est l'inconvénient de ce tirage au sort ?", choix: ["Le modèle choisit parfois un mot peu probable, ce qui peut mener à une réponse étrange ou fausse.", "Le modèle oublie la question.", "Il n'y en a aucun."], bon: 0, expl: "Les réponses sont aussi moins prévisibles." },
+        ] },
+      { t: "quiz", titre: "Des tokens",
+        intro: "On admet qu'un token correspond en moyenne à trois quarts de mot en anglais, et à un peu moins en français.",
+        questions: [
+          { q: "Pourquoi un modèle découpe-t-il « anticonstitutionnellement » en plusieurs tokens, mais « chat » en un seul ?", choix: ["Parce que les mots longs sont interdits.", "Parce que les tokens sont les morceaux de texte les plus fréquents : « chat » est fréquent, un mot long et rare est découpé.", "Parce que « chat » est un mot anglais."], bon: 1, expl: "Un mot rare est découpé en morceaux plus fréquents." },
+          { q: "Un roman de 90 000 mots en anglais représente environ combien de tokens ?", choix: ["67 500", "90 000", "120 000"], bon: 2, expl: "90 000 ÷ 0,75 = 120 000 tokens." },
+          { q: "Les modèles de langage ont longtemps eu du mal à compter les lettres d'un mot. Pourquoi ?", choix: ["Ils ne savent pas compter.", "Ils ne « voient » pas les lettres une à une, mais des morceaux de mots numérotés.", "Les lettres changent d'un texte à l'autre."], bon: 1, expl: "Compter les lettres demande une information que le modèle ne lit pas directement." },
+        ] },
+      { t: "quiz", titre: "Un mini-générateur de phrases", widget: "generateur",
+        intro: "Un vrai modèle de langage est un réseau de milliards de paramètres. On peut pourtant en imiter le principe : on regarde, dans un texte d'entraînement, quels mots suivent chaque mot, puis on construit une phrase en tirant au sort, à chaque étape, un mot parmi les suivants possibles. Fabrique quelques phrases.",
+        questions: [
+          { q: "Dans le texte d'entraînement, combien de fois le mot « le » est-il suivi de « chat » ?", choix: ["1 fois sur 6", "2 fois sur 6", "3 fois sur 6"], bon: 1, expl: "Les mots qui suivent « le » sont : chat, canapé, chien, jardin, chat, chien. La probabilité de tirer « chat » est donc 2/6, soit 1/3 ; celle de tirer « jardin » est 1/6." },
+          { q: "Quels mots peuvent suivre « dort » ?", choix: ["sur ou dans", "le ou la", "chat ou chien"], bon: 0, expl: "« le chat dort sur… » et « le chien dort dans… »." },
+          { q: "Le générateur peut écrire « le chat dort sur le jardin . ». Pourquoi ?", choix: ["Parce que cette phrase figure dans le texte d'entraînement.", "Parce que chaque enchaînement de deux mots existe dans le texte.", "Parce qu'il comprend ce qu'est un jardin."], bon: 1, expl: "Après « sur », il peut choisir « le » ; après « le », il peut choisir « jardin »." },
+          { q: "Que penser de cette phrase ?", choix: ["Elle est correcte grammaticalement et pleine de sens.", "Elle est correcte grammaticalement, mais n'a pas vraiment de sens.", "Elle est incorrecte grammaticalement."], bon: 1, expl: "Le programme ne sait rien des jardins ni des canapés : il n'a que des statistiques sur des enchaînements de mots." },
+          { q: "Quelle différence y a-t-il avec un vrai modèle de langage ?", choix: ["Le vrai modèle ne tire rien au sort.", "Le vrai modèle tient compte de tout le texte qui précède, pas seulement du dernier mot.", "Le vrai modèle n'a pas besoin de textes d'entraînement."], bon: 1, expl: "Il travaille sur des tokens, a été entraîné sur des milliards de textes et ajusté pour suivre des consignes. Mais le principe reste le même : produire une suite plausible. C'est la source de ses réussites… et de ses « hallucinations » (chapitre 7)." },
+        ] },
+      { t: "lecon", titre: "Le générateur en Python",
+        texte: `<p>Voici le programme qui se cache derrière la manipulation précédente. <code>texte.split()</code> découpe le texte en une liste de mots ; le point est un « mot » comme les autres, qui sert de signal d'arrêt. <code>random.choice(liste)</code> tire au sort un élément de la liste.</p><p>Exécute-le plusieurs fois : la phrase change. Remplace ensuite le texte d'entraînement par un texte de ton choix (mots séparés par des espaces, ponctuation incluse) : les phrases générées imitent le vocabulaire du nouveau texte.</p>`,
+        code: `import random\n\ntexte = "le chat dort sur le canapé . le chien dort dans le jardin . "\ntexte = texte + "le chat mange dans la cuisine . le chien joue sur la terrasse ."\nmots = texte.split()      # découpe le texte en une liste de mots\n\ndef suivants(mot):\n    liste = []\n    for i in range(len(mots) - 1):\n        if mots[i] == mot:\n            liste.append(mots[i + 1])\n    return liste\n\nmot = "le"\nphrase = "le"\nwhile mot != ".":\n    mot = random.choice(suivants(mot))\n    phrase = phrase + " " + mot\nprint(phrase)` },
+      { t: "code", titre: "Les mots suivants", d: 2, caches: ["suivants('chat')", "suivants('.')", "suivants('sur')", "suivants('terrasse')"],
+        enonce: `<p>Écris la fonction <code>suivants(mot)</code> : elle renvoie la liste des mots qui suivent immédiatement <code>mot</code> dans la liste <code>mots</code>, dans l'ordre où ils apparaissent, avec leurs répétitions.</p>`,
+        depart: `texte = "le chat dort sur le canapé . le chien dort dans le jardin . "\ntexte = texte + "le chat mange dans la cuisine . le chien joue sur la terrasse ."\nmots = texte.split()\n\ndef suivants(mot):\n    liste = []\n    # À compléter\n    return liste\n\nprint(suivants("le"))`,
+        solution: `texte = "le chat dort sur le canapé . le chien dort dans le jardin . "\ntexte = texte + "le chat mange dans la cuisine . le chien joue sur la terrasse ."\nmots = texte.split()\n\ndef suivants(mot):\n    liste = []\n    for i in range(len(mots) - 1):\n        if mots[i] == mot:\n            liste.append(mots[i + 1])\n    return liste\n\nprint(suivants("le"))`,
+        tests: [{ appels: [["suivants('le')", "['chat', 'canapé', 'chien', 'jardin', 'chat', 'chien']"], ["suivants('dort')", "['sur', 'dans']"], ["suivants('zèbre')", "[]"]] }],
+        indices: ["Parcours les indices avec for i in range(len(mots) - 1) : le dernier mot n'a pas de suivant.", "Si mots[i] == mot, le mot suivant est mots[i + 1] : ajoute-le à la liste."] },
+      { t: "code", titre: "La probabilité d'un enchaînement", d: 2, caches: ["probabilite('le', 'chien')", "probabilite('dort', 'dans')", "probabilite('chat', 'joue')", "probabilite('.', 'le')"],
+        enonce: `<p>Écris une fonction <code>probabilite(mot, suivant)</code> qui renvoie la probabilité que <code>mot</code> soit suivi de <code>suivant</code> : le nombre de fois où cet enchaînement apparaît, divisé par le nombre total de mots qui suivent <code>mot</code>. On suppose que <code>mot</code> figure dans le texte ailleurs qu'à la fin.</p>`,
+        depart: `texte = "le chat dort sur le canapé . le chien dort dans le jardin . "\ntexte = texte + "le chat mange dans la cuisine . le chien joue sur la terrasse ."\nmots = texte.split()\n\ndef suivants(mot):\n    liste = []\n    for i in range(len(mots) - 1):\n        if mots[i] == mot:\n            liste.append(mots[i + 1])\n    return liste\n\ndef probabilite(mot, suivant):\n    `,
+        solution: `texte = "le chat dort sur le canapé . le chien dort dans le jardin . "\ntexte = texte + "le chat mange dans la cuisine . le chien joue sur la terrasse ."\nmots = texte.split()\n\ndef suivants(mot):\n    liste = []\n    for i in range(len(mots) - 1):\n        if mots[i] == mot:\n            liste.append(mots[i + 1])\n    return liste\n\ndef probabilite(mot, suivant):\n    liste = suivants(mot)\n    nombre = 0\n    for m in liste:\n        if m == suivant:\n            nombre = nombre + 1\n    return nombre / len(liste)`,
+        tests: [{ appels: [["probabilite('le', 'chat')", "1 / 3"], ["probabilite('le', 'jardin')", "1 / 6"], ["probabilite('dort', 'sur')", "0.5"], ["probabilite('le', 'zèbre')", "0.0"]] }],
+        indices: ["Commence par récupérer la liste des suivants avec suivants(mot).", "Compte combien de fois suivant y figure, puis divise par la longueur de la liste."] },
+      { t: "quiz", titre: "Les suivants à la main", intro: "On entraîne le générateur sur le texte : « il fait beau . il fait froid . il pleut . il fait beau ».",
+        questions: [
+          { q: "Quels mots suivent « il », dans l'ordre ?", choix: ["fait, fait, pleut, fait", "fait, pleut", "beau, froid, beau"], bon: 0, expl: "Et les mots qui suivent « fait » sont : beau, froid, beau." },
+          { q: "Quelle est la probabilité que « fait » soit suivi de « beau » ?", choix: ["1/2", "2/3", "1/3"], bon: 1, expl: "« beau » apparaît 2 fois parmi les 3 suivants de « fait »." },
+          { q: "Le programme peut-il écrire « il pleut froid » ?", choix: ["Oui, tous les mots sont dans le texte.", "Non : dans le texte, « pleut » n'est jamais suivi de « froid ».", "Oui, une fois sur trois."], bon: 1, expl: "« pleut » est toujours suivi d'un point." },
+        ] },
+      { t: "lecon", titre: "Et les images ?",
+        texte: `<p>La plupart des générateurs d'images utilisent des <strong>modèles de diffusion</strong>. Pendant l'entraînement, on ajoute progressivement du « bruit » (des pixels aléatoires) à des millions d'images, et le réseau apprend à retirer ce bruit étape par étape.</p>
+<p>Pour créer une image, il part d'un bruit totalement aléatoire et le « nettoie » progressivement, guidé par la description écrite, jusqu'à obtenir une image qui lui correspond.</p>` },
+      { t: "lecon", titre: "Utile ou inadapté ?",
+        texte: `<p>Parce qu'une IA générative produit ce qui est <em>plausible</em>, et non ce qui est <em>vérifié</em>, elle est plus ou moins adaptée selon les tâches.</p>
+<table class="donnees large"><thead><tr><th>Plutôt utile</th><th>Plutôt inadapté, ou à vérifier absolument</th></tr></thead><tbody>
+<tr><td>reformuler, résumer un texte que l'on fournit</td><td>donner des faits précis, des dates, des chiffres sans source</td></tr>
+<tr><td>proposer des idées, des plans, des exemples</td><td>citer des références (livres, articles, lois) : elles peuvent être inventées</td></tr>
+<tr><td>expliquer une notion autrement, poser des questions d'entraînement</td><td>calculer avec précision ou raisonner sur de longs calculs</td></tr>
+<tr><td>corriger l'orthographe, traduire un texte courant</td><td>donner l'actualité récente : ses connaissances s'arrêtent à une date</td></tr>
+<tr><td>aider à écrire ou corriger un petit programme</td><td>décider à notre place (santé, droit, orientation) ou remplacer notre jugement</td></tr></tbody></table>
+<aside class="retenir"><strong>À retenir.</strong> Une IA générative est un outil puissant pour <strong>produire</strong> et <strong>reformuler</strong>, mais pas une source de vérité. Plus une tâche exige l'exactitude (faits, chiffres, sources) ou engage une décision importante, plus il faut vérifier et garder la main.</aside>` },
+      { t: "tri", titre: "Bon usage ou non ?", q: "Chaque usage d'un assistant conversationnel est-il plutôt utile, ou inadapté sans vérification ?", categories: ["Plutôt utile", "Inadapté sans vérification"],
+        items: [
+          { txt: "Trouver trois idées de sujet pour un exposé.", cat: 0, expl: "Proposer des idées est un bon usage." },
+          { txt: "Connaître le résultat du match d'hier soir.", cat: 1, expl: "L'actualité est postérieure à l'entraînement du modèle ; même avec une recherche en ligne, il faut vérifier." },
+          { txt: "Obtenir la liste des livres publiés par une autrice, pour sa bibliographie.", cat: 1, expl: "À vérifier absolument : des titres peuvent être inventés." },
+          { txt: "Reformuler un paragraphe que l'on a écrit soi-même.", cat: 0, expl: "On travaille sur son propre texte, en gardant le contrôle." },
+          { txt: "Savoir quel médicament prendre contre un mal de tête persistant.", cat: 1, expl: "Une question de santé relève d'un médecin ou d'un pharmacien." },
+          { txt: "S'entraîner à l'oral d'anglais en conversant.", cat: 0, expl: "Un entraînement à l'expression, sans enjeu d'exactitude." },
+        ] },
+      { t: "quiz", titre: "Même question, autre réponse",
+        intro: "Deux élèves posent exactement la même question à un assistant : « En quelle année a été construite la tour Eiffel ? ». L'un obtient « Elle a été achevée en 1889 », l'autre « Sa construction s'est déroulée de 1887 à 1889 ».",
+        questions: [
+          { q: "Ces deux réponses se contredisent-elles ?", choix: ["Oui : l'une des deux est fausse.", "Non : elles sont compatibles, mais formulées différemment.", "On ne peut pas le savoir."], bon: 1, expl: "Le modèle tire au sort ses mots à chaque génération : la formulation change." },
+          { q: "Imagine que l'une des deux ait répondu « 1899 », sur le même ton assuré. Comment le détecter ?", choix: ["En reposant la question jusqu'à obtenir deux fois la même réponse.", "En vérifiant dans une source fiable.", "C'est impossible."], bon: 1, expl: "Le modèle peut produire un token peu probable ou confondre des dates proches. On peut aussi remarquer que 1899 est postérieur à l'Exposition universelle de 1889, pour laquelle la tour a été construite." },
+          { q: "On demande deux fois à un assistant de résumer le même texte en cinq lignes. Que faut-il toujours faire avant d'utiliser un de ces résumés ?", choix: ["Choisir le plus long.", "Le comparer au texte d'origine.", "Rien : un résumé est toujours fidèle."], bon: 1, expl: "Les deux résumés sont en général différents, et il arrive que l'outil ajoute une information absente du texte ou déforme une nuance. Un résumé est utile pour se faire une première idée ou réviser ; il est risqué s'il remplace la lecture d'un texte que l'on doit analyser." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Un assistant conversationnel repose sur…", choix: ["une grande encyclopédie consultée mot à mot.", "un grand modèle de langage entraîné sur d'immenses quantités de textes.", "des humains qui répondent en direct.", "un moteur de recherche uniquement."], bon: 1, expl: "Un très grand réseau de neurones." },
+          { q: "Un token est…", choix: ["un mot de passe.", "un morceau de texte numéroté que lit le modèle.", "une image.", "une unité d'énergie."], bon: 1, expl: "Un mot court, un bout de mot, un signe de ponctuation." },
+          { q: "Pour écrire sa réponse, un modèle de langage…", choix: ["prédit le token suivant, encore et encore.", "recopie toujours la même phrase.", "cherche la réponse exacte dans une base de faits.", "écrit tous les mots en même temps au hasard."], bon: 0, expl: "Toute la réponse est construite ainsi." },
+          { q: "Un outil multimodal…", choix: ["ne traite que du texte.", "fonctionne sur plusieurs ordinateurs.", "comprend et produit plusieurs types de contenus.", "parle plusieurs langues."], bon: 2, expl: "Par exemple une photo en entrée et un texte en sortie." },
+          { q: "Les générateurs d'images utilisent souvent…", choix: ["des modèles de diffusion, qui « nettoient » progressivement un bruit.", "des photos découpées et recollées.", "un dessinateur humain caché.", "un filtre anti-spam."], bon: 0, expl: "Ils partent d'un bruit aléatoire, guidés par la description." },
+          { q: "Pour laquelle de ces tâches une IA générative est-elle la moins fiable sans vérification ?", choix: ["Reformuler un texte fourni.", "Proposer des idées de titres.", "Citer des références précises d'articles scientifiques.", "Corriger l'orthographe."], bon: 2, expl: "Les références peuvent être inventées." },
+          { q: "Le Chat est un assistant conversationnel développé par…", choix: ["une entreprise française, Mistral AI.", "la NASA.", "le ministère de l'Éducation nationale.", "une entreprise japonaise."], bon: 0, expl: "Mistral AI est une entreprise française." },
+          { q: "Une IA générative produit avant tout des contenus…", choix: ["toujours vrais.", "plausibles.", "copiés sur un seul site.", "vérifiés par des experts."], bon: 1, expl: "Plausible n'est pas vrai." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Deux familles.</strong> Les IA qui <strong>classent, recommandent ou prédisent</strong>, souvent invisibles, et les IA <strong>génératives</strong>, qui produisent du texte, des images, du son, de la vidéo ou du code. Un outil <strong>multimodal</strong> traite plusieurs types de contenus.</p>
+<p><strong>Le modèle de langage.</strong> Un très grand réseau de neurones entraîné sur d'immenses quantités de textes. Il lit des <strong>tokens</strong> et écrit en <strong>prédisant le token suivant</strong>, encore et encore, avec une part de <strong>hasard</strong> : la même question peut recevoir deux réponses différentes.</p>
+<p><strong>Trois étapes.</strong> Pré-entraînement (prédire la suite sur des milliards de textes), ajustement (suivre des consignes), utilisation (répondre à un <em>prompt</em>).</p>
+<p><strong>Les images.</strong> Les <strong>modèles de diffusion</strong> partent d'un bruit aléatoire et le « nettoient » progressivement, guidés par la description.</p>
+<p><strong>Utile ou inadapté.</strong> Utile pour reformuler, résumer un texte fourni, proposer des idées, expliquer autrement. À vérifier absolument pour les faits, les chiffres, les références, l'actualité, et inadapté pour décider à notre place.</p>
+<p><strong>À ne pas confondre.</strong> Une IA générative produit ce qui est <strong>plausible</strong>, pas ce qui est <strong>vérifié</strong>.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>distinguer les deux familles d'IA du quotidien</li><li>expliquer ce qu'est un token</li><li>décrire comment un modèle de langage écrit</li><li>expliquer pourquoi deux réponses diffèrent</li><li>dire pour quelles tâches une IA générative est adaptée</li><li>programmer un mini-générateur de phrases</li></ul>` },
+    ] },
+    { id: "c6", num: 6, titre: "Bien utiliser l'IA pour apprendre", resume: "Limites, requêtes, tuteur ou faiseur de devoirs, intégrité",
+    etapes: [
+      { t: "tri", titre: "Un bon usage de l'IA en cours ?", q: "Pour chaque situation, l'usage de l'IA te semble-t-il acceptable ou inacceptable ? Demande-toi qui fait l'effort qui fait apprendre.",
+        categories: ["Acceptable", "Inacceptable"],
+        items: [
+          { txt: "Inès demande à l'IA de lui réexpliquer, avec un autre exemple, une notion de physique qu'elle n'a pas comprise.", cat: 0, expl: "Inès fait elle-même l'effort d'apprendre." },
+          { txt: "Tom fait rédiger toute sa dissertation de français par l'IA et la rend comme si c'était la sienne.", cat: 1, expl: "L'IA fait le travail évalué à sa place, et ce n'est pas déclaré." },
+          { txt: "Chloé demande à l'IA de lui poser des questions pour réviser son contrôle d'histoire.", cat: 0, expl: "L'IA sert d'entraîneur ; Chloé fait l'effort de mémorisation." },
+          { txt: "Adam photographie son exercice de maths, recopie la solution de l'IA et la rend.", cat: 1, expl: "Le devoir est rendu, mais rien n'est appris." },
+          { txt: "Jade écrit son texte seule, puis demande à l'IA de repérer ses fautes d'orthographe et les corrige elle-même.", cat: 0, expl: "Acceptable en général, si la consigne n'évalue pas l'orthographe." },
+          { txt: "Noah demande à l'IA trois idées de plan pour un exposé, en choisit une et rédige tout lui-même.", cat: 0, expl: "Noah choisit, puis fait le travail de rédaction." },
+          { txt: "Emma fait traduire par l'IA le texte d'un devoir noté de traduction en anglais.", cat: 1, expl: "La traduction est précisément ce qui est évalué." },
+        ],
+        expl: "Trois questions permettent de trancher : qui fait l'effort qui fait apprendre ? La consigne l'autorise-t-elle ? Est-ce que je le déclare ?" },
+      { t: "lecon", titre: "Ce que l'IA fait bien, et ses limites",
+        texte: `<p>Les assistants conversationnels sont d'excellents rédacteurs et reformulateurs. Ils ont cependant des limites qu'il faut connaître pour bien les utiliser.</p>
+<table class="donnees large"><thead><tr><th>Limite</th><th>Ce que cela signifie</th></tr></thead><tbody>
+<tr><th>Erreurs et inventions</th><td>Ils peuvent affirmer avec assurance des faits faux ou inventer des sources : ce sont les « hallucinations » (chapitre 7).</td></tr>
+<tr><th>Connaissances datées</th><td>Leurs connaissances s'arrêtent à la date de fin de leur entraînement, sauf s'ils peuvent faire une recherche en ligne.</td></tr>
+<tr><th>Calculs et raisonnements</th><td>Ils peuvent se tromper dans un calcul ou un raisonnement long, même s'ils l'expliquent avec aplomb.</td></tr>
+<tr><th>Manque de contexte</th><td>Ils ne connaissent ni ton cours, ni ton professeur, ni les consignes exactes de ton devoir, sauf si tu les leur donnes.</td></tr>
+<tr><th>Complaisance</th><td>Ils ont tendance à aller dans ton sens et à approuver ce que tu proposes, même quand tu as tort.</td></tr>
+<tr><th>Biais</th><td>Ils reproduisent les stéréotypes présents dans leurs données d'entraînement (chapitre 8).</td></tr></tbody></table>` },
+      { t: "tri", titre: "Quelle limite ?", q: "Ces questions sont posées à un assistant conversationnel sans accès à Internet. Quelle limite risque de poser problème ?",
+        categories: ["Connaissances datées", "Calculs", "Manque de contexte", "Complaisance", "Inventions"],
+        items: [
+          { txt: "« Qui a gagné l'élection d'hier ? »", cat: 0, expl: "L'événement est postérieur à la fin de son entraînement." },
+          { txt: "« Combien font 37 849 × 6 271 ? »", cat: 1, expl: "Il peut se tromper dans un calcul, même s'il l'explique avec aplomb." },
+          { txt: "« Mon professeur veut-il un plan en deux ou en trois parties ? »", cat: 2, expl: "Il ne connaît ni ton professeur ni ses consignes." },
+          { txt: "« J'ai écrit que la Terre est le centre du système solaire, j'ai bien raison ? »", cat: 3, expl: "La question appelle une approbation, alors que l'affirmation est fausse." },
+          { txt: "« Donne-moi trois livres récents sur l'IA, avec leur éditeur et leur année. »", cat: 4, expl: "Les références peuvent être inventées ; et pour « récents », ses connaissances sont datées." },
+        ] },
+      { t: "lecon", titre: "Rédiger une bonne requête",
+        texte: `<p>Le <strong>prompt</strong> (on dit aussi <em>requête</em> ou <em>invite</em>) est l'instruction écrite que l'on donne à une IA générative. La qualité de la réponse dépend beaucoup de la qualité du prompt.</p>
+<p>Une requête efficace contient souvent quatre éléments :</p>
+<ol class="phases"><li><strong>Le contexte</strong> qui je suis, ce que je sais déjà, où je bloque</li><li><strong>La tâche</strong> ce que je demande précisément</li><li><strong>Les contraintes</strong> ce que l'IA doit respecter ou ne pas faire</li><li><strong>Le format</strong> la forme attendue de la réponse</li></ol>
+<p><strong>Une requête vague :</strong> « Les fonctions affines. »</p>
+<p><strong>Une requête précise :</strong> « Je suis élève de seconde et je n'ai pas compris comment lire le coefficient directeur d'une fonction affine sur un graphique. Explique-le-moi avec un exemple simple, puis pose-moi deux questions pour vérifier que j'ai compris. Ne donne pas les réponses tout de suite. »</p>
+<aside class="retenir"><strong>Dialoguer, pas commander une fois.</strong> Une bonne utilisation est un <strong>dialogue</strong> : on lit la réponse d'un œil critique, puis on précise, on corrige, on demande un autre exemple. On parle d'<strong>itération</strong>. Et l'on ne confie jamais à l'IA de données personnelles : ni nom complet, ni adresse, ni photo, ni informations sur d'autres personnes.</aside>` },
+      { t: "quiz", titre: "Améliorer des requêtes", intro: "Pour chaque requête de départ, choisis la réécriture qui respecte les quatre éléments et qui aide à apprendre.",
+        questions: [
+          { q: "« Fais l'exercice 34 page 112. »", choix: ["« Fais l'exercice 34 page 112 et explique chaque étape en détail. »", "« Je suis en seconde. Je bloque sur cet exercice de maths : [énoncé]. Voici ce que j'ai essayé : [démarche]. Ne me donne pas la solution : indique-moi seulement où je me trompe et donne-moi un indice. »", "« Donne-moi vite la réponse de l'exercice 34, c'est pour demain. »"], bon: 1,
+            expl: "Elle donne le contexte et la démarche déjà tentée, et interdit à l'IA de faire l'exercice à ta place." },
+          { q: "« La Révolution française. »", choix: ["« Je suis en seconde et je révise la Révolution française pour un contrôle. Pose-moi cinq questions de cours de difficulté croissante, une par une, et corrige chacune de mes réponses en m'expliquant mes erreurs. »", "« Écris-moi tout ce qu'il faut savoir sur la Révolution française. »", "« Rédige mon exposé sur la Révolution française, en deux pages. »"], bon: 0,
+            expl: "L'IA devient un entraîneur : c'est toi qui fais l'effort de mémorisation." },
+          { q: "« Corrige ma rédaction. »", choix: ["« Réécris ma rédaction pour qu'elle soit parfaite. »", "« Voici ma rédaction (sujet : [sujet]). Ne la réécris pas. Relève mes erreurs d'orthographe et de syntaxe sous forme de liste, en expliquant la règle à chaque fois, pour que je les corrige moi-même. »", "« Corrige ma rédaction et mets-moi une note. »"], bon: 1,
+            expl: "La contrainte « ne la réécris pas » et le format en liste te laissent le travail de correction." },
+        ] },
+      { t: "lecon", titre: "Tuteur, pas faiseur de devoirs",
+        texte: `<p>On n'apprend qu'en faisant l'effort soi-même : chercher, se tromper, recommencer. Si l'IA fait l'effort à ta place, le devoir est rendu, mais rien n'est appris, et l'écart se voit le jour du contrôle.</p>
+<table class="donnees large"><thead><tr><th>L'IA m'aide à apprendre quand…</th><th>L'IA m'empêche d'apprendre quand…</th></tr></thead><tbody>
+<tr><td>elle m'explique une notion autrement, avec d'autres exemples</td><td>elle fait l'exercice à ma place et je recopie</td></tr>
+<tr><td>elle me pose des questions pour réviser</td><td>je lui fais rédiger un texte que je n'ai pas pensé</td></tr>
+<tr><td>elle commente un travail que j'ai fait seul(e)</td><td>je n'essaie plus de chercher avant de lui demander</td></tr>
+<tr><td>elle me propose des pistes que je développe moi-même</td><td>je lui fais confiance sans rien vérifier</td></tr></tbody></table>
+<p><strong>Intégrité scolaire.</strong> Présenter comme son propre travail un texte, une solution ou une image produite par une IA, alors que la consigne ne l'autorise pas, est une <strong>fraude</strong>, au même titre que copier sur un camarade ou recopier un site sans le citer.</p>
+<p>Trois questions permettent de décider si un usage est acceptable :</p>
+<ol><li><strong>Qui fait l'effort qui fait apprendre ?</strong> Si c'est l'IA, l'usage est probablement mauvais.</li><li><strong>La consigne l'autorise-t-elle ?</strong> Les règles changent selon le professeur et le travail : en cas de doute, on demande.</li><li><strong>Est-ce que je le dis ?</strong> Un usage autorisé se <strong>déclare</strong> : quel outil, pour quoi faire, ce que j'ai gardé et ce que j'ai modifié.</li></ol>
+<aside class="savoir"><strong>Les détecteurs d'IA.</strong> Il existe des logiciels qui prétendent détecter les textes écrits par une IA. Ils sont peu fiables : ils accusent parfois à tort des textes écrits par des élèves, en particulier lorsque ceux-ci écrivent dans une langue qui n'est pas leur langue maternelle, et se laissent tromper par un texte légèrement réécrit. Les professeurs s'appuient plutôt sur le dialogue, sur l'oral et sur la connaissance du travail de leurs élèves.</aside>` },
+      { t: "tri", titre: "Aide ou triche ?", q: "Chaque usage aide-t-il à apprendre, ou empêche-t-il d'apprendre ?", categories: ["Aide à apprendre", "Empêche d'apprendre"],
+        items: [
+          { txt: "Demander à l'IA de corriger un programme Python qui ne marche pas, sans chercher l'erreur soi-même.", cat: 1, expl: "L'IA fait l'effort de recherche de l'erreur." },
+          { txt: "Demander à l'IA pourquoi son programme ne marche pas, après avoir cherché dix minutes, puis le corriger soi-même.", cat: 0, expl: "L'élève cherche d'abord, puis corrige lui-même." },
+          { txt: "Faire résumer un livre au programme au lieu de le lire, avant un contrôle sur ce livre.", cat: 1, expl: "La lecture est l'apprentissage visé, et un résumé peut être inexact." },
+          { txt: "Demander dix questions de vocabulaire d'espagnol pour s'entraîner.", cat: 0, expl: "L'IA sert d'entraîneur ; l'élève fait l'effort de mémorisation." },
+        ] },
+      { t: "quiz", titre: "Le devoir suspect", intro: "Voici un extrait de la copie de Lucas, pour un devoir à la maison sur les énergies renouvelables, où l'usage de l'IA n'était pas autorisé.",
+        doc: `<blockquote class="recit">Les énergies renouvelables représentent un enjeu majeur pour l'avenir de notre planète. Il est important de noter que plusieurs facteurs doivent être pris en compte. En tant que modèle de langage, je ne peux pas donner d'avis personnel, mais voici les principaux points. Selon une étude de l'Institut européen de l'énergie verte (2021), 87 % des Français souhaitent davantage d'éoliennes. En conclusion, l'avenir énergétique dépendra de nombreux facteurs.</blockquote>`,
+        questions: [
+          { q: "Quel indice montre le plus nettement que ce texte a été copié d'une IA ?", choix: ["Il parle d'éoliennes.", "La phrase « En tant que modèle de langage… », recopiée telle quelle.", "Il contient un pourcentage."], bon: 1, expl: "Autre indice : un style très général et creux (« il est important de noter », « de nombreux facteurs »)." },
+          { q: "Quel problème, plus grave pour la qualité du devoir, pose la phrase sur l'étude de 2021 ?", choix: ["Elle est trop longue.", "L'institut et son chiffre de 87 % sont très probablement inventés.", "Elle date de 2021."], bon: 1, expl: "Une source introuvable rend l'information inutilisable ; la présenter comme vraie, c'est diffuser une fausse information." },
+          { q: "Qu'aurait dû faire Lucas ?", choix: ["Supprimer seulement la phrase « En tant que modèle de langage ».", "Chercher lui-même des informations dans des sources fiables et rédiger avec ses propres mots, ou demander à son professeur s'il pouvait utiliser l'IA.", "Demander à l'IA un texte plus long."], bon: 1, expl: "Le texte n'apporte d'ailleurs aucune idée précise." },
+        ] },
+      { t: "quiz", titre: "La complaisance", intro: "Hugo écrit à un assistant : « J'ai démontré que (a + b)² = a² + b², c'est bien ça ? Dis-moi que j'ai raison. »",
+        questions: [
+          { q: "Hugo a-t-il raison ? Essaie avec a = 1 et b = 1.", choix: ["Oui : on trouve 4 des deux côtés.", "Non : (1 + 1)² = 4, alors que 1² + 1² = 2.", "Oui : on trouve 2 des deux côtés."], bon: 1, expl: "Un seul contre-exemple suffit. La bonne identité est (a + b)² = a² + 2ab + b²." },
+          { q: "Pourquoi sa formulation risque-t-elle d'obtenir une réponse trompeuse ?", choix: ["Elle est trop courte.", "Il demande explicitement d'être approuvé : la complaisance de l'IA risque de l'amener à confirmer, ou à atténuer sa critique.", "Elle contient des maths."], bon: 1, expl: "Une IA a tendance à aller dans le sens de l'utilisateur." },
+          { q: "Quelle requête lui permettrait d'obtenir un avis honnête et d'apprendre quelque chose ?", choix: ["« Confirme que (a + b)² = a² + b². »", "« Voici ma démonstration : [démonstration]. Vérifie-la de façon critique : est-elle juste ? Si elle est fausse, aide-moi à trouver un contre-exemple moi-même, puis explique-moi la bonne formule. »", "« Donne-moi la bonne réponse. »"], bon: 1, expl: "Elle demande une vérification critique et laisse à Hugo l'effort de trouver le contre-exemple." },
+        ] },
+      { t: "quiz", titre: "Déclarer son usage", intro: "Pour un exposé, le professeur autorise l'IA « pour trouver des idées et corriger l'orthographe, à condition de le déclarer ». Sarah a demandé des idées de plan, en a gardé une qu'elle a modifiée, et a fait corriger son orthographe.",
+        questions: [
+          { q: "Quelle déclaration d'usage convient ?", choix: ["« J'ai un peu utilisé l'IA. »", "« J'ai utilisé l'assistant [nom], le [date], pour deux usages autorisés. Je lui ai demandé trois idées de plan : j'en ai retenu une, en remplaçant sa deuxième partie. Je lui ai ensuite fait relever mes fautes d'orthographe, que j'ai corrigées moi-même. Le contenu et la rédaction sont de moi. »", "Aucune : l'usage était autorisé, il n'y a rien à dire."], bon: 1, expl: "Une déclaration précise : quel outil, pour quoi faire, ce qui a été gardé et ce qui a été modifié." },
+          { q: "Pourquoi ne faut-il pas confier de données personnelles à un assistant conversationnel ?", choix: ["Parce qu'il les oublie aussitôt.", "Parce que ces informations, sur soi ou sur d'autres personnes, n'ont pas à lui être transmises.", "Parce qu'il répond moins bien."], bon: 1, expl: "Ni nom complet, ni adresse, ni photo, ni informations sur d'autres personnes. Le chapitre 10 revient sur la vie privée." },
+        ] },
+      { t: "lecon", titre: "Écrire avec l'IA comme assistant",
+        texte: `<p>Voici une façon de travailler à essayer en classe, sur la question : <strong>« Faut-il interdire les téléphones portables au lycée ? »</strong></p>
+<ol><li><strong>Seul(e), sans IA :</strong> rédige un premier jet d'une dizaine de lignes.</li><li><strong>Avec l'IA :</strong> soumets ton texte à l'outil autorisé avec la requête ci-dessous, et lis attentivement les remarques.</li><li><strong>Seul(e) à nouveau :</strong> améliore ton texte <em>toi-même</em>, en retenant les remarques qui te semblent justes.</li></ol>
+<blockquote class="recit">Je suis élève de seconde. Voici un paragraphe argumenté que j'ai écrit sur la question « Faut-il interdire les téléphones portables au lycée ? ». Ne le réécris pas. Indique-moi : 1) si ma thèse est claire ; 2) si mes arguments sont convaincants et lequel est le plus faible ; 3) un contre-argument auquel je n'ai pas pensé ; 4) mes erreurs d'expression. Sois honnête, même si c'est critique. Voici mon texte : [coller le texte]</blockquote>
+<p>Un <strong>journal d'utilisation</strong> accompagne le texte final : l'outil utilisé et la date, les remarques retenues, celles écartées et pourquoi, ce qui a été vérifié ou modifié, ce que l'échange a appris. Un journal réussi est précis, par exemple : « l'IA trouvait mon deuxième argument faible ; je l'ai remplacé par un exemple tiré de mon expérience ».</p>` },
+      { t: "ordre", texte: true, titre: "Les temps du travail", q: "Range dans l'ordre les temps de ce travail d'écriture.",
+        lignes: ["Je rédige un premier jet, seul.", "Je soumets mon texte à l'IA en lui demandant des remarques, pas une réécriture.", "Je lis ses remarques d'un œil critique.", "J'améliore mon texte moi-même.", "Je remplis mon journal d'utilisation."],
+        expl: "L'effort d'écriture reste le tien, avant comme après l'échange avec l'IA." },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Un prompt est…", choix: ["une erreur de l'IA.", "un type de réseau de neurones.", "l'instruction écrite que l'on donne à une IA générative.", "un logiciel de détection."], bon: 2, expl: "On dit aussi requête ou invite." },
+          { q: "Parmi ces requêtes, laquelle aide le plus à apprendre ?", choix: ["« Explique-moi la méthode avec un autre exemple, puis pose-moi une question. »", "« Fais mon exercice. »", "« Donne-moi la réponse. »", "« Écris mon exposé. »"], bon: 0, expl: "L'effort reste du côté de l'élève." },
+          { q: "Les quatre éléments d'une bonne requête sont…", choix: ["titre, image, son, vidéo.", "nom, prénom, adresse, classe.", "question, réponse, note, appréciation.", "contexte, tâche, contraintes, format."], bon: 3, expl: "Et l'on ne donne jamais de données personnelles." },
+          { q: "Un assistant sans accès à Internet ne peut pas connaître de façon fiable…", choix: ["la définition d'un algorithme.", "les événements postérieurs à la fin de son entraînement.", "la conjugaison du verbe être.", "la date de la Révolution française."], bon: 1, expl: "Ses connaissances sont datées." },
+          { q: "La complaisance d'une IA désigne sa tendance à…", choix: ["aller dans le sens de l'utilisateur, même quand il a tort.", "refuser de répondre.", "répondre très lentement.", "consommer beaucoup d'énergie."], bon: 0, expl: "D'où l'intérêt de demander une vérification critique." },
+          { q: "Rendre comme sien un texte généré par une IA, alors que la consigne l'interdit, est…", choix: ["une bonne méthode de travail.", "obligatoire.", "une fraude.", "sans conséquence."], bon: 2, expl: "Au même titre que copier sur un camarade." },
+          { q: "Les logiciels de détection de textes écrits par une IA…", choix: ["sont peu fiables et peuvent accuser à tort.", "sont infaillibles.", "sont obligatoires au lycée.", "détectent aussi les fautes d'orthographe."], bon: 0, expl: "Ils se laissent aussi tromper par un texte légèrement réécrit." },
+          { q: "Itérer avec une IA, c'est…", choix: ["poser une seule question et recopier la réponse.", "changer d'outil à chaque question.", "répéter la même question jusqu'à obtenir la réponse voulue.", "lire la réponse de façon critique, puis préciser ou corriger sa demande."], bon: 3, expl: "Une bonne utilisation est un dialogue." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Les limites à connaître.</strong> Erreurs et inventions, connaissances datées, calculs et raisonnements fragiles, manque de contexte, <strong>complaisance</strong>, biais.</p>
+<p><strong>Une bonne requête.</strong> Le <strong>prompt</strong> contient souvent quatre éléments : <strong>contexte</strong>, <strong>tâche</strong>, <strong>contraintes</strong>, <strong>format</strong>. On <strong>itère</strong> : lire d'un œil critique, puis préciser ou corriger. On ne confie jamais de données personnelles.</p>
+<p><strong>Tuteur, pas faiseur de devoirs.</strong> L'IA aide à apprendre quand elle explique autrement, pose des questions, commente un travail fait seul. Elle empêche d'apprendre quand elle fait l'effort à ma place.</p>
+<p><strong>Trois questions.</strong> Qui fait l'effort qui fait apprendre ? La consigne l'autorise-t-elle ? Est-ce que je le déclare ?</p>
+<p><strong>Intégrité.</strong> Présenter comme sien un travail produit par une IA sans autorisation est une <strong>fraude</strong>. Un usage autorisé se <strong>déclare</strong>. Les détecteurs d'IA sont peu fiables.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>citer les limites d'un assistant conversationnel</li><li>rédiger une requête en quatre éléments</li><li>distinguer un usage qui aide d'un usage qui empêche d'apprendre</li><li>appliquer les trois questions</li><li>rédiger une déclaration d'usage</li></ul>` },
+    ] },
+    { id: "c7", num: 7, titre: "Vérifier et valider les productions de l'IA", resume: "Hallucinations, sources, recoupement, ordres de grandeur",
+    etapes: [
+      { t: "tri", titre: "Ce texte est-il fiable ?", q: "Un assistant a rédigé cette biographie de Marie Curie. Elle paraît sérieuse, mais contient quatre erreurs. Classe chaque phrase, en t'aidant si possible d'une source fiable.",
+        categories: ["Exacte", "Erronée"],
+        items: [
+          { txt: "Marie Curie, née Maria Skłodowska à Cracovie en 1867, est une physicienne et chimiste d'origine polonaise.", cat: 1, expl: "Elle est née à Varsovie, le 7 novembre 1867." },
+          { txt: "Elle s'installe à Paris en 1891 pour étudier à la Sorbonne, où elle rencontre Pierre Curie, qu'elle épouse en 1895.", cat: 0, expl: "Phrase exacte." },
+          { txt: "En 1898, le couple découvre deux nouveaux éléments chimiques : le polonium et le radium.", cat: 0, expl: "Phrase exacte." },
+          { txt: "En 1903, elle reçoit le prix Nobel de chimie, partagé avec Pierre Curie et Henri Becquerel.", cat: 1, expl: "Le prix Nobel de 1903 est un prix Nobel de physique." },
+          { txt: "En 1911, elle obtient un second prix Nobel, ce qui fait d'elle la seule personne de l'histoire à avoir reçu deux prix Nobel.", cat: 1, expl: "Elle est la première, et la seule dans deux sciences différentes, mais pas la seule : Linus Pauling, par exemple, en a reçu deux." },
+          { txt: "Comme elle l'écrit dans ses Mémoires publiés en 1925 : « La science est une lumière qui ne s'éteint jamais. »", cat: 1, expl: "On ne trouve aucune trace de ces « Mémoires » ni de cette citation dans les sources fiables : elles sont inventées." },
+          { txt: "Elle meurt en 1934 et repose depuis 1995 au Panthéon.", cat: 0, expl: "Phrase exacte." },
+        ],
+        expl: "Les erreurs sont écrites dans le même style que les phrases exactes : rien, dans la forme, ne permet de les repérer." },
+      { t: "quiz", titre: "Bilan de l'enquête",
+        questions: [
+          { q: "Les erreurs se repéraient-elles au style du texte ?", choix: ["Oui, les phrases fausses sont moins bien écrites.", "Non : elles sont écrites dans le même style que les phrases exactes, ce qui les rend crédibles.", "Oui, elles contiennent des fautes d'orthographe."], bon: 1, expl: "C'est ce qui les rend dangereuses." },
+          { q: "Pourquoi la citation des « Mémoires » est-elle souvent l'erreur la plus difficile à repérer ?", choix: ["Parce qu'elle est en fin de texte.", "Parce qu'une citation, un titre et une date donnent une impression de précision.", "Parce qu'elle est courte."], bon: 1, expl: "Il faut chercher la source pour s'apercevoir qu'elle n'existe pas." },
+          { q: "Aurait-on pu vérifier ce texte en le soumettant à une autre IA ?", choix: ["Oui, deux IA ne se trompent jamais ensemble.", "Non : une autre IA peut reproduire les mêmes erreurs ; il faut des sources fiables et indépendantes.", "Oui, à condition qu'elle soit plus récente."], bon: 1, expl: "Deux modèles entraînés sur des données semblables peuvent faire la même erreur." },
+        ] },
+      { t: "lecon", titre: "Les hallucinations",
+        texte: `<p>On appelle <strong>hallucination</strong> une réponse fausse ou inventée produite par une IA générative et présentée avec la même assurance qu'une réponse exacte.</p>
+<p>Les hallucinations ne sont pas des « bugs » occasionnels : elles découlent du fonctionnement même des modèles de langage (chapitre 5).</p>
+<ul><li>Le modèle produit la suite la plus <strong>plausible</strong>, pas la plus <strong>vraie</strong> : il ne consulte pas une base de faits vérifiés.</li><li>Quand une information est rare dans ses données d'entraînement, il « comble les trous » avec ce qui ressemble à une bonne réponse.</li><li>Il est entraîné à répondre de façon fluide et serviable : il avoue moins souvent son ignorance qu'il ne le devrait.</li><li>Ses connaissances s'arrêtent à une date, et ses données contiennent elles-mêmes des erreurs.</li></ul>
+<aside class="retenir">Le <strong>ton assuré</strong> et le <strong>style soigné</strong> d'une réponse ne disent rien de son exactitude. Un texte d'IA peut être juste à 90 % et contenir une erreur grave au milieu de phrases exactes.</aside>
+<table class="donnees large"><thead><tr><th>Type d'erreur</th><th>Exemple</th></tr></thead><tbody>
+<tr><th>Faits, dates, lieux</th><td>une ville de naissance, une date de bataille, un auteur inversé</td></tr>
+<tr><th>Chiffres</th><td>une population, une distance, un pourcentage fantaisiste</td></tr>
+<tr><th>Sources inventées</th><td>un livre, un article, une étude ou une citation qui n'existent pas, avec un titre et une date crédibles</td></tr>
+<tr><th>Généralisations abusives</th><td>« le seul », « toujours », « tous les scientifiques s'accordent »</td></tr>
+<tr><th>Calculs et raisonnements</th><td>une étape de calcul fausse dans une démonstration bien rédigée</td></tr>
+<tr><th>Informations périmées</th><td>une loi, un record ou un responsable qui ont changé depuis l'entraînement</td></tr></tbody></table>` },
+      { t: "lecon", titre: "Une méthode en quatre étapes",
+        texte: `<ol class="phases"><li><strong>Repérer</strong> les affirmations vérifiables : faits, dates, chiffres, citations, sources</li><li><strong>Remonter à la source</strong> trouver d'où vient l'information, si possible la source d'origine</li><li><strong>Recouper</strong> confirmer avec au moins deux sources fiables et indépendantes</li><li><strong>Évaluer</strong> la fiabilité des sources : qui ? quand ? dans quel but ?</li></ol>
+<p>Une <strong>affirmation vérifiable</strong> est une phrase qui peut être confirmée ou réfutée par des faits : « Marie Curie est née en 1867 ». Une opinion (« Marie Curie est la plus grande scientifique de l'histoire ») ne se vérifie pas : elle se discute avec des arguments.</p>
+<p><strong>Recouper</strong> une information, c'est vérifier qu'elle est confirmée par plusieurs sources <strong>indépendantes</strong>, c'est-à-dire qui ne se recopient pas les unes les autres.</p>
+<p>Pour évaluer la <strong>fiabilité</strong> d'une source, on se demande :</p>
+<ul><li><strong>Qui</strong> est l'auteur ? Une institution reconnue, un journaliste, un scientifique, un anonyme ?</li><li><strong>Quand</strong> l'information a-t-elle été publiée ou mise à jour ?</li><li><strong>Pourquoi</strong> a-t-elle été publiée : informer, vendre, convaincre, divertir ?</li><li><strong>Comment</strong> : l'auteur cite-t-il lui-même ses sources ?</li></ul>
+<aside class="savoir"><strong>Et quand l'IA cite ses sources ?</strong> Certains assistants effectuent une recherche en ligne et affichent des liens. C'est un progrès, mais pas une garantie : il arrive que la page citée ne dise pas ce que l'IA lui attribue, ou qu'elle soit elle-même peu fiable. Il faut <strong>ouvrir la source</strong> et vérifier qu'elle contient bien l'information. Et l'on ne vérifie pas une IA avec une autre IA.</aside>` },
+      { t: "ordre", texte: true, titre: "Les quatre étapes", q: "Range dans l'ordre les étapes de la méthode de vérification.",
+        lignes: ["Repérer les affirmations vérifiables.", "Remonter à la source de l'information.", "Recouper avec au moins deux sources indépendantes.", "Évaluer la fiabilité des sources."],
+        expl: "Repérer, remonter à la source, recouper, évaluer." },
+      { t: "tri", titre: "Vérifiable ou opinion ?", q: "Classe chaque phrase.", categories: ["Affirmation vérifiable", "Opinion"],
+        items: [
+          { txt: "La Seine traverse Paris.", cat: 0, expl: "Un fait, que l'on peut confirmer." },
+          { txt: "Le meilleur sport du monde est le football.", cat: 1, expl: "Un jugement, qui se discute." },
+          { txt: "Le cœur d'un adulte au repos bat en moyenne entre 60 et 100 fois par minute.", cat: 0, expl: "Un fait mesurable." },
+          { txt: "Il faudrait supprimer les devoirs à la maison.", cat: 1, expl: "Une prise de position." },
+          { txt: "Le français est une langue officielle au Canada.", cat: 0, expl: "Un fait, que l'on peut confirmer." },
+          { txt: "Les chats sont plus attachants que les chiens.", cat: 1, expl: "Une préférence." },
+        ] },
+      { t: "ordre", texte: true, titre: "Quelle confiance accorder ?", q: "On veut vérifier une information sur une réforme du baccalauréat. Range ces sources de la plus fiable à la moins fiable.",
+        lignes: ["La page officielle du ministère de l'Éducation nationale.", "Un article d'un quotidien national, daté de la semaine dernière.", "La réponse d'un assistant conversationnel, sans source.", "Une vidéo d'un influenceur qui fait la promotion d'une application de révision.", "Un message relayé sur un réseau social par un compte anonyme."],
+        expl: "Le ministère est la source officielle, à jour, responsable de la réforme. L'article est signé et daté, mais à recouper. L'assistant sans source expose à l'hallucination et à l'information périmée ; l'influenceur a un but commercial ; le compte anonyme n'offre aucune garantie. D'autres classements des trois dernières se défendent, s'ils sont bien justifiés." },
+      { t: "quiz", titre: "La bibliographie suspecte", intro: "Un assistant a proposé cette bibliographie pour un exposé sur l'IA.",
+        doc: `<ol><li>Cédric Villani, <em>Donner un sens à l'intelligence artificielle</em>, rapport au gouvernement, 2018.</li><li>Yann LeCun, <em>Quand la machine apprend</em>, Gallimard, 2015.</li><li>Alan Turing, <em>Les Réseaux de neurones profonds</em>, Dunod, 1985.</li></ol>`,
+        questions: [
+          { q: "Une référence est impossible, sans même faire de recherche. Laquelle ?", choix: ["La première.", "La deuxième.", "La troisième."], bon: 2, expl: "Alan Turing est mort en 1954 : il ne peut pas avoir publié un livre en 1985. Et l'expression « réseaux de neurones profonds » est bien postérieure à sa mort." },
+          { q: "Comment vérifier les deux autres ?", choix: ["En redemandant la bibliographie à l'assistant.", "En cherchant dans le catalogue d'une bibliothèque (CDI, Bibliothèque nationale de France) ou sur le site de l'éditeur.", "En comptant les mots des titres."], bon: 1, expl: "Pour le rapport, on consulte le site officiel où il est publié." },
+          { q: "Après vérification, le livre de Yann LeCun existe, mais chez Odile Jacob, en 2019. Que faut-il en conclure ?", choix: ["Une bibliographie produite par une IA est une liste de pistes : chaque référence doit être vérifiée.", "La bibliographie est prête à l'emploi, à un détail près.", "Le livre n'existe pas."], bon: 0, expl: "Et l'on ne cite que ce que l'on a soi-même consulté." },
+        ] },
+      { t: "lecon", titre: "Vérifier un chiffre par un ordre de grandeur",
+        texte: `<p>Les mathématiques sont un excellent outil de vérification. Un calcul rapide permet souvent de détecter un chiffre absurde.</p>
+<p>Une IA affirme : « La lumière du Soleil met environ 8 secondes à nous parvenir. » La distance Terre–Soleil est d'environ 150 millions de kilomètres et la lumière parcourt environ 300 000 km par seconde :</p>
+<p class="formule">150 000 000 ÷ 300 000 = 500 s, soit environ 8 minutes et 20 secondes.</p>
+<p>L'IA a confondu secondes et minutes : l'erreur est d'un facteur 60.</p>
+<aside class="retenir">Vérifier, ce n'est pas tout revérifier : on concentre ses efforts sur les affirmations <strong>vérifiables</strong> et <strong>importantes</strong> pour son travail. Et si l'on ne peut pas vérifier une information, on ne l'utilise pas, ou l'on précise qu'elle n'a pas été vérifiée.</aside>` },
+      { t: "code", titre: "Le calcul comme détecteur", d: 1,
+        caches: ["duree(750, 300)", "duree(300, 20)", "duree(1000, 8)"],
+        enonce: `<p>Écris la fonction <code>duree(distance, vitesse)</code> qui renvoie la durée d'un trajet : la distance divisée par la vitesse.</p><p>Elle servira à contrôler des affirmations : <code>duree(384000, 300000)</code> donne le temps, en secondes, que met un signal radio pour aller de la Terre à la Lune.</p>`,
+        depart: `def duree(distance, vitesse):\n    # à compléter\n    return 0\n\nprint(duree(384000, 300000))`,
+        solution: `def duree(distance, vitesse):\n    return distance / vitesse\n\nprint(duree(384000, 300000))`,
+        tests: [{ appels: [["duree(150000000, 300000)", "500.0"], ["duree(384000, 300000)", "1.28"], ["duree(384000, 5)", "76800.0"]] }],
+        indices: ["Une durée s'obtient en divisant la distance par la vitesse.", "return distance / vitesse"] },
+      { t: "quiz", titre: "Plausible ou non ?", intro: "Pour chaque affirmation, fais un calcul d'ordre de grandeur.",
+        questions: [
+          { q: "« Un signal radio envoyé de la Terre met plus d'une minute à atteindre la Lune. » (384 000 km, à 300 000 km/s)", choix: ["Plausible.", "Faux : il met un peu plus d'une seconde.", "Faux : il met plus d'une heure."], bon: 1, expl: "384 000 ÷ 300 000 ≈ 1,3 s." },
+          { q: "« En marchant à 5 km/h sans s'arrêter, il faudrait environ 9 ans pour parcourir la distance Terre–Lune. »", choix: ["Plausible.", "Faux : environ 9 mois.", "Faux : environ 90 ans."], bon: 0, expl: "384 000 ÷ 5 = 76 800 h, soit 3 200 jours, soit environ 8,8 ans." },
+          { q: "« Un élève qui passe 3 heures par jour sur son téléphone y consacre plus d'un mois complet par an. »", choix: ["Faux : à peine une semaine.", "Exact : plus d'un mois et demi.", "Faux : plus de six mois."], bon: 1, expl: "3 × 365 = 1 095 h ; 1 095 ÷ 24 ≈ 45,6 jours." },
+          { q: "« Un TGV roulant à 300 km/h relie Paris à Marseille (environ 750 km) en 2 h 30 environ, sans arrêt. »", choix: ["Plausible.", "Faux."], bon: 0, expl: "750 ÷ 300 = 2,5 h." },
+          { q: "« Un adulte possède environ 2 000 os. »", choix: ["Plausible.", "Faux : c'est dix fois trop."], bon: 1, expl: "Un adulte possède 206 os." },
+        ] },
+      { t: "tri", titre: "Mission vérification : la Lune", q: "Ce texte d'un assistant, destiné à un exposé, contient cinq erreurs. Vérifie chaque phrase avec au moins deux sources fiables, puis classe-la.",
+        categories: ["Exacte", "Erronée"],
+        items: [
+          { txt: "La Lune est l'unique satellite naturel de la Terre. Elle se trouve en moyenne à 38 000 km de nous.", cat: 1, expl: "La distance moyenne est d'environ 384 400 km." },
+          { txt: "Son diamètre, d'environ 3 470 km, vaut à peu près le quart de celui de la Terre.", cat: 0, expl: "Exact : environ 3 474 km." },
+          { txt: "La pesanteur à sa surface est deux fois plus faible que sur Terre.", cat: 1, expl: "Elle est environ six fois plus faible." },
+          { txt: "Le 21 juillet 1969 (heure de Paris), lors de la mission Apollo 11, Buzz Aldrin devient le premier homme à marcher sur la Lune.", cat: 1, expl: "Le premier est Neil Armstrong ; Buzz Aldrin l'a suivi quelques minutes plus tard." },
+          { txt: "Au total, quatre astronautes ont foulé le sol lunaire.", cat: 1, expl: "Douze astronautes, lors de six missions Apollo, entre 1969 et 1972." },
+          { txt: "La Lune présente toujours la même face à la Terre ; sa face cachée, elle, est plongée dans une nuit éternelle.", cat: 1, expl: "En partie faux : la face cachée reçoit la lumière du Soleil comme l'autre ; elle est seulement invisible depuis la Terre." },
+          { txt: "La Lune s'éloigne de la Terre d'environ 3,8 cm par an.", cat: 0, expl: "Exact." },
+          { txt: "C'est surtout elle qui provoque les marées sur Terre.", cat: 0, expl: "Exact ; le Soleil contribue aussi, environ deux fois moins." },
+        ] },
+      { t: "quiz", titre: "Le permis à 16 ans ?", intro: "À la question « À quel âge peut-on passer le permis de conduire en France ? », un assistant répond : « Depuis 2023, on peut passer le permis B dès 16 ans, et conduire seul dès l'obtention. »",
+        questions: [
+          { q: "Pourquoi ce type d'information est-il particulièrement exposé aux erreurs des IA ?", choix: ["Parce que les règles changent avec le temps : l'IA peut s'appuyer sur des données anciennes ou mélanger plusieurs règles.", "Parce que le sujet est trop technique.", "Parce que personne n'écrit sur le permis."], bon: 0, expl: "Ici, elle mélange permis et conduite accompagnée." },
+          { q: "Quelle source consulter pour vérifier ?", choix: ["Un forum d'automobilistes.", "Le site officiel de l'administration française, en regardant la date de mise à jour de la page.", "Un autre assistant conversationnel."], bon: 1, expl: "Et l'on recoupe avec un article de presse récent." },
+          { q: "Le site officiel indique : permis B dès 17 ans depuis le 1er janvier 2024, conduite accompagnée dès 15 ans. Quelle est la réponse corrigée ?", choix: ["« Depuis 2023, permis B dès 16 ans. »", "« Depuis le 1er janvier 2024, on peut passer le permis B dès 17 ans. La conduite accompagnée est possible dès 15 ans. »", "« Le permis B se passe à 15 ans. »"], bon: 1, expl: "La date et l'âge étaient faux tous les deux." },
+        ] },
+      { t: "quiz", titre: "La source ne dit pas ça", intro: "Un assistant avec recherche en ligne affirme : « Selon un article du site d'un grand journal [lien], 80 % des lycéens utilisent l'IA pour faire leurs devoirs. »",
+        doc: `<blockquote class="recit">Ce que dit l'article, une fois le lien ouvert : « Selon un sondage réalisé auprès de 1 000 jeunes de 18 à 25 ans, 80 % déclarent avoir déjà utilisé un outil d'IA générative, quel qu'en soit l'usage. »</blockquote>`,
+        questions: [
+          { q: "Qui a réellement été interrogé ?", choix: ["Des lycéens.", "Des jeunes de 18 à 25 ans.", "Des professeurs."], bon: 1, expl: "La population n'est pas celle qu'annonce l'IA." },
+          { q: "Que déclarent réellement ces 80 % ?", choix: ["Utiliser l'IA pour faire leurs devoirs.", "Avoir déjà utilisé un outil d'IA générative, quel qu'en soit l'usage.", "Utiliser l'IA tous les jours."], bon: 1, expl: "Autre différence : un sondage auprès de 1 000 jeunes est présenté comme une vérité générale." },
+          { q: "Pourquoi cette déformation est-elle trompeuse, alors qu'un lien est fourni ?", choix: ["Le lien donne une impression de sérieux, et peu de lecteurs l'ouvrent pour vérifier.", "Le lien est trop long.", "Le journal est inconnu."], bon: 0, expl: "L'information déformée paraît sourcée." },
+          { q: "Quelle phrase rapporte fidèlement l'article ?", choix: ["« 80 % des jeunes trichent avec l'IA. »", "« Selon un sondage cité par le journal, 80 % des 1 000 jeunes de 18 à 25 ans interrogés déclarent avoir déjà utilisé un outil d'IA générative. »", "« La plupart des lycéens utilisent l'IA. »"], bon: 1, expl: "Elle garde la population, l'usage et la nature de l'information." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Une hallucination d'IA est…", choix: ["un bug qui fait planter l'ordinateur.", "une image floue.", "une réponse trop longue.", "une réponse fausse ou inventée présentée avec assurance."], bon: 3, expl: "Avec la même assurance qu'une réponse exacte." },
+          { q: "Les hallucinations s'expliquent notamment par le fait que le modèle…", choix: ["produit la suite la plus plausible, sans consulter une base de faits vérifiés.", "est volontairement programmé pour mentir.", "manque d'électricité.", "est relié à de mauvais sites web."], bon: 0, expl: "Plausible ne veut pas dire vrai." },
+          { q: "Laquelle de ces phrases est une affirmation vérifiable ?", choix: ["« Ce film est magnifique. »", "« Il faudrait plus de vacances. »", "« La tour Eiffel mesure environ 330 mètres. »", "« Le bleu est la plus belle couleur. »"], bon: 2, expl: "Les trois autres sont des opinions." },
+          { q: "Recouper une information, c'est…", choix: ["la recopier dans son cahier.", "la confirmer avec plusieurs sources indépendantes.", "la demander deux fois à la même IA.", "la partager sur un réseau social."], bon: 1, expl: "Des sources qui ne se recopient pas les unes les autres." },
+          { q: "Une IA cite une étude avec un titre, une revue et une date. On peut en conclure…", choix: ["qu'il faut vérifier que l'étude existe et dit bien cela.", "que l'étude existe forcément.", "que l'IA a raison.", "que l'étude est récente."], bon: 0, expl: "Les sources inventées ont un titre et une date crédibles." },
+          { q: "Pour vérifier la réponse d'une IA, demander à une autre IA…", choix: ["suffit toujours.", "est interdit par la loi.", "est la meilleure méthode.", "ne suffit pas : elles peuvent faire la même erreur."], bon: 3, expl: "Il faut des sources fiables et indépendantes." },
+          { q: "La distance Terre–Soleil vaut environ 150 000 000 km et la lumière va à 300 000 km/s. La lumière met donc environ…", choix: ["8 secondes.", "50 secondes.", "500 secondes.", "5 000 secondes."], bon: 2, expl: "150 000 000 ÷ 300 000 = 500." },
+          { q: "Pour évaluer la fiabilité d'une source, on se demande notamment…", choix: ["si elle est longue.", "qui l'a écrite, quand et dans quel but.", "si elle contient des images.", "si elle a beaucoup de « j'aime »."], bon: 1, expl: "Qui ? Quand ? Pourquoi ? Comment ?" },
+          { q: "Si l'on ne parvient pas à vérifier une information importante trouvée grâce à une IA, il vaut mieux…", choix: ["ne pas l'utiliser, ou préciser qu'elle n'a pas été vérifiée.", "l'utiliser quand même.", "la reformuler pour qu'elle paraisse plus sûre.", "la publier sur un réseau social."], bon: 0, expl: "On concentre ses efforts sur ce qui est vérifiable et important." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Hallucination.</strong> Réponse fausse ou inventée, présentée avec assurance. Le modèle produit la suite la plus <strong>plausible</strong>, pas la plus vraie. Le ton et le style ne disent rien de l'exactitude.</p>
+<p><strong>Erreurs fréquentes.</strong> Faits, dates et lieux ; chiffres ; sources inventées ; généralisations abusives ; calculs ; informations périmées.</p>
+<p><strong>La méthode.</strong> <strong>Repérer</strong> les affirmations vérifiables, <strong>remonter à la source</strong>, <strong>recouper</strong> avec au moins deux sources indépendantes, <strong>évaluer</strong> leur fiabilité (qui ? quand ? pourquoi ? comment ?).</p>
+<p><strong>Ordre de grandeur.</strong> Un calcul rapide détecte un chiffre absurde.</p>
+<p><strong>Prudence.</strong> On ouvre les sources citées par l'IA ; on ne vérifie pas une IA avec une autre IA ; une information invérifiable ne s'utilise pas, ou se signale comme non vérifiée.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>expliquer ce qu'est une hallucination et d'où elle vient</li><li>distinguer une affirmation vérifiable d'une opinion</li><li>appliquer la méthode en quatre étapes</li><li>évaluer la fiabilité d'une source</li><li>contrôler un chiffre par un ordre de grandeur</li></ul>` },
+    ] },
   ]
 },
 {

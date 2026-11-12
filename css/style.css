@@ -381,6 +381,16 @@ table.donnees { border-collapse: collapse; margin: 0 0 1.2rem; font-size: .95rem
 .neu-table { margin: 0; display: table; width: auto; }
 .neu-table th span { display: block; font-weight: 400; font-size: .78rem; }
 .neu-table tr.faux td { background: var(--corail-pale); color: var(--corail); }
+blockquote.recit { margin: 0 0 1.2rem; padding: .9rem 1.1rem; border-left: 5px solid var(--soleil); border-radius: 10px; background: var(--carte); font-style: italic; max-width: 66ch; }
+.gen { padding: 1rem; border-radius: 16px; background: var(--carte); border: 2px solid var(--trait); max-width: 46rem; }
+.gen-titre { margin: .8rem 0 .2rem; font-weight: 700; font-size: .9rem; color: var(--encre2); }
+.gen-titre:first-child { margin-top: 0; }
+.gen-texte { margin: 0; font-family: var(--mono); font-size: .9rem; }
+.gen-phrase { margin: 0; min-height: 2.2rem; font: 1.25rem var(--mono); }
+.gen-phrase strong { background: var(--ecaille-pale); padding: 0 .3rem; border-radius: 6px; }
+.gen-suivants { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; min-height: 2.2rem; }
+.gen-suivants li { padding: .2rem .7rem; border-radius: 99px; border: 2px solid var(--encre2); font-family: var(--mono); font-size: .95rem; }
+.gen-histo { margin: 0; padding-left: 1.2rem; font-size: .95rem; }
 @media (max-width: 760px) { .donnees.large { display: block; overflow-x: auto; font-size: .9rem; } .donnees.large th, .donnees.large td { padding: .3rem .45rem; } }
 @media (max-width: 900px) { .partie, .knn, .pixels, .neurone { grid-template-columns: minmax(0, 1fr); } }
 

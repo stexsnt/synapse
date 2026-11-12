@@ -477,7 +477,7 @@ function etapeTri(z, c, i, e) {
 function etapeQuiz(z, c, i, e) {
   let n = 0, erreurs = 0; const N = e.questions.length;
   z.innerHTML = `<h1>${h(e.titre)}</h1>${e.intro ? `<p class="prose question">${h(e.intro)}</p>` : ""}${e.doc || ""}${e.code ? blocCode(e.code) : ""}${e.widget ? `<div class="widget"></div>` : ""}<div class="quiz-q"></div>`;
-  const widget = e.widget ? ({ knn: widgetKnn, pixels: widgetPixels, perceptron: widgetPerceptron })[e.widget]($(".widget", z)) : null;
+  const widget = e.widget ? ({ knn: widgetKnn, pixels: widgetPixels, perceptron: widgetPerceptron, generateur: widgetGenerateur })[e.widget]($(".widget", z)) : null;
   const zq = $(".quiz-q", z);
   const poser = () => {
     const q = e.questions[n]; let rate = false, fait = false;
@@ -610,6 +610,36 @@ function widgetPixels(z) {
   $("#px-tout", z).onclick = () => { IMAGE_CHAT.forEach((l, r) => l.forEach((v, c) => { etat[r][c] = v; })); maj(); };
   $("#px-raz", z).onclick = () => { etat.forEach(l => l.fill(0)); maj(); };
   maj();
+  return { reveler() {} };
+}
+
+/* Manipulation : construire une phrase en tirant au sort le mot suivant (chapitre 5). */
+function widgetGenerateur(z) {
+  const PHRASES = ["le chat dort sur le canapé .", "le chien dort dans le jardin .", "le chat mange dans la cuisine .", "le chien joue sur la terrasse ."];
+  const mots = PHRASES.join(" ").split(" ");
+  const suivants = m => mots.slice(0, -1).map((x, k) => x === m ? mots[k + 1] : null).filter(x => x !== null);
+  let phrase, tire, histo = [];
+  z.innerHTML = `<div class="gen"><p class="gen-titre">Texte d'entraînement</p><p class="gen-texte">${PHRASES.map(h).join(" ")}</p>
+    <p class="gen-titre">Phrase en construction</p><p class="gen-phrase" aria-live="polite"></p>
+    <p class="gen-titre gen-t2"></p><ul class="gen-suivants"></ul>
+    <div class="actions"><button class="btn petit" id="gen-tirer">Tirer au sort le mot suivant</button><button class="btn lien" id="gen-raz">Nouvelle phrase</button></div>
+    <ol class="gen-histo" aria-label="Phrases déjà obtenues"></ol></div>`;
+  const maj = () => {
+    const dernier = phrase[phrase.length - 1], fini = dernier === ".", liste = fini ? [] : suivants(dernier);
+    $(".gen-phrase", z).innerHTML = phrase.map((m, k) => k === phrase.length - 1 ? `<strong>${h(m)}</strong>` : h(m)).join(" ");
+    $(".gen-t2", z).textContent = fini ? "Le point termine la phrase." : `Mots qui suivent « ${dernier} » dans le texte (${liste.length})`;
+    $(".gen-suivants", z).innerHTML = liste.map(m => `<li>${h(m)}</li>`).join("");
+    $("#gen-tirer", z).disabled = fini;
+    $(".gen-histo", z).innerHTML = histo.map(p => `<li>${h(p)} <span class="muet">${PHRASES.includes(p) ? "(figure dans le texte d'entraînement)" : "(absente du texte d'entraînement)"}</span></li>`).join("");
+  };
+  const raz = () => { phrase = ["le"]; maj(); };
+  $("#gen-tirer", z).onclick = () => {
+    const liste = suivants(phrase[phrase.length - 1]); phrase.push(liste[Math.floor(Math.random() * liste.length)]);
+    if (phrase[phrase.length - 1] === ".") { histo.unshift(phrase.join(" ")); histo = histo.slice(0, 5); }
+    maj();
+  };
+  $("#gen-raz", z).onclick = raz;
+  raz();
   return { reveler() {} };
 }
 
