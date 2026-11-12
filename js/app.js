@@ -15,7 +15,7 @@ const aujourdhui = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()
 
 /* ---------- État enregistré dans le navigateur ---------- */
 function etatVide() {
-  return { pseudo: "", xp: 0, faits: {}, codes: {}, serie: { n: 0, jour: "" }, badges: {}, bac: { code: BAC_DEPART, runs: 0 }, theme: "", compteurs: { sansIndice: 0, tenace: 0 }, defiJour: "" };
+  return { pseudo: "", xp: 0, faits: {}, codes: {}, serie: { n: 0, jour: "" }, badges: {}, bac: { code: BAC_DEPART, runs: 0 }, theme: "", compteurs: { sansIndice: 0, tenace: 0 }, defiJour: "", fiches: {}, fichesJour: { j: "", xp: 0 } };
 }
 function charger() {
   try { return Object.assign(etatVide(), JSON.parse(localStorage.getItem(CLE) || "{}")); } catch (e) { return etatVide(); }
@@ -293,6 +293,8 @@ function majEntete() {
   $("#stat-niveau").textContent = nv.nom;
   $("#stat-xp").textContent = S.xp + " XP";
   $("#jauge-xp").style.width = pc + "%";
+  const lienLex = $('nav.principal a[data-onglet="lexique"]'), nbDues = fichesDues().length;
+  if (lienLex) { lienLex.dataset.nb = nbDues || ""; lienLex.setAttribute("aria-label", nbDues ? `Lexique, ${nbDues} fiche${nbDues > 1 ? "s" : ""} à réviser` : "Lexique"); }
   $("#stat-serie").textContent = S.serie.jour === aujourdhui() || S.serie.jour === aujourdhui(new Date(Date.now() - 864e5)) ? S.serie.n : 0;
 }
 function appliquerTheme() {
@@ -779,14 +781,111 @@ function vueProfil() {
 }
 
 /* ---------- Routage ---------- */
+/* ---------- Lexique et fiches de révision ----------
+   Répétition espacée à cinq boîtes : une fiche sue monte d'une boîte et revient plus tard, une fiche ratée repart de zéro.
+   Les fiches d'un chapitre s'ouvrent dès que l'élève y a validé une étape. */
+const DELAIS = [0, 1, 3, 7, 14], XP_FICHE = 2, XP_FICHES_JOUR = 20, TAILLE_SEANCE = 12;
+const sansAccent = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const chapOuvert = n => { const c = TOUS.find(x => x.num === n); return !!c && c.etapes.some((e, i) => S.faits[idEtape(c, i)]); };
+const fichesOuvertes = () => LEXIQUE.filter(f => chapOuvert(f.c));
+const fichesDues = () => fichesOuvertes().filter(f => { const r = S.fiches[f.t]; return !r || r.j <= aujourdhui(); });
+const jourCourt = j => j.slice(8, 10) + "/" + j.slice(5, 7);
+let seance = null;
+
+function vueLexique() {
+  const ouvertes = fichesOuvertes(), dues = fichesDues().length, acquises = ouvertes.filter(f => (S.fiches[f.t] || {}).b >= 3).length;
+  const prochaine = ouvertes.map(f => (S.fiches[f.t] || {}).j).filter(j => j && j > aujourdhui()).sort()[0];
+  const revision = !ouvertes.length ? `<p>Les fiches de révision s'ouvrent chapitre par chapitre : valide une première étape dans un chapitre pour débloquer ses fiches.</p><a class="btn" href="#/">Aller au parcours</a>`
+    : dues ? `<p><strong>${dues} fiche${dues > 1 ? "s" : ""} à réviser</strong> aujourd'hui. ${acquises} acquise${acquises > 1 ? "s" : ""} sur ${ouvertes.length} débloquées.</p><a class="btn" href="#/fiches">Réviser mes fiches</a>`
+    : `<p><strong>Tout est à jour.</strong> ${acquises} fiche${acquises > 1 ? "s" : ""} acquise${acquises > 1 ? "s" : ""} sur ${ouvertes.length} débloquées${prochaine ? `. Prochaine révision le ${jourCourt(prochaine)}` : ""}.</p><a class="btn secondaire" href="#/fiches/libre">M'entraîner quand même</a>`;
+  app().innerHTML = `<section class="page lexique"><h1>Lexique</h1>
+  <div class="revision">${revision}</div>
+  <div class="actions lex-filtres">
+    <label class="sr" for="cherche">Chercher un terme</label><input id="cherche" type="search" placeholder="Chercher un terme ou un mot" autocomplete="off">
+    <label class="sr" for="lex-chap">Chapitre</label><select id="lex-chap"><option value="">Tous les chapitres</option>${TOUS.filter(c => c.num).map(c => `<option value="${c.num}">Chapitre ${c.num} : ${h(c.titre)}</option>`).join("")}</select>
+  </div>
+  <p id="lex-nb" class="muet" aria-live="polite"></p>
+  <dl id="lex-liste" class="termes"></dl></section>`;
+  const tries = [...LEXIQUE].sort((a, b) => a.t.localeCompare(b.t, "fr"));
+  const lister = () => {
+    const q = sansAccent($("#cherche").value.trim()), ch = +$("#lex-chap").value;
+    const l = tries.filter(f => (!ch || f.c === ch) && (!q || sansAccent(f.t + " " + f.d).includes(q)));
+    $("#lex-nb").textContent = l.length === LEXIQUE.length ? `${l.length} termes` : `${l.length} terme${l.length > 1 ? "s" : ""} sur ${LEXIQUE.length}`;
+    $("#lex-liste").innerHTML = l.map(f => `<div><dt>${h(f.t)}</dt><dd>${h(f.d)} <a href="#/c/c${f.c}">Chapitre ${f.c}</a></dd></div>`).join("") || `<p class="muet">Aucun terme ne correspond.</p>`;
+  };
+  $("#cherche").oninput = lister; $("#lex-chap").onchange = lister; lister();
+}
+
+function vueFiches(libre) {
+  const ouvertes = fichesOuvertes();
+  let file;
+  if (libre) file = ouvertes.map(f => [Math.random(), f]).sort((a, b) => a[0] - b[0]).map(a => a[1]);
+  else file = fichesDues().sort((a, b) => ((S.fiches[a.t] || {}).j || "9") < ((S.fiches[b.t] || {}).j || "9") ? -1 : 1);
+  if (!file.length) { location.hash = "#/lexique"; return; }
+  seance = { file: file.slice(0, TAILLE_SEANCE), i: 0, vues: 0, sues: 0, gain: 0, libre, reprises: new Set() };
+  carteFiche();
+}
+function carteFiche() {
+  const s = seance, f = s.file[s.i];
+  if (!f) return finSeance();
+  const boite = (S.fiches[f.t] || { b: 0 }).b, inverse = s.libre ? s.i % 2 === 1 : boite >= 2;
+  app().innerHTML = `<section class="page fiches"><h1>Fiches de révision</h1>
+  <p class="muet">Fiche ${s.i + 1} sur ${s.file.length}${s.libre ? ", entraînement libre" : ""}</p>
+  <div class="jauge grand"><i style="width:${Math.round(100 * s.i / s.file.length)}%"></i></div>
+  <article class="fiche" aria-live="polite">
+    <p class="fiche-consigne">${inverse ? "Quel terme correspond à cette définition ?" : "Que signifie ce terme ?"}</p>
+    <p class="${inverse ? "fiche-def" : "fiche-terme"}">${h(inverse ? f.d : f.t)}</p>
+    <div class="fiche-verso" hidden><p class="fiche-consigne">Réponse</p><p class="${inverse ? "fiche-terme" : "fiche-def"}">${h(inverse ? f.t : f.d)}</p><p class="muet">Chapitre ${f.c}</p></div>
+  </article>
+  <div class="actions" id="fiche-actions"><button class="btn" id="retourner">Retourner la fiche</button></div>
+  <p class="muet" id="fiche-aide">Réponds dans ta tête avant de retourner la fiche : c'est l'effort de rappel qui fait retenir.</p>
+  <p><a href="#/lexique">Arrêter et revenir au lexique</a></p></section>`;
+  $("#retourner").onclick = () => {
+    $(".fiche-verso").hidden = false; $(".fiche").classList.add("retournee"); $("#fiche-aide").textContent = "Sois honnête : une fiche ratée revient simplement plus tôt.";
+    $("#fiche-actions").innerHTML = `<button class="btn secondaire" id="rate">Je ne savais pas</button><button class="btn" id="su">Je savais</button>`;
+    $("#su").onclick = () => repondreFiche(true); $("#rate").onclick = () => repondreFiche(false); $("#su").focus();
+  };
+  $("#retourner").focus({ preventScroll: true });
+}
+function repondreFiche(su) {
+  const s = seance, f = s.file[s.i], jour = aujourdhui(), reprise = s.reprises.has(f.t);
+  if (!reprise) { s.vues++; if (su) s.sues++; }
+  if (!s.libre) {
+    const b = su ? (reprise ? 1 : Math.min(DELAIS.length - 1, ((S.fiches[f.t] || { b: 0 }).b || 0) + 1)) : 0;
+    S.fiches[f.t] = { b, j: aujourdhui(new Date(Date.now() + DELAIS[b] * 864e5)) };
+    if (su && !reprise) {
+      if (S.fichesJour.j !== jour) S.fichesJour = { j: jour, xp: 0 };
+      const gain = Math.min(XP_FICHE, XP_FICHES_JOUR - S.fichesJour.xp);
+      if (gain > 0) { const avant = niveau(S.xp); S.xp += gain; S.fichesJour.xp += gain; s.gain += gain; const apres = niveau(S.xp); if (apres.i > avant.i) toast(`Niveau atteint : ${apres.nom}`, "niveau"); }
+    }
+    const hier = aujourdhui(new Date(Date.now() - 864e5));
+    if (S.serie.jour !== jour) { S.serie.n = S.serie.jour === hier ? S.serie.n + 1 : 1; S.serie.jour = jour; }
+    verifierBadges(); sauver(); majEntete();
+  }
+  if (!su && !reprise) { s.reprises.add(f.t); s.file.push(f); }   // une fiche ratée repasse une fois en fin de séance
+  s.i++; carteFiche();
+}
+function finSeance() {
+  const s = seance, restent = fichesDues().length;
+  const prochaine = fichesOuvertes().map(f => (S.fiches[f.t] || {}).j).filter(j => j && j > aujourdhui()).sort()[0];
+  app().innerHTML = `<section class="page fiches"><h1>Séance terminée</h1>
+  <div class="succes"><div><strong>${s.sues} / ${s.vues}</strong><span class="gain">${s.libre ? "entraînement libre" : s.gain ? `+${s.gain} XP` : "plafond d'XP du jour atteint"}</span>
+  <p>Tu savais ${s.sues} fiche${s.sues > 1 ? "s" : ""} sur ${s.vues}. ${s.libre ? "L'entraînement libre ne change pas le calendrier de tes fiches." : restent ? `Il reste ${restent} fiche${restent > 1 ? "s" : ""} à voir aujourd'hui.` : prochaine ? `Prochaine révision le ${jourCourt(prochaine)}.` : ""}</p></div></div>
+  <div class="actions">${!s.libre && restent ? `<a class="btn" href="#/fiches" id="encore">Continuer</a>` : ""}<a class="btn secondaire" href="#/lexique">Retour au lexique</a><a class="btn secondaire" href="#/">Retour au parcours</a></div></section>`;
+  seance = null;
+  const e = $("#encore"); if (e) e.onclick = ev => { ev.preventDefault(); vueFiches(false); };
+}
+
 function route() {
   const m = location.hash.replace(/^#\/?/, "").split("/");
   $$("nav.principal a").forEach(a => a.removeAttribute("aria-current"));
-  const onglet = m[0] === "c" ? "" : m[0];
+  const onglet = m[0] === "c" ? "" : m[0] === "fiches" ? "lexique" : m[0];
   const actif = $(`nav.principal a[data-onglet="${onglet}"]`); if (actif) actif.setAttribute("aria-current", "page");
   if (m[0] === "c" && chapParId(m[1])) vueChapitre(chapParId(m[1]), m[2]);
   else if (m[0] === "bac") vueBac();
   else if (m[0] === "profil") vueProfil();
+  else if (m[0] === "lexique") vueLexique();
+  else if (m[0] === "fiches") vueFiches(m[1] === "libre");
   else vueAccueil();
   window.scrollTo(0, 0);
   const t = $("#app h1"); if (t) { t.tabIndex = -1; t.focus({ preventScroll: true }); }

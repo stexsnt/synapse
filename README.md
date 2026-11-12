@@ -7,6 +7,12 @@ aucune donnée transmise. Le moteur est celui du site Mue (stexsnt/python-lycee)
 
 Les évaluations du livret et leurs corrigés ne sont volontairement pas publiés sur le site.
 
+## Lexique et fiches de révision
+
+`js/lexique.js` contient les termes du cours (terme, définition, chapitre). La page Lexique les affiche avec
+une recherche et les propose en fiches recto verso, avec une répétition espacée à cinq boîtes. Les fiches
+d'un chapitre s'ouvrent dès qu'une étape y est validée. Ajouter une ligne au fichier crée un terme et sa fiche.
+
 ## État
 
 Les quatre parties sont complètes : 14 chapitres, 237 étapes. Les évaluations du livret

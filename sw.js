@@ -4,7 +4,7 @@
      et cache en secours quand il n'y a pas de connexion.
    Si Pyodide est mis à jour, changer le nom du cache ci-dessous. */
 const CACHE = "synapse-v1";
-const BASE = ["./", "index.html", "prof.html", "css/style.css", "js/contenu.js", "js/moteur.js", "js/bilan.js", "js/app.js", "js/prof.js",
+const BASE = ["./", "index.html", "prof.html", "css/style.css", "js/contenu.js", "js/lexique.js", "js/moteur.js", "js/bilan.js", "js/app.js", "js/prof.js",
   "pyodide/pyodide.mjs", "pyodide/pyodide.asm.mjs", "pyodide/pyodide.asm.wasm", "pyodide/python_stdlib.zip", "pyodide/pyodide-lock.json"];
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE)).catch(() => {})); });
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n)))).then(() => self.clients.claim())));

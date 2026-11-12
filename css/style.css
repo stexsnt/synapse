@@ -444,3 +444,26 @@ blockquote.recit { margin: 0 0 1.2rem; padding: .9rem 1.1rem; border-left: 5px s
 .classe .ligne-outils { display: flex; gap: .3rem; margin-top: .3rem; }
 .classe .mini { font: .8rem var(--texte); padding: .15rem .35rem; border: 1px solid var(--encre2); border-radius: 6px; background: var(--carte); color: var(--encre); cursor: pointer; max-width: 9rem; }
 .classe tbody th .btn.lien { padding: 0; font-weight: 700; }
+
+/* Lexique et fiches de révision */
+nav.principal a[data-nb]:not([data-nb=""])::after { content: attr(data-nb); display: inline-block; min-width: 1.35em; margin-left: .35em; padding: 0 .3em; border-radius: 999px; background: var(--soleil); color: #fff; font-size: .78rem; line-height: 1.35em; text-align: center; vertical-align: .08em; }
+[data-theme="sombre"] nav.principal a[data-nb]::after { color: #1E2140; }
+.revision { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem 1.2rem; margin: 1rem 0 1.6rem; padding: 1rem 1.2rem; background: var(--carte); border: 2px solid var(--trait); border-left: 6px solid var(--ecaille); border-radius: 14px; }
+.revision p { margin: 0; max-width: 46ch; }
+.lex-filtres input[type="search"] { flex: 1 1 14rem; min-width: 0; font: 1rem var(--texte); padding: .5rem .7rem; border: 2px solid var(--encre2); border-radius: 10px; background: var(--carte); color: var(--encre); }
+.lex-filtres select { flex: 0 1 18rem; min-width: 0; }
+.termes { margin: .6rem 0 0; }
+.termes > div { padding: .8rem 0; border-top: 1px solid var(--trait); }
+.termes dt { font: 700 1.08rem var(--titre); }
+.termes dd { margin: .25rem 0 0; max-width: 68ch; }
+.termes dd a { white-space: nowrap; font-size: .9rem; margin-left: .3rem; }
+.fiches .jauge.grand { margin: .4rem 0 1.2rem; }
+.fiche { min-height: 15rem; display: flex; flex-direction: column; justify-content: center; gap: .4rem; padding: 1.6rem 1.5rem; background: var(--carte); border: 2px solid var(--trait); border-top: 8px solid var(--p1); border-radius: 18px; }
+.fiche.retournee { border-top-color: var(--ecaille); }
+.fiche p { margin: 0; }
+.fiche-consigne { font-size: .9rem; font-weight: 700; color: var(--encre2); }
+.fiche-terme { font: 800 clamp(1.5rem, 5vw, 2.1rem)/1.2 var(--titre); }
+.fiche-def { font-size: 1.15rem; line-height: 1.5; max-width: 60ch; }
+.fiche-verso { margin-top: 1.1rem; padding-top: 1.1rem; border-top: 2px dashed var(--trait); display: flex; flex-direction: column; gap: .4rem; }
+.fiche-verso[hidden] { display: none; }
+.fiches #fiche-actions .btn { flex: 1 1 11rem; }
