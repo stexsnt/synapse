@@ -9,8 +9,8 @@ Les évaluations du livret et leurs corrigés ne sont volontairement pas publié
 
 ## État
 
-Parties 1 à 3 complètes (chapitres 1 à 11). Les chapitres 12 à 14 apparaissent comme
-« Bientôt disponible ».
+Les quatre parties sont complètes : 14 chapitres, 237 étapes. Les évaluations du livret
+et leurs corrigés ne sont pas publiés.
 
 ## Mise en ligne sur GitHub Pages
 

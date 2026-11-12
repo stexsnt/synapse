@@ -1458,9 +1458,322 @@ const PARCOURS = [
 {
   id: "p4", titre: "Impacts social et environnemental", sous: "Comprendre les effets de l'IA sur la société, le travail et la planète",
   chapitres: [
-    { id: "c12", num: 12, titre: "L'IA et le monde du travail", resume: "Bientôt disponible", etapes: [] },
-    { id: "c13", num: 13, titre: "L'empreinte écologique de l'IA", resume: "Bientôt disponible", etapes: [] },
-    { id: "c14", num: 14, titre: "L'IA pour la société et les défis mondiaux", resume: "Bientôt disponible", etapes: [] },
+    { id: "c12", num: 12, titre: "L'IA et le monde du travail", resume: "Automatiser ou augmenter, emplois exposés, métiers de l'IA, compétences",
+    etapes: [
+      { t: "tri", titre: "Quels métiers vont changer avec l'IA ?", q: "Voici des tâches de trois métiers. L'IA pourrait-elle les réaliser seule, aider la personne, ou difficilement intervenir ? (Classement indicatif, à discuter.)",
+        categories: ["Réalisée seule", "Aidée", "Reste humaine"],
+        items: [
+          { txt: "Comptable : saisir et classer les factures.", cat: 0, expl: "Une tâche répétitive, aux règles claires." },
+          { txt: "Traducteur : vérifier et corriger une traduction automatique.", cat: 1, expl: "La machine propose, l'humain contrôle." },
+          { txt: "Infirmier : rassurer un patient avant une opération.", cat: 2, expl: "Une relation humaine." },
+          { txt: "Infirmier : faire un pansement à un enfant qui bouge.", cat: 2, expl: "Présence physique et dextérité dans une situation variée." },
+          { txt: "Comptable : conseiller un artisan sur un investissement.", cat: 1, expl: "L'IA peut préparer des simulations ; le conseil et la responsabilité restent au comptable." },
+          { txt: "Traducteur : traduire une notice d'utilisation courante.", cat: 0, expl: "Un texte courant est en grande partie automatisable." },
+        ],
+        expl: "Aucun métier n'a toutes ses tâches dans la même colonne. Les tâches qui restent humaines demandent souvent une présence physique, une relation, du jugement dans l'imprévu ou une responsabilité." },
+      { t: "lecon", titre: "Automatiser ou augmenter",
+        texte: `<ul><li>Il y a <strong>automatisation</strong> lorsqu'une machine réalise seule une tâche qui était faite par un humain.</li><li>Il y a <strong>augmentation</strong> lorsque la machine aide l'humain à mieux faire son travail, sans le remplacer : il gagne du temps, de la précision, ou peut faire des choses nouvelles.</li></ul>
+<p>Un métier est un ensemble de tâches. Même lorsque certaines tâches sont automatisées, les autres restent, et de nouvelles apparaissent : le métier se <strong>transforme</strong>. Les distributeurs automatiques de billets n'ont pas fait disparaître les employés de banque ; ils ont changé leur travail, davantage tourné vers le conseil.</p>
+<p><strong>Un traducteur.</strong> Traduire un texte courant : en partie automatisable. Vérifier et corriger une traduction automatique : augmentation. Adapter un slogan publicitaire à une culture, traduire un roman avec son style, interpréter lors d'une négociation délicate : tâches très humaines. Le métier évolue vers la relecture experte, l'adaptation culturelle et les textes à forts enjeux.</p>` },
+      { t: "tri", titre: "Automatiser ou augmenter ?", q: "Classe chaque situation.", categories: ["Automatisation", "Augmentation"],
+        items: [
+          { txt: "Un logiciel trie seul les factures et les enregistre en comptabilité.", cat: 0, expl: "La machine réalise seule la tâche." },
+          { txt: "Une radiologue utilise une IA qui signale les zones suspectes, puis décide elle-même du diagnostic.", cat: 1, expl: "La décision reste humaine." },
+          { txt: "Un robot de caisse remplace les caissiers dans un magasin.", cat: 0, expl: "La machine remplace l'humain." },
+          { txt: "Un journaliste utilise une IA pour transcrire ses interviews, puis écrit son article.", cat: 1, expl: "La transcription est automatisée, mais le métier de journaliste est augmenté." },
+          { txt: "Une agricultrice utilise des images satellites analysées par IA pour savoir quelles parcelles arroser.", cat: 1, expl: "L'IA éclaire sa décision." },
+        ] },
+      { t: "tri", titre: "Découper un métier", q: "Voici les tâches d'une secrétaire médicale.", categories: ["Automatisable", "Augmentable", "Humaine"],
+        items: [
+          { txt: "Accueillir les patients.", cat: 2, expl: "Une relation humaine." },
+          { txt: "Prendre les rendez-vous.", cat: 0, expl: "La prise de rendez-vous en ligne existe déjà." },
+          { txt: "Rédiger les comptes rendus dictés par le médecin.", cat: 1, expl: "Transcription automatique, puis relecture." },
+          { txt: "Gérer la facturation.", cat: 0, expl: "Automatisable en grande partie." },
+          { txt: "Rassurer un patient inquiet au téléphone.", cat: 2, expl: "Écouter et rassurer." },
+        ],
+        expl: "Le métier pourrait se recentrer sur l'accueil, l'accompagnement, la coordination et la vérification des documents produits par les outils." },
+      { t: "lecon", titre: "Que disent les études ?",
+        texte: `<ul><li>En 2025, une étude de l'<strong>Organisation internationale du travail</strong> (OIT) estime qu'environ <strong>un emploi sur quatre</strong> dans le monde est potentiellement <strong>exposé</strong> à l'IA générative, et environ un tiers dans les pays à revenu élevé. Les emplois de bureau sont les plus exposés. Selon l'étude, l'IA générative devrait davantage <strong>transformer</strong> les emplois que les supprimer.</li><li>Dans les pays riches, les emplois occupés par des femmes sont plus souvent dans la catégorie la plus exposée à l'automatisation, car elles sont plus nombreuses dans les emplois administratifs.</li></ul>
+<aside class="retenir"><strong>Exposé ne veut pas dire supprimé.</strong> Un emploi <strong>exposé</strong> est un emploi dont une partie des tâches pourrait être réalisée ou modifiée par l'IA. Cela ne dit pas si l'emploi disparaîtra : tout dépend des choix des entreprises, des coûts, des règles, de l'acceptation par le public et de la formation des travailleurs. Les prévisions sur l'emploi sont <strong>incertaines</strong> : il faut les lire avec esprit critique.</aside>
+<p>Les révolutions techniques passées (machine à vapeur, électricité, informatique) ont détruit certains emplois et en ont créé d'autres, souvent inimaginables auparavant. Mais la transition peut être difficile pour les personnes concernées : les nouvelles compétences ne s'acquièrent pas du jour au lendemain, et les nouveaux emplois ne sont pas forcément dans la même région ni aussi bien payés.</p>` },
+      { t: "quiz", titre: "Lire des chiffres", intro: "Un titre de presse annonce : « L'IA va supprimer un emploi sur quatre ! »",
+        questions: [
+          { q: "Pourquoi ce titre déforme-t-il l'étude de l'OIT ?", choix: ["Parce que le chiffre exact est un sur trois.", "Parce qu'il transforme une exposition possible en suppression certaine.", "Parce que l'étude ne parle pas d'emploi."], bon: 1, expl: "L'étude parle d'emplois potentiellement exposés et conclut à une transformation plus probable que la suppression." },
+          { q: "Quel titre serait fidèle ?", choix: ["« Selon l'OIT, un emploi sur quatre pourrait être transformé par l'IA générative. »", "« L'IA ne changera rien au travail. »", "« Un quart des travailleurs au chômage demain. »"], bon: 0, expl: "Il garde la source, le conditionnel et l'idée de transformation." },
+          { q: "Pourquoi un titre alarmiste attire-t-il davantage de lecteurs ?", choix: ["Parce qu'il est plus court.", "Parce qu'il suscite la peur et la curiosité, donc plus de clics et de partages.", "Parce qu'il est plus exact."], bon: 1, expl: "C'est un ressort fréquent de la désinformation et de la mésinformation (chapitre 9)." },
+        ] },
+      { t: "lecon", titre: "Les métiers de l'IA",
+        texte: `<table class="donnees large"><thead><tr><th>Métier</th><th>Rôle</th></tr></thead><tbody>
+<tr><th>Ingénieur ou ingénieure en apprentissage automatique</th><td>concevoir, entraîner et améliorer des modèles</td></tr>
+<tr><th>Data scientist (scientifique des données)</th><td>analyser des données pour en tirer des connaissances et des prédictions</td></tr>
+<tr><th>Data engineer (ingénieur des données)</th><td>collecter, nettoyer et organiser les données</td></tr>
+<tr><th>Chercheur ou chercheuse en IA</th><td>inventer de nouvelles méthodes</td></tr>
+<tr><th>Spécialiste de l'éthique et de la conformité</th><td>vérifier qu'un système respecte la loi et ne discrimine pas</td></tr>
+<tr><th>Annotateur ou annotatrice de données</th><td>étiqueter images, textes et sons pour l'entraînement</td></tr>
+<tr><th>Développeur ou développeuse</th><td>intégrer l'IA dans des applications</td></tr></tbody></table>
+<p>Le <strong>micro-travail</strong> désigne des tâches très courtes (étiqueter une image, vérifier une réponse, classer un texte), payées à la pièce sur des plateformes en ligne. Indispensable à l'entraînement des IA, il est souvent invisible, précaire et mal rémunéré, et une partie est réalisée dans des pays à bas salaires. En 2023, une enquête du magazine <em>Time</em> a révélé que des travailleurs kenyans, payés moins de deux dollars de l'heure, avaient été chargés de repérer des contenus violents ou choquants pour rendre un assistant conversationnel plus sûr.</p>` },
+      { t: "code", titre: "Le travail invisible", d: 1,
+        caches: ["gain_horaire(0.05, 30)", "gain_horaire(0.01, 5)", "gain_horaire(0.1, 60)"],
+        enonce: `<p>Une plateforme paie 0,02 $ par image étiquetée. Une travailleuse étiquette en moyenne une image toutes les 10 secondes.</p><p>Écris la fonction <code>gain_horaire(prix, secondes)</code> qui renvoie le gain pour une heure de travail : le nombre d'images étiquetées en 3 600 secondes, multiplié par le prix d'une image.</p>`,
+        depart: `def gain_horaire(prix, secondes):\n    # à compléter\n    return 0\n\nprint(gain_horaire(0.02, 10))`,
+        solution: `def gain_horaire(prix, secondes):\n    images = 3600 / secondes\n    return images * prix\n\nprint(gain_horaire(0.02, 10))`,
+        tests: [{ appels: [["gain_horaire(0.02, 10)", "7.2"], ["gain_horaire(0.5, 3600)", "0.5"]] }],
+        indices: ["En une heure, elle étiquette 3600 / secondes images.", "return 3600 / secondes * prix"] },
+      { t: "quiz", titre: "Un travail peu visible", intro: "La travailleuse étiquette 360 images par heure et gagne 7,20 $ par heure.",
+        questions: [
+          { q: "Pourquoi parle-t-on de travail « invisible » ?", choix: ["Parce qu'il se fait de nuit.", "Parce qu'il est indispensable, mais n'apparaît pas dans l'image de produits d'IA présentés comme « automatiques ».", "Parce qu'il n'existe pas vraiment."], bon: 1, expl: "Il est réalisé à distance, souvent dans d'autres pays, sans contrat ni protection." },
+          { q: "Quelle mesure améliorerait les conditions de ces travailleurs ?", choix: ["Imposer une rémunération minimale et des contrats.", "Augmenter le nombre d'images à étiqueter.", "Supprimer les pauses."], bon: 0, expl: "Et aussi : un soutien psychologique pour ceux qui voient des contenus choquants, la publication des conditions de travail des sous-traitants." },
+        ] },
+      { t: "lecon", titre: "Les compétences d'avenir",
+        texte: `<p>Plus les machines savent faire, plus certaines compétences humaines prennent de la valeur :</p>
+<ul><li><strong>l'esprit critique</strong> : vérifier, évaluer, décider ;</li><li><strong>la créativité</strong> : poser de nouvelles questions, imaginer ;</li><li><strong>les compétences relationnelles</strong> : écouter, coopérer, convaincre, prendre soin ;</li><li><strong>les compétences numériques et scientifiques</strong> : comprendre comment fonctionnent les outils pour bien les utiliser, et pouvoir les concevoir ;</li><li><strong>la capacité à apprendre</strong> tout au long de la vie, car les outils changeront encore.</li></ul>
+<aside class="savoir"><strong>Le numérique a besoin de tout le monde.</strong> Les filles et les femmes restent nettement minoritaires dans les formations et les métiers du numérique et de l'IA. Or des équipes peu diverses conçoivent plus facilement des systèmes biaisés (chapitre 8). Les spécialités de première Numérique et sciences informatiques (NSI) et Mathématiques sont des portes d'entrée vers ces métiers, ouvertes à toutes et à tous.</aside>
+<p><strong>Enquête sur un métier.</strong> Choisis un métier qui t'intéresse. Avec les fiches de l'ONISEP (onisep.fr), des articles de presse récents et, si possible, le témoignage d'une personne qui l'exerce, note : la formation, cinq tâches principales, celles que l'IA pourrait automatiser, celles qu'elle pourrait augmenter, celles qui resteront humaines, les nouvelles compétences à acquérir, un risque et une opportunité, et tes sources (au moins trois, dont une non générée par IA).</p>` },
+      { t: "tri", titre: "Compétences complémentaires", q: "Pour chaque métier : compétence humaine que l'IA rend plus importante, ou tâche répétitive où l'IA fait gagner du temps ?", categories: ["Compétence humaine", "Gain de temps avec l'IA"],
+        items: [
+          { txt: "Architecte : écouter les clients.", cat: 0, expl: "Une compétence relationnelle." },
+          { txt: "Architecte : générer des variantes de plans.", cat: 1, expl: "L'IA propose, l'architecte choisit." },
+          { txt: "Avocat : rechercher de la jurisprudence.", cat: 1, expl: "À vérifier, bien sûr !" },
+          { txt: "Aide-soignante : l'empathie et les soins physiques.", cat: 0, expl: "Prendre soin reste humain." },
+          { txt: "Aide-soignante : organiser les plannings.", cat: 1, expl: "Une tâche d'organisation répétitive." },
+          { txt: "Professeur des écoles : s'adapter à chaque élève.", cat: 0, expl: "La relation pédagogique." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "L'augmentation désigne une situation où l'IA…", choix: ["remplace complètement l'humain.", "fait augmenter les salaires.", "aide l'humain à mieux faire son travail.", "augmente le nombre d'heures travaillées."], bon: 2, expl: "Sans le remplacer." },
+          { q: "L'IA agit avant tout sur…", choix: ["des tâches.", "des métiers entiers d'un seul coup.", "les diplômes.", "les horaires de travail."], bon: 0, expl: "Un métier est un ensemble de tâches." },
+          { q: "Selon l'OIT (2025), la part des emplois mondiaux potentiellement exposés à l'IA générative est d'environ…", choix: ["1 %.", "10 %.", "50 %.", "25 %."], bon: 3, expl: "Un emploi sur quatre." },
+          { q: "Un emploi « exposé » à l'IA est un emploi…", choix: ["qui va forcément disparaître.", "dont une partie des tâches pourrait être réalisée ou modifiée par l'IA.", "protégé par la loi.", "exercé en plein air."], bon: 1, expl: "Exposé ne veut pas dire supprimé." },
+          { q: "Selon l'OIT, les emplois les plus exposés à l'IA générative sont…", choix: ["les emplois de bureau.", "les métiers du bâtiment.", "les métiers agricoles.", "les métiers du sport."], bon: 0, expl: "Notamment les emplois administratifs." },
+          { q: "Le micro-travail consiste à…", choix: ["travailler sur un très petit ordinateur.", "réaliser des tâches très courtes payées à la pièce, comme étiqueter des images.", "travailler moins de deux heures par semaine.", "fabriquer des microprocesseurs."], bon: 1, expl: "Il est indispensable à l'entraînement des IA." },
+          { q: "Laquelle de ces compétences prend plus de valeur avec l'IA ?", choix: ["Recopier des textes.", "Faire des calculs répétitifs.", "Mémoriser des annuaires.", "L'esprit critique."], bon: 3, expl: "Vérifier, évaluer, décider." },
+          { q: "Les prévisions sur l'effet de l'IA sur l'emploi sont…", choix: ["certaines et précises.", "sans intérêt.", "incertaines et à lire avec esprit critique.", "interdites."], bon: 2, expl: "Tout dépend de choix qui restent à faire." },
+          { q: "Pourquoi la diversité des équipes qui conçoivent l'IA est-elle importante ?", choix: ["Elle rend les ordinateurs plus rapides.", "Elle réduit le risque de systèmes biaisés.", "Elle est obligatoire dans tous les pays.", "Elle diminue la consommation d'énergie."], bon: 1, expl: "Voir le chapitre 8." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Automatisation</strong> : la machine réalise seule la tâche. <strong>Augmentation</strong> : elle aide l'humain à mieux faire son travail.</p>
+<p><strong>Tâches, pas métiers.</strong> Un métier est un ensemble de tâches : il se <strong>transforme</strong> plus souvent qu'il ne disparaît.</p>
+<p><strong>Les études.</strong> Selon l'OIT (2025), environ un emploi sur quatre est potentiellement <strong>exposé</strong> à l'IA générative, surtout les emplois de bureau. Exposé ne veut pas dire supprimé ; les prévisions sont incertaines.</p>
+<p><strong>Les métiers de l'IA.</strong> Ingénierie, science et ingénierie des données, recherche, éthique et conformité, annotation, développement. Le <strong>micro-travail</strong> est indispensable, mais invisible et précaire.</p>
+<p><strong>Compétences d'avenir.</strong> Esprit critique, créativité, relationnel, compétences numériques et scientifiques, capacité à apprendre.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>distinguer automatisation et augmentation</li><li>découper un métier en tâches</li><li>lire avec esprit critique un chiffre sur l'emploi</li><li>citer des métiers de l'IA et définir le micro-travail</li><li>nommer les compétences que l'IA rend plus précieuses</li></ul>` },
+    ] },
+    { id: "c13", num: 13, titre: "L'empreinte écologique de l'IA", resume: "Centres de données, ordres de grandeur, effet rebond, sobriété",
+    etapes: [
+      { t: "ordre", texte: true, titre: "Combien consomme une requête à une IA ?", q: "Sans rien chercher, range ces usages du moins énergivore au plus énergivore.",
+        lignes: ["Poser une question écrite à un assistant conversationnel.", "Générer une image avec une IA.", "Allumer une ampoule LED de 10 W pendant une heure.", "Recharger complètement son smartphone.", "Regarder une heure de vidéo en ligne."],
+        expl: "Ordres de grandeur publiés : requête texte 0,24 Wh (Google, 2025) ; image générée environ 3 Wh (estimation de recherche, 2023) ; ampoule 10 Wh ; recharge environ 15 Wh ; heure de vidéo environ 77 Wh (estimation de l'AIE, 2020). On surestime souvent la requête texte et on sous-estime la vidéo." },
+      { t: "quiz", titre: "Les ordres de grandeur", intro: "Estimations publiées, à considérer comme des ordres de grandeur.",
+        doc: `<table class="donnees"><thead><tr><th>Usage</th><th>Énergie estimée</th></tr></thead><tbody><tr><td>Requête texte à un assistant</td><td>0,24 Wh</td></tr><tr><td>Image générée par IA</td><td>environ 3 Wh</td></tr><tr><td>Ampoule LED de 10 W, une heure</td><td>10 Wh</td></tr><tr><td>Recharge complète de smartphone</td><td>environ 15 Wh</td></tr><tr><td>Une heure de vidéo en ligne</td><td>environ 77 Wh</td></tr></tbody></table>`,
+        questions: [
+          { q: "Combien de requêtes texte faut-il pour consommer autant qu'une heure de vidéo ?", choix: ["Environ 30.", "Environ 320.", "Environ 3 200."], bon: 1, expl: "77 ÷ 0,24 ≈ 320." },
+          { q: "Et autant qu'une image générée ?", choix: ["Environ 12 à 13.", "Environ 100.", "Environ 2."], bon: 0, expl: "3 ÷ 0,24 = 12,5." },
+          { q: "Une requête consomme très peu. Pourquoi l'IA pose-t-elle malgré tout un problème environnemental ?", choix: ["Parce que les requêtes se comptent par milliards chaque jour, et qu'il faut ajouter l'entraînement des modèles et la fabrication du matériel.", "Parce que chaque requête pollue une rivière.", "Elle n'en pose aucun."], bon: 0, expl: "Et les usages plus gourmands (images, vidéos) se multiplient." },
+        ] },
+      { t: "lecon", titre: "L'IA est matérielle",
+        texte: `<p>On dit que l'IA est « dans le nuage » (le <em>cloud</em>). En réalité, elle fonctionne dans des bâtiments bien réels : les <strong>centres de données</strong>, qui abritent des milliers de serveurs et de processeurs spécialisés, refroidis en permanence.</p>
+<ol class="phases"><li><strong>Matériel</strong> extraction de métaux (cuivre, terres rares…), fabrication des puces, des serveurs, des bâtiments ; déchets électroniques</li><li><strong>Électricité</strong> pour faire calculer les puces et refroidir les machines ; ses émissions dépendent de la façon dont elle est produite</li><li><strong>Eau</strong> pour refroidir les centres de données, et pour produire l'électricité et les puces</li></ol>
+<p>L'<strong>analyse du cycle de vie</strong> mesure les impacts environnementaux d'un produit à toutes les étapes de son existence : extraction des matières premières, fabrication, transport, utilisation et fin de vie.</p>
+<p>Le <strong>wattheure</strong> (Wh) est une unité d'énergie : l'énergie consommée par un appareil de 1 watt pendant 1 heure.</p>
+<p class="formule">1 kWh = 1 000 Wh · 1 MWh = 1 000 kWh · 1 GWh = 1 000 MWh · 1 TWh = 1 000 GWh</p>
+<p>L'<strong>intensité carbone</strong> de l'électricité est la masse de CO₂ émise pour produire 1 kWh. Elle est faible lorsque l'électricité vient surtout du nucléaire, de l'hydraulique, de l'éolien ou du solaire (quelques dizaines de grammes par kWh en France), et élevée lorsqu'elle vient du charbon ou du gaz (la moyenne mondiale est de l'ordre de 450 grammes par kWh).</p>` },
+      { t: "tri", titre: "D'où vient l'empreinte ?", q: "Classe chaque élément dans l'une des trois sources d'impact.", categories: ["Matériel", "Électricité", "Eau"],
+        items: [
+          { txt: "L'extraction de cuivre et de terres rares.", cat: 0, expl: "Des matières premières." },
+          { txt: "Les tours de refroidissement d'un centre de données.", cat: 2, expl: "Elles consomment de l'eau." },
+          { txt: "Le fonctionnement des processeurs pendant l'entraînement.", cat: 1, expl: "Les puces calculent grâce à l'électricité." },
+          { txt: "Les serveurs remplacés tous les cinq ans.", cat: 0, expl: "Fabrication et déchets électroniques." },
+          { txt: "La climatisation des salles de serveurs.", cat: 1, expl: "La climatisation consomme de l'électricité." },
+        ] },
+      { t: "quiz", titre: "Convertir",
+        questions: [
+          { q: "2 500 Wh, c'est…", choix: ["25 kWh.", "2,5 kWh.", "0,25 kWh."], bon: 1, expl: "On divise par 1 000." },
+          { q: "945 TWh, c'est…", choix: ["945 000 GWh.", "9 450 GWh.", "0,945 GWh."], bon: 0, expl: "1 TWh = 1 000 GWh." },
+          { q: "1 287 MWh, c'est…", choix: ["1 287 000 GWh.", "12,87 GWh.", "1,287 GWh."], bon: 2, expl: "1 GWh = 1 000 MWh." },
+        ] },
+      { t: "lecon", titre: "Entraînement et utilisation",
+        texte: `<ul><li><strong>L'entraînement</strong> d'un grand modèle mobilise des milliers de processeurs pendant des semaines ou des mois. C'est un coût ponctuel, mais très élevé. En 2025, l'entreprise française Mistral AI a publié, avec l'ADEME et le cabinet Carbone 4, l'analyse du cycle de vie de l'un de ses grands modèles : son entraînement et ses 18 premiers mois d'utilisation représentaient environ <strong>20 400 tonnes de CO₂</strong> et <strong>281 000 m³ d'eau</strong>.</li><li><strong>L'utilisation</strong> (on parle d'<em>inférence</em>) coûte peu à chaque requête, mais elle se répète des milliards de fois par jour. Selon la même étude, une réponse d'environ 400 tokens représentait environ 1,1 g de CO₂ et 45 mL d'eau, en tenant compte de tout le cycle de vie. Google annonce de son côté 0,24 Wh et 0,26 mL d'eau pour une requête texte médiane, en ne comptant que le fonctionnement de ses centres de données.</li></ul>
+<aside class="retenir"><strong>Des chiffres à manier avec précaution.</strong> Les estimations varient beaucoup selon ce que l'on compte (le seul fonctionnement des serveurs, ou tout le cycle de vie), selon le modèle, la longueur de la réponse et le type de tâche. Ces chiffres sont souvent publiés par les entreprises elles-mêmes, sans méthode commune. Il faut toujours se demander : <strong>qu'est-ce qui est compté, et par qui ?</strong></aside>` },
+      { t: "quiz", titre: "Comparer des chiffres", intro: "Google annonce 0,26 mL d'eau par requête texte médiane ; Mistral AI annonce 45 mL d'eau pour une réponse de 400 tokens.",
+        questions: [
+          { q: "Peut-on en conclure qu'un assistant consomme 170 fois plus d'eau que l'autre ?", choix: ["Oui : 45 ÷ 0,26 ≈ 170.", "Non : les deux chiffres ne mesurent pas la même chose.", "Oui, les deux entreprises sont fiables."], bon: 1, expl: "L'un ne compte que l'eau des centres de données pour une requête « médiane » ; l'autre inclut tout le cycle de vie pour une réponse d'une longueur donnée." },
+          { q: "Que faudrait-il pour comparer honnêtement deux modèles ?", choix: ["Une méthode de calcul commune, une même tâche de référence, des chiffres vérifiés par un organisme indépendant.", "Le prix de l'abonnement.", "Le nombre d'utilisateurs."], bon: 0, expl: "Qu'est-ce qui est compté, et par qui ?" },
+        ] },
+      { t: "quiz", titre: "L'entraînement d'un grand modèle", intro: "Des chercheurs ont estimé en 2021 que l'entraînement d'un grand modèle de langage de l'époque avait consommé environ 1 287 MWh. Un foyer français consomme en moyenne environ 4 500 kWh d'électricité par an.",
+        questions: [
+          { q: "À combien d'années de consommation d'un foyer cet entraînement correspond-il ?", choix: ["Environ 3 ans.", "Environ 29 ans.", "Environ 286 ans."], bon: 2, expl: "1 287 MWh = 1 287 000 kWh ; 1 287 000 ÷ 4 500 ≈ 286." },
+          { q: "Quelles émissions avec une électricité à 30 g/kWh, puis à 450 g/kWh ?", choix: ["Environ 39 tonnes, puis 579 tonnes de CO₂.", "Environ 39 kg, puis 579 kg.", "La même chose dans les deux cas."], bon: 0, expl: "1 287 000 × 30 = 38 610 000 g ; le même calcul émet quinze fois plus avec 450 g/kWh." },
+          { q: "Qu'en conclure ?", choix: ["L'emplacement du centre de données compte énormément.", "L'entraînement ne consomme rien.", "Il faut entraîner les modèles la nuit."], bon: 0, expl: "Tout dépend de la façon dont l'électricité est produite." },
+        ] },
+      { t: "lecon", titre: "À l'échelle mondiale",
+        texte: `<p>Selon l'Agence internationale de l'énergie (AIE), les centres de données consommaient en 2024 environ <strong>1,5 %</strong> de l'électricité mondiale, soit environ 415 TWh, à peu près la consommation annuelle de la France. Portée par l'IA, cette consommation pourrait plus que <strong>doubler d'ici 2030</strong>, pour atteindre environ 945 TWh, soit environ 3 % de la demande mondiale. Dans certains territoires, la part est déjà très élevée : environ 20 % de l'électricité en Irlande.</p>
+<table class="donnees"><thead><tr><th>Année</th><th>Centres de données dans le monde</th></tr></thead><tbody><tr><td>2024</td><td>415 TWh</td></tr><tr><td>2030 (projection)</td><td>945 TWh</td></tr></tbody></table>
+<p>L'<strong>effet rebond</strong> désigne le fait qu'une technologie devenue plus efficace, donc moins coûteuse, est utilisée beaucoup plus, si bien que la consommation totale augmente au lieu de baisser. Google indique que l'énergie d'une requête médiane a été divisée par plus de trente en un an ; mais si le nombre de requêtes et d'usages explose, la consommation totale peut continuer de croître.</p>` },
+      { t: "quiz", titre: "L'effet rebond", intro: "En un an, l'énergie consommée par requête par un service d'IA est divisée par 10. Dans le même temps, son nombre de requêtes est multiplié par 25.",
+        questions: [
+          { q: "Comment la consommation totale a-t-elle évolué ?", choix: ["Elle a été divisée par 10.", "Elle a été multipliée par 2,5.", "Elle n'a pas changé."], bon: 1, expl: "25 ÷ 10 = 2,5." },
+          { q: "Comment l'expliquer ?", choix: ["Plus efficace, donc moins cher et plus rapide, le service est beaucoup plus utilisé : la hausse des usages dépasse le gain d'efficacité.", "Les serveurs sont tombés en panne.", "Le calcul est faux."], bon: 0, expl: "C'est l'effet rebond." },
+          { q: "Quelle mesure limiterait cet effet ?", choix: ["Fixer des objectifs de consommation totale, et pas seulement par requête.", "Rendre le service encore plus rapide.", "Générer plus d'images."], bon: 0, expl: "On peut aussi réserver les usages les plus coûteux aux besoins réels." },
+        ] },
+      { t: "code", titre: "L'empreinte d'une journée", d: 2,
+        caches: ["total_jour([('a', 1, 1)])", "total_jour([('a', 0.5, 4), ('b', 10, 3)])", "total_jour([])"],
+        enonce: `<p>Léo a noté ses usages d'une journée : 20 requêtes à un assistant, 2 images générées, 2 heures de vidéo en ligne et une recharge de smartphone. Chaque élément de la liste <code>usages</code> contient un nom, une énergie en Wh et un nombre par jour.</p><p>Complète la fonction <code>total_jour(usages)</code> qui renvoie l'énergie totale de la journée, en Wh.</p>`,
+        depart: `usages = [\n    ("requête texte à une IA", 0.24, 20),\n    ("image générée par IA", 3, 2),\n    ("heure de vidéo en ligne", 77, 2),\n    ("recharge de smartphone", 15, 1)]\n\ndef total_jour(usages):\n    total = 0\n    for (nom, energie, nombre) in usages:\n        # à compléter\n        pass\n    return total\n\nprint("Total :", round(total_jour(usages), 1), "Wh par jour")`,
+        solution: `usages = [\n    ("requête texte à une IA", 0.24, 20),\n    ("image générée par IA", 3, 2),\n    ("heure de vidéo en ligne", 77, 2),\n    ("recharge de smartphone", 15, 1)]\n\ndef total_jour(usages):\n    total = 0\n    for (nom, energie, nombre) in usages:\n        total = total + energie * nombre\n    return total\n\nprint("Total :", round(total_jour(usages), 1), "Wh par jour")`,
+        tests: [{ appels: [["total_jour(usages)", "179.8"], ["total_jour([('vidéo', 77, 1)])", "77"]] }],
+        indices: ["La consommation d'un usage vaut energie * nombre.", "total = total + energie * nombre"] },
+      { t: "code", titre: "Du wattheure au CO₂", d: 2,
+        caches: ["emissions(1000, 100)", "emissions(200, 30)", "emissions(0, 450)"],
+        enonce: `<p>Écris la fonction <code>emissions(wh_par_jour, intensite)</code> qui renvoie les émissions annuelles, en <strong>kilogrammes</strong> de CO₂.</p><ul><li>l'énergie annuelle en kWh vaut <code>wh_par_jour * 365 / 1000</code> ;</li><li>l'intensité est donnée en grammes de CO₂ par kWh : on divise encore par 1 000 pour obtenir des kilogrammes.</li></ul>`,
+        depart: `def emissions(wh_par_jour, intensite):\n    kwh_an = 0   # à compléter\n    return 0\n\nprint("France :", round(emissions(179.8, 30), 1), "kg de CO2 par an")\nprint("Moyenne mondiale :", round(emissions(179.8, 450), 1), "kg de CO2 par an")`,
+        solution: `def emissions(wh_par_jour, intensite):\n    kwh_an = wh_par_jour * 365 / 1000\n    return kwh_an * intensite / 1000\n\nprint("France :", round(emissions(179.8, 30), 1), "kg de CO2 par an")\nprint("Moyenne mondiale :", round(emissions(179.8, 450), 1), "kg de CO2 par an")`,
+        tests: [{ appels: [["emissions(179.8, 30)", "1.96881"], ["emissions(179.8, 450)", "29.53215"]] }],
+        indices: ["kwh_an = wh_par_jour * 365 / 1000", "return kwh_an * intensite / 1000"] },
+      { t: "quiz", titre: "Le bilan de Léo", intro: "Léo consomme 179,8 Wh par jour, soit environ 65,6 kWh par an : environ 2,0 kg de CO₂ avec l'électricité française, 29,5 kg avec la moyenne mondiale.",
+        questions: [
+          { q: "Quel usage pèse le plus lourd ?", choix: ["Les requêtes à l'assistant (4,8 Wh).", "Les images générées (6 Wh).", "La vidéo en ligne (154 Wh)."], bon: 2, expl: "L'IA ne représente qu'environ 6 % du total de Léo." },
+          { q: "Léo génère 20 images par jour au lieu de 2, et remplace une heure de vidéo par une heure de lecture. Son empreinte…", choix: ["augmente.", "baisse : 156,8 Wh par jour.", "ne change pas."], bon: 1, expl: "+54 Wh pour les images, −77 Wh pour la vidéo." },
+          { q: "Un service d'IA reçoit 1 milliard de requêtes texte par jour. Quelle énergie en un an ?", choix: ["Environ 87,6 kWh.", "Environ 87,6 MWh.", "Environ 87,6 GWh."], bon: 2, expl: "1 000 000 000 × 0,24 × 365 Wh, soit plus d'un million de fois l'empreinte annuelle de Léo, sans compter l'entraînement ni le matériel. L'enjeu de l'IA se situe surtout à l'échelle collective." },
+        ] },
+      { t: "lecon", titre: "Vers des usages plus sobres",
+        texte: `<table class="donnees large"><thead><tr><th>En tant qu'utilisateur</th><th>En tant que société</th></tr></thead><tbody>
+<tr><td>se demander si l'IA est utile pour la tâche (une recherche simple ou une calculatrice suffisent souvent)</td><td>mesurer et publier l'empreinte des modèles avec des méthodes communes</td></tr>
+<tr><td>préférer le texte à l'image ou à la vidéo quand c'est possible</td><td>privilégier des modèles plus petits, spécialisés, adaptés à la tâche</td></tr>
+<tr><td>formuler des requêtes précises pour éviter les allers-retours inutiles</td><td>installer les centres de données là où l'électricité est bas carbone et récupérer leur chaleur</td></tr>
+<tr><td>garder son matériel plus longtemps</td><td>allonger la durée de vie du matériel et recycler les métaux</td></tr></tbody></table>
+<aside class="retenir">L'IA n'est pas « immatérielle » : elle consomme des métaux, de l'électricité et de l'eau. Une requête isolée pèse peu, mais l'<strong>échelle</strong> (des milliards d'utilisations), l'<strong>entraînement</strong> de modèles toujours plus grands et l'<strong>effet rebond</strong> rendent son empreinte significative et croissante. La <strong>sobriété</strong> consiste à réserver l'IA aux usages qui en valent la peine.</aside>` },
+      { t: "tri", titre: "Usage utile ou superflu ?", q: "Le recours à une IA générative est-il justifié, ou existe-t-il une solution plus sobre ?", categories: ["Justifié", "Solution plus sobre"],
+        items: [
+          { txt: "Calculer 15 × 23.", cat: 1, expl: "Une calculatrice suffit." },
+          { txt: "Connaître la capitale de l'Australie.", cat: 1, expl: "Une recherche simple ou un manuel." },
+          { txt: "Obtenir un retour détaillé sur la structure de sa dissertation.", cat: 0, expl: "L'IA apporte un vrai retour personnalisé, à condition de garder la main sur son travail." },
+          { txt: "Générer dix variantes d'un même logo « pour voir ».", cat: 1, expl: "Superflu dans la plupart des cas : mieux vaut préciser sa demande." },
+          { txt: "Traduire une notice de médicament dans une langue que l'on ne parle pas.", cat: 0, expl: "Justifié si aucun traducteur n'est disponible, mais à faire vérifier par un pharmacien : l'erreur peut être grave." },
+        ] },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "Un centre de données est…", choix: ["un nuage qui stocke les données.", "une base de données en ligne.", "un bâtiment qui abrite des milliers de serveurs.", "un logiciel d'IA."], bon: 2, expl: "L'IA est matérielle." },
+          { q: "1 kWh est égal à…", choix: ["10 Wh.", "1 000 Wh.", "100 Wh.", "1 000 000 Wh."], bon: 1, expl: "Kilo signifie mille." },
+          { q: "L'intensité carbone de l'électricité est…", choix: ["plus faible en France que la moyenne mondiale.", "la même partout dans le monde.", "nulle pour les centres de données.", "plus élevée lorsque l'électricité est éolienne."], bon: 0, expl: "Quelques dizaines de grammes par kWh, contre 450 environ." },
+          { q: "Selon l'AIE, les centres de données consommaient en 2024 environ…", choix: ["50 % de l'électricité mondiale.", "0,001 % de l'électricité mondiale.", "15 % de l'électricité mondiale.", "1,5 % de l'électricité mondiale."], bon: 3, expl: "Environ 415 TWh." },
+          { q: "L'analyse du cycle de vie prend en compte…", choix: ["seulement l'électricité consommée pendant l'utilisation.", "toutes les étapes, de l'extraction des matières premières à la fin de vie.", "seulement le prix du produit.", "seulement l'eau consommée."], bon: 1, expl: "Fabrication, transport, utilisation, fin de vie." },
+          { q: "Pour un même modèle, quelle tâche consomme en général le plus d'énergie ?", choix: ["Une réponse texte courte.", "Une réponse « oui ».", "La génération d'une vidéo.", "Un simple calcul."], bon: 2, expl: "Une image ou une vidéo consomme bien plus qu'un texte court." },
+          { q: "L'effet rebond désigne le fait que…", choix: ["plus une technologie devient efficace, plus on l'utilise, et la consommation totale peut augmenter.", "les serveurs rebondissent en cas de panne.", "les requêtes reviennent à l'utilisateur.", "l'énergie est recyclée."], bon: 0, expl: "Le gain d'efficacité est dépassé par la hausse des usages." },
+          { q: "L'eau sert dans les centres de données principalement à…", choix: ["nettoyer les écrans.", "fabriquer de l'électricité sur place.", "abreuver le personnel.", "refroidir les machines."], bon: 3, expl: "Les serveurs chauffent en permanence." },
+          { q: "Un geste sobre consiste à…", choix: ["générer beaucoup d'images pour choisir la meilleure.", "utiliser une IA pour faire un calcul simple.", "utiliser l'IA quand elle apporte vraiment quelque chose et formuler des requêtes précises.", "changer de téléphone chaque année."], bon: 2, expl: "Réserver l'IA aux usages qui en valent la peine." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>L'IA est matérielle.</strong> Elle fonctionne dans des <strong>centres de données</strong> et consomme du <strong>matériel</strong>, de l'<strong>électricité</strong> et de l'<strong>eau</strong>. L'analyse du cycle de vie compte toutes les étapes.</p>
+<p><strong>Unités.</strong> 1 kWh = 1 000 Wh. L'<strong>intensité carbone</strong> est la masse de CO₂ émise par kWh : environ 30 g en France, 450 g en moyenne mondiale.</p>
+<p><strong>Entraînement et utilisation.</strong> L'entraînement est ponctuel mais très coûteux ; chaque requête coûte peu, mais il y en a des milliards.</p>
+<p><strong>Prudence.</strong> Qu'est-ce qui est compté, et par qui ?</p>
+<p><strong>À l'échelle mondiale.</strong> Environ 1,5 % de l'électricité en 2024 (415 TWh), peut-être 945 TWh en 2030. L'<strong>effet rebond</strong> fait croître la consommation totale malgré les gains d'efficacité.</p>
+<p><strong>Sobriété.</strong> Réserver l'IA aux usages qui en valent la peine.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>citer les trois sources d'impact de l'IA</li><li>convertir des unités d'énergie</li><li>calculer une consommation et des émissions</li><li>expliquer l'effet rebond</li><li>lire avec prudence un chiffre d'empreinte</li><li>adopter des usages sobres</li></ul>` },
+    ] },
+    { id: "c14", num: 14, titre: "L'IA pour la société et les défis mondiaux", resume: "Usages utiles, double usage, solutionnisme, juger un projet",
+    etapes: [
+      { t: "tri", titre: "L'IA peut-elle aider le climat ?", q: "Quatre usages réels de l'IA. Qu'apporte-t-elle surtout dans chacun ?", categories: ["Rapidité", "Quantité de données traitées", "Précision des prévisions"],
+        items: [
+          { txt: "Prévision météo : un modèle d'IA produit des prévisions en quelques minutes au lieu de plusieurs heures de calcul.", cat: 0, expl: "Le Centre européen de prévisions météorologiques l'utilise depuis 2025, en complément de ses modèles physiques." },
+          { txt: "Méthane : des IA analysent des images satellites pour repérer des fuites sur des sites pétroliers et gaziers.", cat: 1, expl: "Aucune équipe humaine ne pourrait examiner autant d'images." },
+          { txt: "Électricité : des IA prévoient la production des éoliennes et des panneaux solaires pour mieux équilibrer le réseau.", cat: 2, expl: "Cette production varie avec la météo." },
+          { txt: "Forêts : des IA surveillent de très grandes surfaces par satellite pour détecter la déforestation et les départs d'incendies.", cat: 1, expl: "Avec, là aussi, un gain de rapidité de détection." },
+        ] },
+      { t: "quiz", titre: "Le revers de la médaille",
+        questions: [
+          { q: "D'après le chapitre 13, quel est le « coût » climatique de ces outils ?", choix: ["Aucun.", "Leur coût en électricité, en eau et en matériel, en particulier pour l'entraînement des modèles.", "Le prix des satellites."], bon: 1, expl: "L'IA est matérielle." },
+          { q: "L'IA peut-elle, à elle seule, résoudre le problème du réchauffement climatique ?", choix: ["Oui, si les modèles sont assez grands.", "Non : elle aide à mesurer, prévoir et surveiller, mais réduire les émissions exige des décisions humaines et politiques."], bon: 1, expl: "Lois, investissements, contrôles, changements de comportements." },
+          { q: "Une compagnie pétrolière utilise des IA pour trouver plus vite de nouveaux gisements. Qu'en conclure ?", choix: ["Que l'IA est toujours bonne pour le climat.", "Qu'une technologie n'est ni bonne ni mauvaise en soi : tout dépend de son usage.", "Que l'IA est toujours mauvaise pour le climat."], bon: 1, expl: "Le même outil peut accélérer l'extraction d'énergies fossiles." },
+        ] },
+      { t: "lecon", titre: "Des usages au service de tous",
+        texte: `<table class="donnees large"><thead><tr><th>Domaine</th><th>Exemples</th></tr></thead><tbody>
+<tr><th>Sciences</th><td>Le programme AlphaFold prédit la forme en trois dimensions des protéines, un problème qui résistait aux biologistes depuis cinquante ans ; ses créateurs ont reçu le prix Nobel de chimie 2024. Ces structures aident à comprendre des maladies et à concevoir des médicaments.</td></tr>
+<tr><th>Santé</th><td>Aide au dépistage du cancer du sein sur les mammographies, en appui des radiologues ; détection de maladies de la rétine ; aide à la découverte de nouvelles molécules.</td></tr>
+<tr><th>Climat et environnement</th><td>Prévision météo, détection des fuites de méthane, suivi des forêts, des glaciers et de la biodiversité (identification d'espèces à partir de photos ou de chants d'oiseaux).</td></tr>
+<tr><th>Accessibilité</th><td>Sous-titrage automatique pour les personnes sourdes ou malentendantes ; description d'images et lecture de textes pour les personnes aveugles ou malvoyantes.</td></tr>
+<tr><th>Éducation</th><td>Exercices adaptés au niveau de chacun, traduction de supports pour les élèves allophones, aide aux élèves en difficulté de lecture.</td></tr>
+<tr><th>Catastrophes</th><td>Cartographie rapide des dégâts après un séisme ou une inondation à partir d'images satellites, pour orienter les secours.</td></tr></tbody></table>
+<aside class="savoir"><strong>Un dépistage du cancer avec l'IA.</strong> En Suède, un grand essai clinique a comparé le dépistage habituel du cancer du sein, où chaque mammographie est lue par deux radiologues, à un dépistage où l'IA trie les examens et signale les zones suspectes. Les premiers résultats, publiés en 2023, montraient que l'IA permettait de détecter au moins autant de cancers tout en réduisant de près de moitié la charge de lecture des radiologues. Les médecins gardent la décision.</aside>` },
+      { t: "tri", titre: "Quel domaine ?", q: "Associe chaque usage à un domaine.", categories: ["Sciences", "Santé", "Climat et environnement", "Accessibilité", "Catastrophes"],
+        items: [
+          { txt: "Une application décrit oralement ce que filme la caméra du téléphone.", cat: 3, expl: "Pour les personnes aveugles ou malvoyantes." },
+          { txt: "Un modèle prédit la structure de protéines.", cat: 0, expl: "C'est AlphaFold." },
+          { txt: "Des images satellites sont analysées après un séisme pour repérer les bâtiments effondrés.", cat: 4, expl: "Pour orienter les secours." },
+          { txt: "Une IA reconnaît les chants d'oiseaux pour suivre la biodiversité.", cat: 2, expl: "Suivi de la biodiversité." },
+          { txt: "Une IA aide les radiologues à repérer des anomalies sur des radiographies.", cat: 1, expl: "En appui des médecins." },
+        ] },
+      { t: "lecon", titre: "Les limites et les risques",
+        texte: `<p>Une technologie est à <strong>double usage</strong> lorsqu'elle peut servir aussi bien à des fins bénéfiques que nuisibles. Un modèle qui conçoit des molécules peut aider à créer des médicaments… ou des substances toxiques ; un système de reconnaissance d'images peut retrouver des personnes disparues… ou surveiller des opposants politiques.</p>
+<p>La <strong>fracture numérique</strong> désigne les inégalités d'accès aux outils numériques et aux compétences pour les utiliser. Pour l'IA, elle concerne aussi les langues : la plupart des grands modèles ont été entraînés surtout sur des textes en anglais, et fonctionnent moins bien dans les langues moins présentes sur Internet.</p>
+<p>La <strong>souveraineté numérique</strong> est la capacité d'un pays ou d'un groupe de pays à maîtriser ses outils numériques, ses données et ses choix technologiques, sans dépendre entièrement d'entreprises ou d'États étrangers.</p>
+<aside class="retenir"><strong>Attention au solutionnisme.</strong> Le <strong>solutionnisme</strong> consiste à croire que la technologie peut résoudre à elle seule des problèmes qui sont aussi sociaux, politiques ou économiques. Une IA peut repérer une fuite de méthane ; ce sont des lois, des contrôles et des investissements qui la font réparer. Avant de lancer un projet d'IA, il faut toujours se demander : <strong>l'IA est-elle la meilleure réponse, et pour qui ?</strong></aside>` },
+      { t: "tri", titre: "Double usage", q: "Chaque technologie a deux visages. Classe ces usages.", categories: ["Usage bénéfique", "Usage nuisible"],
+        items: [
+          { txt: "Reconnaissance faciale : retrouver un enfant disparu.", cat: 0, expl: "La même technique peut aussi surveiller." },
+          { txt: "Reconnaissance faciale : identifier des manifestants.", cat: 1, expl: "Une surveillance des opinions." },
+          { txt: "Clonage de la voix : redonner une voix à une personne qui l'a perdue à cause d'une maladie.", cat: 0, expl: "Un usage d'accessibilité." },
+          { txt: "Clonage de la voix : imiter un proche pour une arnaque.", cat: 1, expl: "Voir le chapitre 9." },
+          { txt: "Génération de textes : aider à rédiger ou à traduire.", cat: 0, expl: "Un assistant d'écriture." },
+          { txt: "Génération de textes : produire en masse de faux avis.", cat: 1, expl: "De la désinformation." },
+        ] },
+      { t: "quiz", titre: "Une langue oubliée", intro: "Un assistant conversationnel fonctionne très bien en anglais et en français, mais commet beaucoup d'erreurs en occitan ou en breton.",
+        questions: [
+          { q: "Comment l'expliquer ?", choix: ["Ces langues sont trop difficiles.", "Le modèle a été entraîné sur très peu de textes dans ces langues : il y généralise mal.", "Les ordinateurs ne peuvent pas les écrire."], bon: 1, expl: "Des données peu représentées (chapitre 2), donc une mauvaise généralisation (chapitre 3)." },
+          { q: "En quoi est-ce une forme de fracture numérique ?", choix: ["Les locuteurs de ces langues ont moins accès à des outils performants, ce qui renforce les inégalités.", "Leurs ordinateurs sont plus lents.", "Ce n'en est pas une."], bon: 0, expl: "Cela peut aussi fragiliser ces langues." },
+          { q: "Quelle solution améliorerait la situation ?", choix: ["Interdire ces langues en ligne.", "Constituer et partager des corpus de textes et d'enregistrements, puis entraîner ou adapter des modèles spécialisés.", "Traduire tout en anglais."], bon: 1, expl: "Avec des associations, des universités, des collectivités." },
+        ] },
+      { t: "quiz", titre: "Solutionnisme ?", intro: "Une entreprise propose une application d'IA qui « résout le harcèlement scolaire » en analysant automatiquement tous les messages des élèves.",
+        questions: [
+          { q: "Pourquoi cette promesse relève-t-elle du solutionnisme ?", choix: ["Parce que l'application est payante.", "Parce que le harcèlement est un problème humain et social : il ne suffit pas de le détecter pour le faire cesser.", "Parce que l'IA ne sait pas lire."], bon: 1, expl: "Il se joue aussi hors des messages." },
+          { q: "Quel risque ce projet présente-t-il pour les élèves ?", choix: ["Une surveillance permanente de leurs conversations privées, et des erreurs qui accusent à tort ou rassurent à tort.", "Une batterie qui se vide plus vite.", "Aucun."], bon: 0, expl: "Faux positifs, faux négatifs, atteinte à la confiance, données très sensibles exposées." },
+          { q: "Quelles réponses restent indispensables ?", choix: ["Une application plus puissante.", "Des adultes formés et disponibles, des procédures claires de signalement, la prise en charge des victimes et des auteurs, le 3018.", "Supprimer les téléphones."], bon: 1, expl: "Et l'éducation à l'empathie et au numérique." },
+        ] },
+      { t: "lecon", titre: "Une grille pour juger un projet d'IA",
+        texte: `<table class="donnees large"><thead><tr><th>Critère</th><th>Questions à se poser</th></tr></thead><tbody>
+<tr><th>Utilité</th><td>Quel problème réel résout-il ? Pour qui ? Existe-t-il une solution plus simple, sans IA ?</td></tr>
+<tr><th>Données</th><td>D'où viennent les données ? Sont-elles de qualité, représentatives, collectées légalement ?</td></tr>
+<tr><th>Équité</th><td>Le système peut-il défavoriser certains groupes ? Comment le vérifier ?</td></tr>
+<tr><th>Vie privée</th><td>Quelles données personnelles sont utilisées ? Sont-elles minimisées et protégées ?</td></tr>
+<tr><th>Environnement</th><td>Quelle est son empreinte ? Est-elle justifiée par le bénéfice attendu ?</td></tr>
+<tr><th>Contrôle humain</th><td>Qui décide au final ? Peut-on contester une décision ?</td></tr>
+<tr><th>Risques d'abus</th><td>Le système pourrait-il être détourné pour nuire ?</td></tr></tbody></table>
+<aside class="retenir">L'IA peut contribuer à de grands défis : santé, climat, sciences, accessibilité. Mais elle n'est qu'un outil : son utilité dépend des <strong>données</strong>, des <strong>choix humains</strong>, du <strong>cadre</strong> dans lequel elle est utilisée et de son <strong>coût</strong> environnemental.</aside>` },
+      { t: "tri", titre: "Quel critère ?", q: "Une mairie veut installer des caméras « intelligentes » pour repérer automatiquement les « comportements suspects » et prévenir la police. À quel critère de la grille chaque remarque se rattache-t-elle ?",
+        categories: ["Utilité", "Équité", "Vie privée", "Contrôle humain"],
+        items: [
+          { txt: "La notion de « comportement suspect » est floue, et l'efficacité de ces dispositifs est discutée.", cat: 0, expl: "Quel problème réel est résolu ?" },
+          { txt: "Le système risque de cibler davantage les jeunes, les personnes sans abri ou les minorités.", cat: 1, expl: "Selon ses données d'entraînement." },
+          { txt: "Tous les passants sont filmés et analysés en continu.", cat: 2, expl: "Des données personnelles, voire biométriques." },
+          { txt: "Qui décide d'une intervention de police, et sur quelle base ?", cat: 3, expl: "La décision finale doit revenir à un humain." },
+        ],
+        expl: "Ce projet relève du RGPD, et le règlement européen sur l'IA interdit la surveillance biométrique en temps réel dans l'espace public par la police, sauf exceptions très encadrées. D'autres réponses existent : présence humaine, meilleur éclairage, caméras classiques consultées seulement en cas d'incident." },
+      { t: "lecon", titre: "Imaginer un projet d'IA responsable",
+        texte: `<p>Par groupes de trois ou quatre, imaginez un projet d'IA qui répond à un défi de votre lycée, de votre ville ou de votre région : environnement, santé, transports, accessibilité, vie scolaire… Il ne s'agit pas de le programmer, mais de le concevoir de façon réaliste et responsable, puis de le présenter en 4 minutes.</p>
+<p><strong>La fiche projet</strong></p>
+<ul><li>le nom du projet ;</li><li>le défi : quel problème, pour qui ?</li><li>ce que fait l'IA : classer, prédire, générer, recommander…</li><li>les données nécessaires, et leur origine ;</li><li>le type d'apprentissage (chapitre 3) ;</li><li>les risques (biais, vie privée, erreurs, abus) et les parades ;</li><li>l'empreinte environnementale et sa justification ;</li><li>qui décide au final ?</li><li>existe-t-il une solution sans IA ? Pourquoi la vôtre est-elle meilleure ?</li></ul>
+<p>Chaque groupe examine ensuite le projet d'un autre groupe avec la grille : un point fort et une amélioration possible pour chaque critère.</p>` },
+      { t: "quiz", titre: "QCM d'auto-évaluation",
+        questions: [
+          { q: "AlphaFold est un programme d'IA qui…", choix: ["joue au go.", "prédit la structure en 3 dimensions des protéines.", "génère des images.", "traduit des textes."], bon: 1, expl: "Un problème vieux de cinquante ans." },
+          { q: "Les créateurs d'AlphaFold ont reçu en 2024…", choix: ["le prix Nobel de chimie.", "le prix Nobel de littérature.", "la médaille Fields.", "un Oscar."], bon: 0, expl: "Partagé avec un chercheur en conception de protéines." },
+          { q: "Une technologie à double usage…", choix: ["est utilisée deux fois par jour.", "coûte deux fois plus cher.", "fonctionne sur deux ordinateurs.", "peut servir à des fins bénéfiques comme nuisibles."], bon: 3, expl: "Tout dépend de son usage." },
+          { q: "La fracture numérique désigne…", choix: ["une panne d'ordinateur.", "les inégalités d'accès aux outils et aux compétences numériques.", "un écran cassé.", "la séparation entre deux réseaux."], bon: 1, expl: "Pour l'IA, elle concerne aussi les langues." },
+          { q: "La souveraineté numérique, c'est…", choix: ["la capacité à maîtriser ses outils, ses données et ses choix technologiques.", "l'interdiction de tout logiciel étranger.", "un réseau social national.", "une monnaie numérique."], bon: 0, expl: "Sans dépendre entièrement d'autres acteurs." },
+          { q: "Le solutionnisme consiste à…", choix: ["résoudre des équations.", "refuser toute technologie.", "croire que la technologie peut résoudre seule des problèmes aussi sociaux ou politiques.", "vendre des solutions informatiques."], bon: 2, expl: "L'IA est-elle la meilleure réponse, et pour qui ?" },
+          { q: "Dans un dépistage du cancer avec l'IA, le diagnostic final est…", choix: ["toujours posé par l'IA seule.", "posé par le patient.", "tiré au sort.", "posé par les médecins."], bon: 3, expl: "L'IA aide à mieux répartir l'attention humaine." },
+          { q: "Avant de lancer un projet d'IA, la première question à se poser est…", choix: ["« Quel est le plus gros modèle disponible ? »", "« Quel problème réel résout-il, et existe-t-il une solution plus simple ? »", "« Combien de personnes pourra-t-on surveiller ? »", "« Quelle couleur pour le logo ? »"], bon: 1, expl: "C'est le critère d'utilité." },
+          { q: "L'IA, face aux grands défis mondiaux, est…", choix: ["un outil utile dont l'intérêt dépend des données, des choix humains et du cadre.", "une solution miracle à tous les problèmes.", "toujours nuisible.", "sans aucun effet."], bon: 0, expl: "Un outil, à juger sur l'ensemble des critères." },
+        ] },
+      { t: "lecon", synthese: true, titre: "Fiche synthèse",
+        texte: `<p><strong>Des usages utiles.</strong> Sciences (AlphaFold), santé (aide au dépistage), climat et environnement, accessibilité, éducation, catastrophes.</p>
+<p><strong>Double usage.</strong> Une même technologie peut servir à des fins bénéfiques ou nuisibles.</p>
+<p><strong>Fracture numérique.</strong> Inégalités d'accès aux outils et aux compétences, y compris entre les langues.</p>
+<p><strong>Souveraineté numérique.</strong> Maîtriser ses outils, ses données et ses choix technologiques.</p>
+<p><strong>Solutionnisme.</strong> Croire que la technologie résout seule des problèmes sociaux ou politiques.</p>
+<p><strong>La grille.</strong> Utilité, données, équité, vie privée, environnement, contrôle humain, risques d'abus.</p>
+<p><strong>Je sais…</strong></p><ul class="je-sais"><li>citer des usages de l'IA au service de la société</li><li>expliquer le double usage</li><li>définir fracture et souveraineté numériques</li><li>reconnaître le solutionnisme</li><li>juger un projet d'IA avec la grille</li></ul>` },
+    ] },
   ]
 }];
 
