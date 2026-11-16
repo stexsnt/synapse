@@ -26,7 +26,7 @@ choisir « Deploy from a branch », branche `main`, dossier `/ (root)`.
 ## Modifier le contenu
 
 Tout le contenu est dans `js/contenu.js` ; le format de chaque type d'étape est décrit en tête de
-fichier. Ajouter les nouvelles étapes à la fin d'un chapitre. Avant de publier :
+fichier. Une nouvelle étape s'ajoute à la fin, ou au milieu avec `numero: n` (règle décrite en tête de `js/contenu.js`). Avant de publier :
 
     cd tests && npm install pyodide && node verifier.js
 
@@ -45,3 +45,4 @@ Dans sa page Profil, l'élève génère un « code pour mon professeur ». La pa
 - `js/prof-plus.js` et `js/qrcode.min.js` (espace professeur) : QR code du lien de classe, à projeter, et impression du tableau de classe.
 - Sur téléphone, le profil propose « Envoyer mon code » par le menu de partage.
 - Python (Pyodide) est chargé en priorité depuis `https://stexsnt.github.io/pyodide/`, copie partagée par les quatre sites et rangée dans un cache commun : un élève ne le télécharge qu'une fois. Le dossier `pyodide/` du dépôt reste la copie de secours.
+- Chaque étape a un numéro stable (voir `numeros` dans `js/bilan.js`) : on peut insérer une étape au milieu d'un chapitre sans décaler la progression des élèves ni les codes déjà reçus par le professeur.

@@ -15,7 +15,10 @@
      predire : { t, titre?, code, attendu, expl }
      code    : { t, titre, enonce, depart, solution, d, tests, caches?, indices, requis?, interdit? }
 
-   Ajoutez les nouvelles étapes À LA FIN d'un chapitre : la progression est enregistrée par position.
+   Où ajouter une étape : à la fin d'un chapitre, sans rien de plus. Pour l'insérer AU MILIEU, lui donner
+   « numero: n », où n est le premier numéro libre (le nombre d'étapes du chapitre avant l'ajout,
+   si aucune n'a encore de numéro). Les autres étapes gardent ainsi leur numéro et la progression des
+   élèves n'est pas décalée. Ne jamais supprimer ni réutiliser un numéro ; tests/verifier.js le contrôle.
    ============================================================ */
 
 const INSECTES_PY = `from math import sqrt
