@@ -34,3 +34,11 @@ fichier. Ajouter les nouvelles étapes à la fin d'un chapitre. Avant de publier
 
 Dans sa page Profil, l'élève génère un « code pour mon professeur ». La page `prof.html`
 (lien « Espace professeur ») range les codes collés par classe (un onglet par classe, comparaison, progrès, export CSV).
+
+## Confort d'usage
+
+- `js/confort.js` (identique sur Mue, Synapse, Périple et Sésame) : message plus clair pendant le chargement de Python,
+  bouton « Réessayer » en cas d'échec, et rappel de sauvegarde quand huit étapes ont été validées depuis la dernière sauvegarde.
+- `manifest.webmanifest` et `icones/` : le site peut être installé sur l'écran d'accueil d'un téléphone ou d'une tablette.
+- Toutes les polices sont dans `polices/` : le site n'appelle aucun service externe.
+- Le pied de page renvoie vers le portail https://stexsnt.github.io/ et les trois autres sites.
