@@ -150,7 +150,7 @@ const AIDE = {
   KeyError: "Cette clé n'existe pas dans le dictionnaire.",
   AttributeError: "Cet objet ne possède pas cette méthode. Vérifie son nom et le type de la variable.",
   RecursionError: "La fonction s'appelle elle-même sans jamais s'arrêter. Il manque un cas de base, ou l'appel ne s'en rapproche pas.",
-  ModuleNotFoundError: "Ce module n'est pas disponible ici. Les modules math et random le sont.",
+  ModuleNotFoundError: "Ce module n'est pas disponible ici. Les modules math, random, matplotlib et numpy le sont (les deux derniers demandent une connexion la première fois).",
   ImportError: "Ce nom n'existe pas dans le module. Vérifie l'orthographe.",
   UnboundLocalError: "Dans une fonction, cette variable est utilisée avant d'avoir reçu une valeur.",
   Temps: "Le programme a été arrêté car il tournait depuis trop longtemps. C'est sans doute une boucle infinie : dans une boucle while, quelque chose doit finir par rendre la condition fausse.",
@@ -162,8 +162,9 @@ function blocErreur(er) {
   return `<div class="err"><strong>${er.ligne ? `Ligne ${er.ligne}, ` : ""}${h(NOM_ERR[er.type] || er.type)}</strong><p>${AIDE[er.type] || "Python a rencontré une erreur pendant l'exécution."}</p>${er.msg ? `<code>${h(er.msg)}</code>` : ""}</div>`;
 }
 function afficherRes(cons, res) {
-  const rien = !res.sortie && !res.erreur && res.besoin == null;
+  const images = res.images || [], rien = !res.sortie && !res.erreur && res.besoin == null && !images.length;
   cons.innerHTML = (res.sortie ? `<pre>${h(res.sortie)}</pre>` : "") +
+    images.map((b, k) => `<img class="figure" alt="Graphique ${images.length > 1 ? k + 1 + " " : ""}tracé par le programme" src="data:image/png;base64,${b}">`).join("") +
     (rien ? `<p class="muet">Le programme s'est terminé sans rien afficher. Utilise print(...) pour voir un résultat.</p>` : "") +
     (res.erreur ? blocErreur(res.erreur) : "");
 }
@@ -899,7 +900,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clLien = normClasse(new URLSearchParams(location.search).get("classe"));   // lien donné par le professeur
   if (clLien) { if (!S.classe) { S.classe = clLien; sauver(); setTimeout(() => toast(`Classe enregistrée dans ton profil : ${clLien}`), 600); } history.replaceState(null, "", location.pathname + location.hash); }
   $("#btn-theme").onclick = () => { S.theme = document.documentElement.dataset.theme === "sombre" ? "clair" : "sombre"; sauver(); appliquerTheme(); };
-  const afficherEtat = e => { const p = $("#etat-python"); p.dataset.etat = e; p.textContent = { repos: "Python se chargera au premier exercice de code", chargement: "Python se prépare…", pret: "Python est prêt", echec: "Python indisponible" }[e]; };
+  const afficherEtat = e => { const p = $("#etat-python"); p.dataset.etat = e; p.textContent = { repos: "Python se chargera au premier exercice de code", chargement: "Python se prépare…", paquets: "Chargement de matplotlib…", pret: "Python est prêt", echec: "Python indisponible" }[e]; };
   Moteur.surEtat(afficherEtat); afficherEtat(Moteur.etat());   // Python démarre à la demande : voir Moteur.preparer
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
   route();
